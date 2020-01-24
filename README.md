@@ -1,1 +1,1 @@
-# medium-power-stats
+# medium-next-gen-stats
