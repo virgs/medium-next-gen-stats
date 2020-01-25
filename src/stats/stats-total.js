@@ -4,7 +4,8 @@ const numberOfDays = 60;
 let firstDayOfRange = new Date(now.getTime() - (numberOfDays * oneDayInMilliseconds));
 let lastDayOfRange = now;
 const numOfDescribedLabels = 5;
-const publicationDateDotRadius = Math.max(4, Math.trunc(250 / numberOfDays));
+const publicationDateDotRadius = Math.min(Math.max(4, Math.trunc(250 / numberOfDays)), 15);
+const originalColor = {r: 82, g: 151, b: 186};
 
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -75,12 +76,22 @@ function getViewsOfPost(infoFilteredByRange, firstDayOfRange, post) {
         }, Array.from(Array(numberOfDays)).map(() => 0));
 }
 
+function getShadeOfColor(max, index) {
+    return {
+        r: (originalColor.r / (max)) * (index + 1),
+        g: (originalColor.g / (max)) * (index + 1),
+        b: (originalColor.b / (max)) * (index + 1)
+    };
+}
+
 function generateChartData(initialRange, infoFilteredByRange, firstDayOfRange) {
     const publicationDateDataset = {
         label: 'Line Dataset',
         data: Array.from(Array(numberOfDays)).map((_, index) => undefined),
         backgroundColor: `rgb(0, 0, 0)`,
-        type: 'bubble'
+        type: 'bubble',
+        order: -1,
+        borderWidth: 15
     };
     return Object.values(infoFilteredByRange
         .reduce((acc, info) => {
@@ -100,10 +111,10 @@ function generateChartData(initialRange, infoFilteredByRange, firstDayOfRange) {
         .map((post, index, vec) => {
             const indexOfDate = getIndexOfDate(post.publicationDate, firstDayOfRange);
             publicationDateDataset.data[indexOfDate] = {x: 0, y: 0, r: publicationDateDotRadius};
-            const backgroundColor = (256.0 / (vec.length + 1)) * (index + 1);
+            const backgroundColor = getShadeOfColor(vec.length, index);
             const dataOfPostId = getViewsOfPost(infoFilteredByRange, firstDayOfRange, post);
             post.data = post.data.map((datum, index) => datum + dataOfPostId[index]);
-            post.backgroundColor = `rgb(${backgroundColor}, ${backgroundColor}, ${backgroundColor}, 0.75)`;
+            post.backgroundColor = `rgb(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, 0.75)`;
             return post;
         })
         .filter((post => post.data
@@ -165,7 +176,7 @@ async function generateChart(info, firstDayOfRange, lastDayOfRange) {
                 callbacks: {
                     label: (tooltipItem, data) => {
                         const dataset = data.datasets[tooltipItem.datasetIndex];
-                        return `  "${dataset.label}":  ${tooltipItem.value}`
+                        return `  "${dataset.label}":    ${tooltipItem.value}`
                     },
                     title: tooltipItems => getStringifiedDate(range[tooltipItems[0].index]),
                     footer: (tooltipItems) => {
