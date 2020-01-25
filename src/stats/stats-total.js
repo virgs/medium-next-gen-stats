@@ -1,15 +1,80 @@
 const oneDayInMilliseconds = 24 * 3600 * 1000;
 const now = new Date();
-const numberOfDays = 60;
-let firstDayOfRange = new Date(now.getTime() - (numberOfDays * oneDayInMilliseconds));
+const daysOfRange = 90;
+let firstDayOfRange = new Date(now.getTime() - (daysOfRange * oneDayInMilliseconds));
 let lastDayOfRange = now;
 const numOfDescribedLabels = 5;
-const publicationDateDotRadius = Math.min(Math.max(4, Math.trunc(250 / numberOfDays)), 15);
 const originalColor = {r: 82, g: 151, b: 186};
 
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+
+const chartOptions = {
+    type: 'bar',
+    data: {},
+    options: {
+        title: {
+            fontColor: '#000',
+            display: true,
+            fontSize: 24,
+            padding: 12,
+            text: `Views from '${getStringifiedDate(firstDayOfRange)}' to '${getStringifiedDate(lastDayOfRange)}'`
+        },
+        legend: {
+            position: 'bottom',
+            align: 'start'
+        },
+        responsive: true,
+        tooltips: {
+            mode: 'index',
+            titleAlign: 'center',
+            titleFontSize: 18,
+            titleMarginBottom: 12,
+            bodySpacing: 10,
+            bodyFontSize: 14,
+            bodyAlign: 'left',
+            footerAlign: 'center',
+            footerFontSize: 16,
+            footerMarginTop: 12,
+            yPadding: 10,
+            xPadding: 10,
+            filter: (item) => item.value > 0,
+            callbacks: {
+                label: (tooltipItem, data) => {
+                    const dataset = data.datasets[tooltipItem.datasetIndex];
+                    return `  "${dataset.label}":    ${tooltipItem.value}`
+                },
+                footer: (tooltipItems) => {
+                    const total = tooltipItems.reduce((acc, tooltipItem) => parseInt(tooltipItem.value) + acc, 0);
+                    return `Total:\t ${total}`;
+                },
+            },
+            footerFontStyle: 'normal',
+            intersect: true
+        },
+        hover: {
+            mode: 'index',
+            intersect: true
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }],
+            xAxes: [
+                {
+                    stacked: true,
+                    gridLines: {
+                        display: false,
+                        offsetGridLines: false
+                    }
+                }]
+        }
+    }
+};
 
 async function waitForEveryTitleToLoad() {
     let length = -1;
@@ -42,7 +107,8 @@ function getPostsFromTableSummary() {
         );
 }
 
-function getRangeDays(beginDate, endDate) {
+
+function getRangeInDays(beginDate, endDate) {
     const differenceInDays = (endDate.getTime() - beginDate.getTime()) / oneDayInMilliseconds;
     let dayIterator = beginDate;
     return Array.from(Array(differenceInDays))
@@ -53,9 +119,45 @@ function getRangeDays(beginDate, endDate) {
         }, []);
 }
 
+function getStringifiedMonth(monthIterator) {
+    const monthName = monthIterator.toLocaleString('default', {month: 'long'});
+    const monthNameCapitalized = monthName.substr(0, 1).toUpperCase() + monthName.substr(1) + '/' + monthIterator.getFullYear();
+    return monthNameCapitalized;
+}
+
+function getRangeInMonths(beginDate, endDate) {
+    const differenceInMonths = endDate.getMonth() - beginDate.getMonth() + (12 * (endDate.getFullYear() - beginDate.getFullYear())) + 1;
+    let monthIterator = beginDate;
+    return Array.from(Array(differenceInMonths))
+        .reduce(acc => {
+            const monthNameCapitalized = getStringifiedMonth(monthIterator);
+            acc = acc.concat(monthNameCapitalized);
+            monthIterator = new Date(monthIterator.getFullYear(), monthIterator.getMonth() + 1);
+            return acc;
+        }, []);
+}
+
+function getRangeInWeeks(beginDate, endDate) {
+    const oneWeekInMilliseconds = oneDayInMilliseconds * 7;
+    const differenceInWeeks = Math.abs(Math.round((endDate.getTime() - beginDate.getTime()) / oneWeekInMilliseconds));
+    let weekIterator = beginDate;
+    return Array.from(Array(differenceInWeeks))
+        .reduce(acc => {
+            const nextWeek = new Date(weekIterator.getTime() + oneWeekInMilliseconds);
+            acc = acc.concat(`${getStringifiedDate(weekIterator)} to ${getStringifiedDate(new Date(nextWeek.getTime() - oneDayInMilliseconds))}`);
+            weekIterator = nextWeek;
+            return acc;
+        }, []);
+}
+
+Date.prototype.getWeek = function () {
+    const januaryFirst = new Date(this.getFullYear(), 0, 1);
+    return Math.ceil((((this - januaryFirst) / oneDayInMilliseconds) + januaryFirst.getDay() + 1) / 7);
+};
+
 function getStringifiedDate(date) {
     const day = (date.getDate() + '').padStart(2, '0');
-    let monthShort = date.toLocaleString('default', {month: 'long'}).substr(0, 3);
+    const monthShort = date.toLocaleString('default', {month: 'long'}).substr(0, 3);
     const month = monthShort.substr(0, 1).toUpperCase() + monthShort.substr(1);
     const year = date.getFullYear();
     return `${day} ${month} ${year}`;
@@ -65,7 +167,7 @@ function getIndexOfDate(dataDate, firstDayOfRange) {
     return Math.trunc((dataDate - firstDayOfRange) / oneDayInMilliseconds);
 }
 
-function getViewsOfPost(infoFilteredByRange, firstDayOfRange, post) {
+function getViewsOfPost(initialRange, infoFilteredByRange, firstDayOfRange, post) {
     return infoFilteredByRange
         .filter(data => data.id === post.id)
         .reduce((acc, data) => {
@@ -73,7 +175,7 @@ function getViewsOfPost(infoFilteredByRange, firstDayOfRange, post) {
             const index = getIndexOfDate(dataDate, firstDayOfRange);
             acc[index] += data.views;
             return acc;
-        }, Array.from(Array(numberOfDays)).map(() => 0));
+        }, initialRange.map(() => 0));
 }
 
 function getShadeOfColor(max, index) {
@@ -85,9 +187,11 @@ function getShadeOfColor(max, index) {
 }
 
 function generateChartData(initialRange, infoFilteredByRange, firstDayOfRange) {
+    console.log("Generating chart");
+    const publicationDateDotRadius = Math.min(Math.max(4, Math.trunc(250 / initialRange.length)), 10);
     const publicationDateDataset = {
-        label: 'Line Dataset',
-        data: Array.from(Array(numberOfDays)).map((_, index) => undefined),
+        label: 'Date of publication',
+        data: initialRange.map((_, index) => undefined),
         backgroundColor: `rgb(0, 0, 0)`,
         type: 'bubble',
         order: -1,
@@ -103,7 +207,7 @@ function generateChartData(initialRange, infoFilteredByRange, firstDayOfRange) {
                     stack: 'unique',
                     barPercentage: 0.95,
                     categoryPercentage: 1,
-                    data: Array.from(Array(numberOfDays)).map(() => 0)
+                    data: initialRange.map((_, index) => 0)
                 };
             }
             return acc;
@@ -112,7 +216,7 @@ function generateChartData(initialRange, infoFilteredByRange, firstDayOfRange) {
             const indexOfDate = getIndexOfDate(post.publicationDate, firstDayOfRange);
             publicationDateDataset.data[indexOfDate] = {x: 0, y: 0, r: publicationDateDotRadius};
             const backgroundColor = getShadeOfColor(vec.length, index);
-            const dataOfPostId = getViewsOfPost(infoFilteredByRange, firstDayOfRange, post);
+            const dataOfPostId = getViewsOfPost(initialRange, infoFilteredByRange, firstDayOfRange, post);
             post.data = post.data.map((datum, index) => datum + dataOfPostId[index]);
             post.backgroundColor = `rgb(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, 0.75)`;
             return post;
@@ -125,7 +229,9 @@ function generateChartData(initialRange, infoFilteredByRange, firstDayOfRange) {
 async function generateChart(info, firstDayOfRange, lastDayOfRange) {
     const infoFilteredByRange = info
         .filter(post => post.collectedAt >= firstDayOfRange && post.collectedAt <= lastDayOfRange);
-    const range = getRangeDays(firstDayOfRange, lastDayOfRange);
+    const range = getRangeInDays(firstDayOfRange, lastDayOfRange);
+    console.log(getRangeInMonths(firstDayOfRange, lastDayOfRange));
+    console.log(getRangeInWeeks(firstDayOfRange, lastDayOfRange));
     const initialRange = range
         .reduce(acc => acc.concat(0), []);
     const labelInterval = Math.trunc(range.length / numOfDescribedLabels);
@@ -138,77 +244,16 @@ async function generateChart(info, firstDayOfRange, lastDayOfRange) {
             return '';
         });
     const chartData = generateChartData(initialRange, infoFilteredByRange, firstDayOfRange);
-    console.log(chartData)
-    const ctx = document.getElementById('chart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: chartData
-        },
-        options: {
-            title: {
-                fontColor: '#000',
-                display: true,
-                fontSize: 24,
-                padding: 12,
-                text: `Views from '${getStringifiedDate(firstDayOfRange)}' to '${getStringifiedDate(lastDayOfRange)}'`
-            },
-            legend: {
-                position: 'bottom',
-                align: 'start'
-            },
-            responsive: true,
-            tooltips: {
-                mode: 'index',
-                titleAlign: 'center',
-                titleFontSize: 18,
-                titleMarginBottom: 12,
-                bodySpacing: 10,
-                bodyFontSize: 14,
-                bodyAlign: 'left',
-                footerAlign: 'center',
-                footerFontSize: 16,
-                footerMarginTop: 12,
-                yPadding: 10,
-                xPadding: 10,
-                filter: (item) => item.value > 0,
-                callbacks: {
-                    label: (tooltipItem, data) => {
-                        const dataset = data.datasets[tooltipItem.datasetIndex];
-                        return `  "${dataset.label}":    ${tooltipItem.value}`
-                    },
-                    title: tooltipItems => getStringifiedDate(range[tooltipItems[0].index]),
-                    footer: (tooltipItems) => {
-                        const total = tooltipItems.reduce((acc, tooltipItem) => parseInt(tooltipItem.value) + acc, 0);
-                        return `Total:\t ${total}`;
-                    },
-                },
-                footerFontStyle: 'normal',
-                intersect: true
-            },
-            hover: {
-                mode: 'index',
-                intersect: true
-            },
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }],
-                xAxes: [
-                    {
-                        stacked: true,
-                        gridLines: {
-                            display: false,
-                            offsetGridLines: false
-                        }
-                    }]
-            }
-        }
-    });
+    console.log(chartData);
+    chartOptions.data = {
+        datasets: chartData,
+        labels
+    };
+    chartOptions.options.tooltips.callbacks.title = tooltipItems => getStringifiedDate(range[tooltipItems[0].index]);
 
+    const ctx = document.getElementById('chart').getContext('2d');
+    console.log(chartOptions);
+    new Chart(ctx, chartOptions);
 }
 
 function removeDefaultAndOldFashionChart() {
@@ -261,4 +306,3 @@ waitForEveryTitleToLoad()
     .then(() => getPostsFromTableSummary())
     .then(postsSummary => getPostsData(postsSummary))
     .then(data => generateChart(data, firstDayOfRange, lastDayOfRange))
-
