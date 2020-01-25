@@ -4,6 +4,7 @@ const numberOfDays = 60;
 let firstDayOfRange = new Date(now.getTime() - (numberOfDays * oneDayInMilliseconds));
 let lastDayOfRange = now;
 const numOfDescribedLabels = 5;
+const publicationDateDotRadius = Math.max(4, Math.trunc(250 / numberOfDays));
 
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -28,7 +29,7 @@ function scrollToTheTop() {
     document.querySelector('body').scrollIntoView({block: 'start'});
 }
 
-function getPostsSummary() {
+function getPostsFromTableSummary() {
     return Array.from(document.querySelectorAll('.sortableTable-row.js-statsTableRow'))
         .map(row => {
                 return {
@@ -39,15 +40,6 @@ function getPostsSummary() {
             }
         );
 }
-
-function getPostsData(postsSummary) {
-    return Promise
-        .all(postsSummary.map((post) => loadPostStats(post)))
-        .then(postsData => postsData
-            .reduce((acc, item) => acc.concat(item), [])
-        );
-}
-
 
 function getRangeDays(beginDate, endDate) {
     const differenceInDays = (endDate.getTime() - beginDate.getTime()) / oneDayInMilliseconds;
@@ -68,26 +60,36 @@ function getStringifiedDate(date) {
     return `${day} ${month} ${year}`;
 }
 
+function getIndexOfDate(dataDate, firstDayOfRange) {
+    return Math.trunc((dataDate - firstDayOfRange) / oneDayInMilliseconds);
+}
+
 function getViewsOfPost(infoFilteredByRange, firstDayOfRange, post) {
-    const chartData = infoFilteredByRange
+    return infoFilteredByRange
         .filter(data => data.id === post.id)
         .reduce((acc, data) => {
             const dataDate = new Date(data.collectedAt);
-            const index = Math.trunc((dataDate - firstDayOfRange) / oneDayInMilliseconds);
+            const index = getIndexOfDate(dataDate, firstDayOfRange);
             acc[index] += data.views;
             return acc;
         }, Array.from(Array(numberOfDays)).map(() => 0));
-    return chartData;
 }
 
 function generateChartData(initialRange, infoFilteredByRange, firstDayOfRange) {
+    const publicationDateDataset = {
+        label: 'Line Dataset',
+        data: Array.from(Array(numberOfDays)).map((_, index) => undefined),
+        backgroundColor: `rgb(0, 0, 0)`,
+        type: 'bubble'
+    };
     return Object.values(infoFilteredByRange
         .reduce((acc, info) => {
             if (acc[info.id] === undefined) {
                 acc[info.id] = {
+                    publicationDate: info.publicationDate,
                     id: info.id,
                     label: info.title,
-                    stack: 'same',
+                    stack: 'unique',
                     barPercentage: 0.95,
                     categoryPercentage: 1,
                     data: Array.from(Array(numberOfDays)).map(() => 0)
@@ -96,14 +98,17 @@ function generateChartData(initialRange, infoFilteredByRange, firstDayOfRange) {
             return acc;
         }, {}))
         .map((post, index, vec) => {
+            const indexOfDate = getIndexOfDate(post.publicationDate, firstDayOfRange);
+            publicationDateDataset.data[indexOfDate] = {x: 0, y: 0, r: publicationDateDotRadius};
             const backgroundColor = (256.0 / (vec.length + 1)) * (index + 1);
             const dataOfPostId = getViewsOfPost(infoFilteredByRange, firstDayOfRange, post);
             post.data = post.data.map((datum, index) => datum + dataOfPostId[index]);
-            post.backgroundColor = `rgb(${backgroundColor}, ${backgroundColor}, ${backgroundColor}, 0.5)`;
+            post.backgroundColor = `rgb(${backgroundColor}, ${backgroundColor}, ${backgroundColor}, 0.75)`;
             return post;
         })
         .filter((post => post.data
-            .reduce((acc, current) => acc + current, 0) > 0));
+            .reduce((acc, current) => acc + current, 0) > 0))
+        .concat(publicationDateDataset);
 }
 
 async function generateChart(info, firstDayOfRange, lastDayOfRange) {
@@ -122,6 +127,7 @@ async function generateChart(info, firstDayOfRange, lastDayOfRange) {
             return '';
         });
     const chartData = generateChartData(initialRange, infoFilteredByRange, firstDayOfRange);
+    console.log(chartData)
     const ctx = document.getElementById('chart').getContext('2d');
     new Chart(ctx, {
         type: 'bar',
@@ -205,14 +211,25 @@ function removeDefaultAndOldFashionChart() {
     document.querySelector("nav").remove()
 }
 
+function getPostsData(postsSummary) {
+    return Promise
+        .all(postsSummary.map((post) => loadPostStats(post)))
+        .then(postsData => postsData
+            .reduce((acc, item) => acc.concat(item), [])
+        );
+}
+
 function loadPostStats(post) {
     return handleGetPostStats(post.id)
-        .then(postStats => postStats
-            .map(postStat => {
-                const result = {...postStat, ...post};
-                delete result.postId;
-                return result
-            }));
+        .then(postStats => {
+            const publicationDate = postStats.reduce((acc, postStat) => acc < postStat.collectedAt ? acc : postStat.collectedAt, new Date());
+            return postStats
+                .map(postStat => {
+                    const fullStats = {...postStat, ...post, publicationDate};
+                    delete fullStats.postId;
+                    return fullStats
+                });
+        });
 }
 
 function handleGetPostStats(postId) {
@@ -230,7 +247,7 @@ function request(url) {
 removeDefaultAndOldFashionChart();
 waitForEveryTitleToLoad()
     .then(() => scrollToTheTop())
-    .then(() => getPostsSummary())
+    .then(() => getPostsFromTableSummary())
     .then(postsSummary => getPostsData(postsSummary))
     .then(data => generateChart(data, firstDayOfRange, lastDayOfRange))
 
