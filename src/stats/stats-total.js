@@ -1,10 +1,9 @@
-log('start');
-
 const oneDayInMilliseconds = 24 * 3600 * 1000;
 const now = new Date();
-const numberOfDays = 30;
+const numberOfDays = 60;
 let firstDayOfRange = new Date(now.getTime() - (numberOfDays * oneDayInMilliseconds));
 let lastDayOfRange = now;
+const numOfDescribedLabels = 5;
 
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -24,8 +23,6 @@ async function waitForEveryTitleToLoad() {
         newLength = postsTitleDom.length;
     }
 }
-
-removeDefaultAndOldFashionChart();
 
 function scrollToTheTop() {
     document.querySelector('body').scrollIntoView({block: 'start'});
@@ -50,12 +47,6 @@ function getPostsData(postsSummary) {
             .reduce((acc, item) => acc.concat(item), [])
         );
 }
-
-waitForEveryTitleToLoad()
-    .then(() => scrollToTheTop())
-    .then(() => getPostsSummary())
-    .then(postsSummary => getPostsData(postsSummary))
-    .then(data => generateChart(data, firstDayOfRange, lastDayOfRange))
 
 
 function getRangeDays(beginDate, endDate) {
@@ -97,16 +88,18 @@ function generateChartData(initialRange, infoFilteredByRange, firstDayOfRange) {
                     id: info.id,
                     label: info.title,
                     stack: 'same',
+                    barPercentage: 0.95,
+                    categoryPercentage: 1,
                     data: Array.from(Array(numberOfDays)).map(() => 0)
                 };
             }
             return acc;
         }, {}))
         .map((post, index, vec) => {
-            const color = (256.0 / vec.length) * index;
+            const backgroundColor = (256.0 / (vec.length + 1)) * (index + 1);
             const dataOfPostId = getViewsOfPost(infoFilteredByRange, firstDayOfRange, post);
             post.data = post.data.map((datum, index) => datum + dataOfPostId[index]);
-            post.backgroundColor = `rgb(${color}, ${color}, ${color})`;
+            post.backgroundColor = `rgb(${backgroundColor}, ${backgroundColor}, ${backgroundColor}, 0.5)`;
             return post;
         })
         .filter((post => post.data
@@ -119,20 +112,16 @@ async function generateChart(info, firstDayOfRange, lastDayOfRange) {
     const range = getRangeDays(firstDayOfRange, lastDayOfRange);
     const initialRange = range
         .reduce(acc => acc.concat(0), []);
-    const chartData = generateChartData(initialRange, infoFilteredByRange, firstDayOfRange);
-
-    const numOfDescribedLabels = 5;
     const labelInterval = Math.trunc(range.length / numOfDescribedLabels);
-    const lastIndexRestDivision = labelInterval - 1;
     const labels = range
         .map((date, index) => {
             const restOfDivision = index % labelInterval;
-            if (restOfDivision === numOfDescribedLabels) {
+            if (restOfDivision === labelInterval - 2) {
                 return getStringifiedDate(date);
             }
             return '';
         });
-    // .map(getStringifiedDate);
+    const chartData = generateChartData(initialRange, infoFilteredByRange, firstDayOfRange);
     const ctx = document.getElementById('chart').getContext('2d');
     new Chart(ctx, {
         type: 'bar',
@@ -141,21 +130,45 @@ async function generateChart(info, firstDayOfRange, lastDayOfRange) {
             datasets: chartData
         },
         options: {
+            title: {
+                fontColor: '#000',
+                display: true,
+                fontSize: 24,
+                padding: 12,
+                text: `Views from '${getStringifiedDate(firstDayOfRange)}' to '${getStringifiedDate(lastDayOfRange)}'`
+            },
+            legend: {
+                position: 'bottom',
+                align: 'start'
+            },
             responsive: true,
             tooltips: {
                 mode: 'index',
+                titleAlign: 'center',
+                titleFontSize: 18,
+                titleMarginBottom: 12,
+                bodySpacing: 10,
+                bodyFontSize: 14,
+                bodyAlign: 'left',
+                footerAlign: 'center',
+                footerFontSize: 16,
+                footerMarginTop: 12,
+                yPadding: 10,
+                xPadding: 10,
+                filter: (item) => item.value > 0,
                 callbacks: {
-                    // Use the footer callback to display the sum of the items showing in the tooltip
-                    footer: function (tooltipItems, data) {
-                        let day;
-                        tooltipItems.forEach(function (tooltipItem) {
-                            day = getStringifiedDate(range[tooltipItem.index])
-                        });
-                        return day;
+                    label: (tooltipItem, data) => {
+                        const dataset = data.datasets[tooltipItem.datasetIndex];
+                        return `  "${dataset.label}":  ${tooltipItem.value}`
+                    },
+                    title: tooltipItems => getStringifiedDate(range[tooltipItems[0].index]),
+                    footer: (tooltipItems) => {
+                        const total = tooltipItems.reduce((acc, tooltipItem) => parseInt(tooltipItem.value) + acc, 0);
+                        return `Total:\t ${total}`;
                     },
                 },
                 footerFontStyle: 'normal',
-                intersect: false
+                intersect: true
             },
             hover: {
                 mode: 'index',
@@ -189,6 +202,7 @@ function removeDefaultAndOldFashionChart() {
     document.querySelector('.bargraph').remove();
     document.querySelector('.chartTabs').remove();
     document.querySelector('.chartPage').remove();
+    document.querySelector("nav").remove()
 }
 
 function loadPostStats(post) {
@@ -201,18 +215,8 @@ function loadPostStats(post) {
             }));
 }
 
-function getDayIdFromDate(date) {
-    return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-}
-
-function log(...args) {
-    console.log('Medium Next Gen Stats -', ...args);
-}
-
-
 function handleGetPostStats(postId) {
-    const API_URL = 'https://medium.com';
-    return request(`${API_URL}/stats/${postId}/0/${Date.now()}`)
+    return request(`https://medium.com/stats/${postId}/0/${Date.now()}`)
         .then(data => data && data.value || []);
 }
 
@@ -222,3 +226,11 @@ function request(url) {
         .then(res => res.text())
         .then(text => JSON.parse(text.slice(16)).payload)
 }
+
+removeDefaultAndOldFashionChart();
+waitForEveryTitleToLoad()
+    .then(() => scrollToTheTop())
+    .then(() => getPostsSummary())
+    .then(postsSummary => getPostsData(postsSummary))
+    .then(data => generateChart(data, firstDayOfRange, lastDayOfRange))
+
