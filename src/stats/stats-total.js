@@ -1,6 +1,6 @@
 const daysOfRange = 180;
-const waitIntervalToLoadPage = 1000;
-// const waitIntervalToLoadPage = 0;
+// const waitIntervalToLoadPage = 1000;
+const waitIntervalToLoadPage = 0;
 const originalColor = {r: 82, g: 151, b: 186};
 
 const oneDayInMilliseconds = 24 * 3600 * 1000;
@@ -24,6 +24,7 @@ const chartOptions = {
     data: {},
     options: {
         animation: {
+            duration: 500,
             onComplete: () => chartOptions.loaded = true
         },
         title: {
@@ -229,22 +230,24 @@ function generateChartData(range, infoFilteredByRange) {
     return Object.values(infoFilteredByRange
         .reduce((acc, info) => {
             if (acc[info.id] === undefined) {
-                acc[info.id] = {
+                const initialValueOfEveryBar = {
                     publicationDate: info.publicationDate,
                     id: info.id,
                     label: info.title,
                     stack: 'unique',
-                    barPercentage: 0.95,
+                    barPercentage: 0.975,
                     categoryPercentage: 1,
                     data: range.map((_, index) => 0)
                 };
+                acc[info.id] = initialValueOfEveryBar;
             }
             return acc;
         }, {}))
         .map((post, index, vec) => {
             const indexOfDate = range
                 .findIndex(item => post.publicationDate.getTime() >= item.begin.getTime() && post.publicationDate.getTime() < item.end.getTime());
-            if (indexOfDate >= 0) {
+            const publicationDay = indexOfDate >= 0;
+            if (publicationDay) {
                 publicationDateDataset.data[indexOfDate] = {x: 0, y: 0, r: publicationDateDotRadius};
             }
             const backgroundColor = getShadeOfColor(vec.length, index);
@@ -257,12 +260,32 @@ function generateChartData(range, infoFilteredByRange) {
         .concat(publicationDateDataset);
 }
 
+function updateChartTabs(chartData) {
+    const summary = chartData.reduce((acc, dataSet) => {
+        if (dataSet.type === 'bubble') {
+            acc.publicationDates += dataSet.data.reduce((sum, item) => sum + (item !== undefined ? 1 : 0), 0);
+        } else {
+            acc.views += dataSet.data.reduce((sum, item) => sum + item, 0);
+        }
+        return acc;
+    }, {
+        views: 0,
+        publicationDates: 0
+    });
+    const chartTabs = document.querySelectorAll('.chartTabs li');
+    const viewsTab = chartTabs[0];
+    viewsTab.querySelector('.js-totalViews').innerText = `${summary.views}`;
+    const publicationsTab = chartTabs[1];
+    publicationsTab.querySelector('.js-totalReads').innerText = `${summary.publicationDates}`;
+}
+
 async function generateChart(info, options) {
     const infoFilteredByRange = info
         .filter(post => post.collectedAt >= options.firstDayOfRange && post.collectedAt <= options.lastDayOfRange);
     const range = options.rangeMethod(options.firstDayOfRange, options.lastDayOfRange);
     const labels = range.map(interval => interval.label);
     const chartData = generateChartData(range, infoFilteredByRange);
+    updateChartTabs(chartData);
     chartOptions.data = {
         datasets: chartData,
         labels
@@ -305,22 +328,34 @@ async function rangeButtonClicked(listItems, clickedItemIndex) {
     }
 }
 
-function renewOldFashionPage() {
+async function renewOldFashionPage() {
     document.querySelectorAll('div .stats-title')[1].innerHTML =
         `<div>
             <canvas id="chart"></canvas>
-        </div>`;
+         </div>`;
     document.querySelector('.bargraph').remove();
-    document.querySelector('.chartTabs').remove();
     document.querySelector(".chartPage").remove();
+    const summaryInfo = document.querySelector('.chartTabs');
+    summaryInfo.classList.add('mngs-summary-info');
+    const chartTabs = document.querySelectorAll('.chartTabs li');
+    const viewsTab = chartTabs[0];
+    viewsTab.querySelector('span').textContent = '';
+    viewsTab.onclick = (e) => e.stopPropagation();
+    viewsTab.querySelector('div').style.cursor = 'initial';
+    const publicationsTab = chartTabs[1];
+    publicationsTab.querySelectorAll('div.chartTab div')[1].textContent = 'Publications';
+    publicationsTab.onclick = (e) => e.stopPropagation();
+    publicationsTab.classList.add('is-active');
+    publicationsTab.querySelector('div').style.cursor = 'initial';
+    chartTabs[2].remove();
 
     const chart = document.querySelector(".stats-title--chart");
-    const rangeNavBar = document.querySelector("nav")
-    rangeNavBar.classList.remove('heading--borderedBottom');
-    // rangeNavBar.css({'border-bottom': 'null'});
+    const rangeNavBar = document.querySelector("nav");
+    rangeNavBar.classList.add('mngs-range-selector');
     const parent = rangeNavBar.parentNode;
     parent.insertBefore(rangeNavBar, chart);
-    const listItems = Array.from(document.querySelectorAll('ul li'));
+    parent.insertBefore(summaryInfo, rangeNavBar);
+    const listItems = Array.from(rangeNavBar.querySelectorAll('ul li'));
     listItems
         .forEach((item, index) => {
             const anchor = item.querySelector('a');
@@ -365,9 +400,9 @@ function request(url) {
 }
 
 nextGenerationLog('Started');
-renewOldFashionPage();
 let postsData = undefined;
-waitForEveryTitleToLoad()
+renewOldFashionPage()
+    .then(() => waitForEveryTitleToLoad())
     .then(() => scrollToTheTop())
     .then(() => getPostsFromTableSummary())
     .then(postsSummary => getPostsData(postsSummary))

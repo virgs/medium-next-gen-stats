@@ -18,6 +18,7 @@
       ],
       "run_at": "document_idle",
       "css": [
+        "src/css/mngs.css"
       ],
       "js": [
         "src/libs/Chart.bundle.js",
