@@ -1,8 +1,8 @@
 const daysOfRange = 180;
 // const waitIntervalToLoadPage = 1000;
 const waitIntervalToLoadPage = 0;
-const originalColor = {r: 82, g: 151, b: 186};
-
+// const originalColor = {r: 82, g: 151, b: 186};
+const originalColor = {r: 82, g: 186, b: 151};
 const oneDayInMilliseconds = 24 * 3600 * 1000;
 const now = new Date();
 const lastDayOfRange = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -35,6 +35,7 @@ const chartOptions = {
             padding: 12,
         },
         legend: {
+            display: false,
             position: 'bottom',
             align: 'start'
         },
@@ -54,11 +55,12 @@ const chartOptions = {
             xPadding: 10,
             filter: (item) => item.value > 0,
             callbacks: {
-                label: (tooltipItem, data) => {
-                    const dataset = data.datasets[tooltipItem.datasetIndex];
-                    return `  "${dataset.label}":    ${tooltipItem.value}`
+                label: (tooltipItem, chart) => {
+                    // const publicationDay = chart.datasets.filter(dataset => dataset.type === 'bubble')[0].data[tooltipItem.index];
+                    const dataset = chart.datasets[tooltipItem.datasetIndex];
+                    return ` "${dataset.label}":    ${tooltipItem.value}`
                 },
-                footer: (tooltipItems) => {
+                footer: tooltipItems => {
                     const total = tooltipItems.reduce((acc, tooltipItem) => parseInt(tooltipItem.value) + acc, 0);
                     return `Total:\t ${total}`;
                 },
@@ -202,12 +204,11 @@ function getRangeInWeeks(beginDate, endDate) {
         }, []);
 }
 
-function getViewsOfPost(range, infoFilteredByRange, post) {
-    return infoFilteredByRange
+function getViewsOfPost(range, data, post) {
+    return data
         .filter(data => data.id === post.id)
         .reduce((acc, data) => {
-            const dataDate = new Date(data.collectedAt);
-            const index = range.findIndex(item => dataDate.getTime() <= item.begin.getTime() && dataDate.getTime() < item.end.getTime());
+            const index = range.findIndex(item => data.collectedAt <= item.begin.getTime() && data.collectedAt < item.end.getTime());
             acc[index] += data.views;
             return acc;
         }, range.map(() => 0));
@@ -221,7 +222,30 @@ function getShadeOfColor(max, index) {
     };
 }
 
-function generateChartData(range, infoFilteredByRange) {
+function initialValueOfEveryBar(info, range) {
+    return {
+        publicationDate: info.publicationDate,
+        id: info.id,
+        label: info.title,
+        stack: 'unique',
+        barPercentage: 0.975,
+        categoryPercentage: 1,
+        data: range.map((_, index) => 0)
+    };
+}
+
+function checkPublicationDot(indexOfDate, publicationDateDataset, post) {
+    const publicationDay = indexOfDate >= 0;
+    if (publicationDay) {
+        if (publicationDateDataset.data[indexOfDate]) {
+            publicationDateDataset.data[indexOfDate].r += publicationDateDotRadius;
+        } else {
+            publicationDateDataset.data[indexOfDate] = {x: 0, y: 0, r: publicationDateDotRadius, post};
+        }
+    }
+}
+
+function generateChartData(range, data) {
     nextGenerationLog("Generating chart");
     const publicationDateDataset = {
         label: 'Publication original date\n',
@@ -231,39 +255,19 @@ function generateChartData(range, infoFilteredByRange) {
         order: -1,
         borderWidth: 10
     };
-    return Object.values(infoFilteredByRange
+    return Object.values(data
         .reduce((acc, info) => {
             if (acc[info.id] === undefined) {
-                const initialValueOfEveryBar = {
-                    publicationDate: info.publicationDate,
-                    id: info.id,
-                    label: info.title,
-                    stack: 'unique',
-                    barPercentage: 0.975,
-                    categoryPercentage: 1,
-                    data: range.map((_, index) => 0)
-                };
-                acc[info.id] = initialValueOfEveryBar;
+                acc[info.id] = initialValueOfEveryBar(info, range);
             }
             return acc;
         }, {}))
         .map((post, index, vec) => {
             const indexOfDate = range
                 .findIndex(item => post.publicationDate.getTime() >= item.begin.getTime() && post.publicationDate.getTime() < item.end.getTime());
-            const publicationDay = indexOfDate >= 0;
-            if (publicationDay) {
-                if (publicationDateDataset.data[indexOfDate]) {
-                    publicationDateDataset.data[indexOfDate] = {
-                        x: 0,
-                        y: 0,
-                        r: publicationDateDataset.data[indexOfDate].r + publicationDateDotRadius
-                    };
-                } else {
-                    publicationDateDataset.data[indexOfDate] = {x: 0, y: 0, r: publicationDateDotRadius};
-                }
-            }
+            checkPublicationDot(indexOfDate, publicationDateDataset, post);
             const backgroundColor = getShadeOfColor(vec.length, index);
-            const dataOfPostId = getViewsOfPost(range, infoFilteredByRange, post);
+            const dataOfPostId = getViewsOfPost(range, data, post);
             post.data = post.data.map((datum, index) => datum + dataOfPostId[index]);
             post.backgroundColor = `rgb(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, 0.75)`;
             return post;
@@ -293,7 +297,7 @@ function updateChartSummaryTabs(chartData) {
 
 async function generateChart(info, options) {
     const infoFilteredByRange = info
-        .filter(post => post.collectedAt >= options.firstDayOfRange && post.collectedAt <= options.lastDayOfRange);
+        .filter(post => post.collectedAt >= options.firstDayOfRange.getTime() && post.collectedAt <= options.lastDayOfRange.getTime());
     const range = options.rangeMethod(options.firstDayOfRange, options.lastDayOfRange);
     const labels = range.map(interval => interval.label);
     const chartData = generateChartData(range, infoFilteredByRange);
