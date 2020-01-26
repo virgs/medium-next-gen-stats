@@ -1,6 +1,8 @@
 const daysOfRange = 180;
-// const waitIntervalToLoadPage = 1000;
-const waitIntervalToLoadPage = 0;
+
+const waitIntervalToLoadPage = 1000;
+// const waitIntervalToLoadPage = 0;
+
 // const originalColor = {r: 82, g: 151, b: 186};
 const originalColor = {r: 82, g: 186, b: 151};
 const oneDayInMilliseconds = 24 * 3600 * 1000;
@@ -18,6 +20,18 @@ async function sleep(ms) {
 function nextGenerationLog(...params) {
     const now = new Date();
     console.log(`${now.getSeconds()}:${now.getMilliseconds()} - ${params}`)
+}
+
+function prettifyNumbers(value) {
+    const oneMillion = 1000000;
+    const oneThousand = 1000;
+    if (value >= oneMillion) {
+        return (Math.trunc(value * 10 / oneMillion) / 10) + 'M';
+    }
+    if (value >= oneThousand) {
+        return (Math.trunc(value * 10 / oneThousand) / 10) + 'K';
+    }
+    return value;
 }
 
 const chartOptions = {
@@ -58,11 +72,11 @@ const chartOptions = {
                 label: (tooltipItem, chart) => {
                     // const publicationDay = chart.datasets.filter(dataset => dataset.type === 'bubble')[0].data[tooltipItem.index];
                     const dataset = chart.datasets[tooltipItem.datasetIndex];
-                    return ` "${dataset.label}":    ${tooltipItem.value}`
+                    return ` "${dataset.label}":    ${prettifyNumbers(tooltipItem.value)}`
                 },
                 footer: tooltipItems => {
                     const total = tooltipItems.reduce((acc, tooltipItem) => parseInt(tooltipItem.value) + acc, 0);
-                    return `Total:\t ${total}`;
+                    return `Total:\t ${prettifyNumbers(total)}`;
                 },
             },
             footerFontStyle: 'normal',
@@ -85,6 +99,8 @@ const chartOptions = {
             xAxes: [
                 {
                     ticks: {
+                        padding: 10,
+                        autoSkipPadding: 50,
                         autoSkip: true,
                         maxRotation: 0,
                         minRotation: 0,
@@ -228,7 +244,7 @@ function initialValueOfEveryBar(info, range) {
         id: info.id,
         label: info.title,
         stack: 'unique',
-        barPercentage: 0.975,
+        barPercentage: 0.95,
         categoryPercentage: 1,
         data: range.map((_, index) => 0)
     };
@@ -290,9 +306,9 @@ function updateChartSummaryTabs(chartData) {
     });
     const chartTabs = document.querySelectorAll('.chartTabs li');
     const viewsTab = chartTabs[0];
-    viewsTab.querySelector('.js-totalViews').innerText = `${summary.views}`;
+    viewsTab.querySelector('.js-totalViews').innerText = `${prettifyNumbers(summary.views)}`;
     const publicationsTab = chartTabs[1];
-    publicationsTab.querySelector('.js-totalReads').innerText = `${summary.publicationDates}`;
+    publicationsTab.querySelector('.js-totalReads').innerText = `${prettifyNumbers(summary.publicationDates)}`;
 }
 
 async function generateChart(info, options) {

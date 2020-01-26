@@ -14,7 +14,7 @@
   "content_scripts": [
     {
       "matches": [
-        "https://medium.com/*/stats*"
+        "https://medium.com/*/stats"
       ],
       "run_at": "document_idle",
       "css": [
