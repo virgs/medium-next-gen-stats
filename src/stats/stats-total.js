@@ -158,6 +158,14 @@ function getRangeInMonths(beginDate, endDate) {
         }, []);
 }
 
+function getStringifiedWeek(date) {
+    const day = (date.getDate() + '').padStart(2, '0');
+    const monthShort = date.toLocaleString('default', {month: 'long'}).substr(0, 3);
+    const month = monthShort.substr(0, 1).toUpperCase() + monthShort.substr(1);
+    return `${day}/${month}`;
+
+}
+
 function getRangeInWeeks(beginDate, endDate) {
     const oneWeekInMilliseconds = oneDayInMilliseconds * 7;
     const differenceInWeeks = Math.abs(Math.round((endDate.getTime() - beginDate.getTime()) / oneWeekInMilliseconds));
@@ -168,7 +176,7 @@ function getRangeInWeeks(beginDate, endDate) {
             const interval = {
                 begin: weekIterator,
                 end: nextWeek,
-                label: `${getStringifiedDate(weekIterator)} to ${getStringifiedDate(new Date(nextWeek.getTime() - oneDayInMilliseconds))}`
+                label: `${getStringifiedWeek(weekIterator)} to ${getStringifiedWeek(new Date(nextWeek.getTime() - oneDayInMilliseconds))}`
             };
             acc = acc.concat(interval);
             weekIterator = nextWeek;
@@ -238,9 +246,6 @@ function generateChartData(range, infoFilteredByRange) {
 }
 
 async function generateChart(info, options) {
-
-    // {firstDayOfRange, lastDayOfRange, rangeMethod: getRangeInDays, label: 'Daily'}
-
     const infoFilteredByRange = info
         .filter(post => post.collectedAt >= options.firstDayOfRange && post.collectedAt <= options.lastDayOfRange);
     const range = options.rangeMethod(options.firstDayOfRange, options.lastDayOfRange);
@@ -254,7 +259,6 @@ async function generateChart(info, options) {
             return '';
         });
     const chartData = generateChartData(range, infoFilteredByRange);
-    console.log(chartData);
     chartOptions.data = {
         datasets: chartData,
         labels
@@ -282,7 +286,6 @@ const ranges = [
 
 async function rangeButtonClicked(listItems, clickedItemIndex) {
     await postsData;
-    console.log(postsData);
     listItems
         .forEach((item, index) => index === clickedItemIndex ? item.classList.add('is-active') : item.classList.remove('is-active'));
     const selectedRange = ranges[clickedItemIndex];
@@ -301,6 +304,12 @@ function renewOldFashionPage() {
         </div>`;
     document.querySelector('.bargraph').remove();
     document.querySelector('.chartTabs').remove();
+    document.querySelector(".chartPage").remove();
+
+    const chart = document.querySelector(".stats-title--chart");
+    const rangeNavBar = document.querySelector("nav");
+    const parent = rangeNavBar.parentNode;
+    parent.insertBefore(rangeNavBar, chart);
     const listItems = Array.from(document.querySelectorAll('ul li'));
     listItems
         .forEach((item, index) => {
@@ -354,5 +363,5 @@ waitForEveryTitleToLoad()
     .then(data => {
         postsData = data;
         generateChart(data, {firstDayOfRange, lastDayOfRange, rangeMethod: getRangeInDays, label: 'Daily'})
-            .then(() => console.log('Chart generateg'));
+            .then(() => console.log('Chart generated'));
     });
