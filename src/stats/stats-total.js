@@ -7,6 +7,7 @@ const oneDayInMilliseconds = 24 * 3600 * 1000;
 const now = new Date();
 const lastDayOfRange = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 const firstDayOfRange = new Date(lastDayOfRange.getTime() - (daysOfRange * oneDayInMilliseconds));
+const publicationDateDotRadius = 5;
 
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -71,6 +72,10 @@ const chartOptions = {
         },
         scales: {
             yAxes: [{
+                gridLines: {
+                    drawBorder: false,
+                    borderDash: [2, 3],
+                },
                 ticks: {
                     beginAtZero: true
                 }
@@ -79,7 +84,7 @@ const chartOptions = {
                 {
                     ticks: {
                         autoSkip: true,
-                        maxRotation: 3,
+                        maxRotation: 0,
                         minRotation: 0,
                     },
                     stacked: true,
@@ -218,14 +223,13 @@ function getShadeOfColor(max, index) {
 
 function generateChartData(range, infoFilteredByRange) {
     nextGenerationLog("Generating chart");
-    const publicationDateDotRadius = Math.min(Math.max(4, Math.trunc(250 / range.length)), 7);
     const publicationDateDataset = {
         label: 'Publication original date\n',
         data: range.map((_, index) => undefined),
         backgroundColor: `rgb(0, 0, 0)`,
         type: 'bubble',
         order: -1,
-        borderWidth: 15
+        borderWidth: 10
     };
     return Object.values(infoFilteredByRange
         .reduce((acc, info) => {
@@ -248,7 +252,15 @@ function generateChartData(range, infoFilteredByRange) {
                 .findIndex(item => post.publicationDate.getTime() >= item.begin.getTime() && post.publicationDate.getTime() < item.end.getTime());
             const publicationDay = indexOfDate >= 0;
             if (publicationDay) {
-                publicationDateDataset.data[indexOfDate] = {x: 0, y: 0, r: publicationDateDotRadius};
+                if (publicationDateDataset.data[indexOfDate]) {
+                    publicationDateDataset.data[indexOfDate] = {
+                        x: 0,
+                        y: 0,
+                        r: publicationDateDataset.data[indexOfDate].r + publicationDateDotRadius
+                    };
+                } else {
+                    publicationDateDataset.data[indexOfDate] = {x: 0, y: 0, r: publicationDateDotRadius};
+                }
             }
             const backgroundColor = getShadeOfColor(vec.length, index);
             const dataOfPostId = getViewsOfPost(range, infoFilteredByRange, post);
@@ -260,10 +272,10 @@ function generateChartData(range, infoFilteredByRange) {
         .concat(publicationDateDataset);
 }
 
-function updateChartTabs(chartData) {
+function updateChartSummaryTabs(chartData) {
     const summary = chartData.reduce((acc, dataSet) => {
         if (dataSet.type === 'bubble') {
-            acc.publicationDates += dataSet.data.reduce((sum, item) => sum + (item !== undefined ? 1 : 0), 0);
+            acc.publicationDates += dataSet.data.reduce((sum, item) => sum + (item !== undefined ? item.r / publicationDateDotRadius : 0), 0);
         } else {
             acc.views += dataSet.data.reduce((sum, item) => sum + item, 0);
         }
@@ -285,7 +297,7 @@ async function generateChart(info, options) {
     const range = options.rangeMethod(options.firstDayOfRange, options.lastDayOfRange);
     const labels = range.map(interval => interval.label);
     const chartData = generateChartData(range, infoFilteredByRange);
-    updateChartTabs(chartData);
+    updateChartSummaryTabs(chartData);
     chartOptions.data = {
         datasets: chartData,
         labels
