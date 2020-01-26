@@ -1,5 +1,4 @@
-const daysOfRange = 360;
-const numOfDescribedLabels = 5;
+const daysOfRange = 180;
 const waitIntervalToLoadPage = 1000;
 // const waitIntervalToLoadPage = 0;
 const originalColor = {r: 82, g: 151, b: 186};
@@ -15,10 +14,18 @@ async function sleep(ms) {
 
 }
 
+function nextGenerationLog(...params) {
+    const now = new Date();
+    console.log(`${now.getSeconds()}:${now.getMilliseconds()} - ${params}`)
+}
+
 const chartOptions = {
     type: 'bar',
     data: {},
     options: {
+        animation: {
+            onComplete: () => chartOptions.loaded = true
+        },
         title: {
             fontColor: '#000',
             display: true,
@@ -69,6 +76,11 @@ const chartOptions = {
             }],
             xAxes: [
                 {
+                    ticks: {
+                        autoSkip: true,
+                        maxRotation: 3,
+                        minRotation: 0,
+                    },
                     stacked: true,
                     gridLines: {
                         display: false,
@@ -92,7 +104,7 @@ async function waitForEveryTitleToLoad() {
         postsTitleDom = document.querySelectorAll('.sortableTable-rowTitle');
         newLength = postsTitleDom.length;
     }
-    console.log("Every title is described in this page")
+    nextGenerationLog("Every title is described in this page")
 }
 
 function scrollToTheTop() {
@@ -204,8 +216,8 @@ function getShadeOfColor(max, index) {
 }
 
 function generateChartData(range, infoFilteredByRange) {
-    console.log("Generating chart");
-    const publicationDateDotRadius = Math.min(Math.max(4, Math.trunc(250 / range.length)), 10);
+    nextGenerationLog("Generating chart");
+    const publicationDateDotRadius = Math.min(Math.max(4, Math.trunc(250 / range.length)), 7);
     const publicationDateDataset = {
         label: 'Publication original date\n',
         data: range.map((_, index) => undefined),
@@ -249,15 +261,7 @@ async function generateChart(info, options) {
     const infoFilteredByRange = info
         .filter(post => post.collectedAt >= options.firstDayOfRange && post.collectedAt <= options.lastDayOfRange);
     const range = options.rangeMethod(options.firstDayOfRange, options.lastDayOfRange);
-    const labelInterval = Math.trunc(range.length / numOfDescribedLabels);
-    const labels = range
-        .map((interval, index) => {
-            const restOfDivision = index % labelInterval;
-            if (restOfDivision === labelInterval - 2) {
-                return interval.label;
-            }
-            return '';
-        });
+    const labels = range.map(interval => interval.label);
     const chartData = generateChartData(range, infoFilteredByRange);
     chartOptions.data = {
         datasets: chartData,
@@ -285,16 +289,20 @@ const ranges = [
 ];
 
 async function rangeButtonClicked(listItems, clickedItemIndex) {
-    await postsData;
-    listItems
-        .forEach((item, index) => index === clickedItemIndex ? item.classList.add('is-active') : item.classList.remove('is-active'));
-    const selectedRange = ranges[clickedItemIndex];
-    await generateChart(postsData, {
-        firstDayOfRange,
-        lastDayOfRange,
-        rangeMethod: selectedRange.rangeMethod,
-        label: selectedRange.label
-    });
+    if (chartOptions.loaded) {
+        chartOptions.loaded = false;
+        const selectedRange = ranges[clickedItemIndex];
+        nextGenerationLog(`Generating ${selectedRange.label} chart`);
+        await postsData;
+        listItems
+            .forEach((item, index) => index === clickedItemIndex ? item.classList.add('is-active') : item.classList.remove('is-active'));
+        await generateChart(postsData, {
+            firstDayOfRange,
+            lastDayOfRange,
+            rangeMethod: selectedRange.rangeMethod,
+            label: selectedRange.label
+        });
+    }
 }
 
 function renewOldFashionPage() {
@@ -307,7 +315,9 @@ function renewOldFashionPage() {
     document.querySelector(".chartPage").remove();
 
     const chart = document.querySelector(".stats-title--chart");
-    const rangeNavBar = document.querySelector("nav");
+    const rangeNavBar = document.querySelector("nav")
+    rangeNavBar.classList.remove('heading--borderedBottom');
+    // rangeNavBar.css({'border-bottom': 'null'});
     const parent = rangeNavBar.parentNode;
     parent.insertBefore(rangeNavBar, chart);
     const listItems = Array.from(document.querySelectorAll('ul li'));
@@ -321,7 +331,7 @@ function renewOldFashionPage() {
 }
 
 function getPostsData(postsSummary) {
-    console.log(`Loading posts data`);
+    nextGenerationLog(`Loading posts data`);
     return Promise
         .all(postsSummary.map((post) => loadPostStats(post)))
         .then(postsData => postsData
@@ -354,6 +364,7 @@ function request(url) {
         .then(text => JSON.parse(text.slice(16)).payload)
 }
 
+nextGenerationLog('Started');
 renewOldFashionPage();
 let postsData = undefined;
 waitForEveryTitleToLoad()
@@ -363,5 +374,5 @@ waitForEveryTitleToLoad()
     .then(data => {
         postsData = data;
         generateChart(data, {firstDayOfRange, lastDayOfRange, rangeMethod: getRangeInDays, label: 'Daily'})
-            .then(() => console.log('Chart generated'));
+            .then(() => nextGenerationLog('Chart generated'));
     });
