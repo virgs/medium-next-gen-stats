@@ -1,4 +1,4 @@
-const daysOfRange = 180;
+const daysOfRange = 27;
 
 const waitIntervalToLoadPage = 500;
 // const waitIntervalToLoadPage = 0;
@@ -7,7 +7,7 @@ const waitIntervalToLoadPage = 500;
 const originalColor = {r: 82, g: 186, b: 151};
 const oneDayInMilliseconds = 24 * 3600 * 1000;
 const now = new Date();
-const lastDayOfRange = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+const lastDayOfRange = new Date(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() + oneDayInMilliseconds);
 const firstDayOfRange = new Date(lastDayOfRange.getTime() - (daysOfRange * oneDayInMilliseconds));
 const publicationDateDotRadius = 5;
 
@@ -39,7 +39,7 @@ const chartOptions = {
     data: {},
     options: {
         animation: {
-            duration: 500,
+            duration: 750,
             onComplete: () => chartOptions.loaded = true
         },
         title: {
@@ -206,7 +206,7 @@ function getStringifiedWeek(date) {
 
 function getRangeInWeeks(beginDate, endDate) {
     const oneWeekInMilliseconds = oneDayInMilliseconds * 7;
-    const differenceInWeeks = Math.abs(Math.round((endDate.getTime() - beginDate.getTime()) / oneWeekInMilliseconds));
+    const differenceInWeeks = Math.abs(Math.round((endDate.getTime() - beginDate.getTime()) / oneWeekInMilliseconds)) + 1;
     let weekIterator = beginDate;
     return Array.from(Array(differenceInWeeks))
         .reduce(acc => {
@@ -226,7 +226,7 @@ function getViewsOfPost(range, data, post) {
     return data
         .filter(data => data.id === post.id)
         .reduce((acc, data) => {
-            const index = range.findIndex(item => data.collectedAt <= item.begin.getTime() && data.collectedAt < item.end.getTime());
+            const index = range.findIndex(item =>  item.begin.getTime() <= data.collectedAt && data.collectedAt < item.end.getTime());
             acc[index] += data.views;
             return acc;
         }, range.map(() => 0));
@@ -315,7 +315,7 @@ function updateChartSummaryTabs(chartData) {
 
 async function generateChart(info, options) {
     const infoFilteredByRange = info
-        .filter(post => post.collectedAt >= options.firstDayOfRange.getTime() && post.collectedAt <= options.lastDayOfRange.getTime());
+        .filter(post => post.collectedAt >= options.firstDayOfRange.getTime() && post.collectedAt < options.lastDayOfRange.getTime());
     const range = options.rangeMethod(options.firstDayOfRange, options.lastDayOfRange);
     const labels = range.map(interval => interval.label);
     const chartData = generateChartData(range, infoFilteredByRange);
