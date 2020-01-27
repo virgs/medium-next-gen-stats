@@ -1,6 +1,6 @@
 const daysOfRange = 180;
 
-const waitIntervalToLoadPage = 1000;
+const waitIntervalToLoadPage = 500;
 // const waitIntervalToLoadPage = 0;
 
 // const originalColor = {r: 82, g: 151, b: 186};
@@ -19,7 +19,7 @@ async function sleep(ms) {
 
 function nextGenerationLog(...params) {
     const now = new Date();
-    console.log(`${now.getSeconds()}:${now.getMilliseconds()} - ${params}`)
+    console.log(`[Medium Next Gen Stats - ${now.getSeconds()}:${now.getMilliseconds()}] ${params}`)
 }
 
 function prettifyNumbers(value) {
@@ -55,6 +55,7 @@ const chartOptions = {
         },
         responsive: true,
         tooltips: {
+            position: 'nearest',
             mode: 'index',
             titleAlign: 'center',
             titleFontSize: 16,
@@ -67,19 +68,20 @@ const chartOptions = {
             footerMarginTop: 12,
             yPadding: 10,
             xPadding: 10,
-            filter: (item) => item.value > 0,
+            itemSort: (first, second) => second.value - first.value,
+            filter: item => item.value > 0,
             callbacks: {
                 label: (tooltipItem, chart) => {
                     // const publicationDay = chart.datasets.filter(dataset => dataset.type === 'bubble')[0].data[tooltipItem.index];
                     const dataset = chart.datasets[tooltipItem.datasetIndex];
                     return ` "${dataset.label}":    ${prettifyNumbers(tooltipItem.value)}`
                 },
-                footer: tooltipItems => {
+                footer: (tooltipItems) => {
                     const total = tooltipItems.reduce((acc, tooltipItem) => parseInt(tooltipItem.value) + acc, 0);
-                    return `Total:\t ${prettifyNumbers(total)}`;
+                    return `Total:\t ${prettifyNumbers(total)} views of ${tooltipItems.length} articles`;
                 },
             },
-            footerFontStyle: 'normal',
+            footerFontStyle: 'bold',
             intersect: true
         },
         hover: {

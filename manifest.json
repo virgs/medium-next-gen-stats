@@ -22,7 +22,7 @@
       ],
       "js": [
         "src/libs/Chart.bundle.js",
-        "src/stats/stats-total.js"
+        "src/stats/next-gen-stats.js"
       ]
     }
   ],
@@ -30,6 +30,6 @@
     "128": "src/images/icon-128.png"
   },
   "browser_action": {
-    "default_title": "Medium Next Generation Stats"
+    "default_title": "Medium Next Gen Stats"
   }
 }
