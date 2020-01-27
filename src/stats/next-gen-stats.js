@@ -1,14 +1,32 @@
-const daysOfRange = 27;
+const daysOfRange = 90;
 
-const waitIntervalToLoadPage = 500;
+const oneDayInMilliseconds = 24 * 3600 * 1000;
+const waitIntervalToLoadPage = 1000;
 // const waitIntervalToLoadPage = 0;
+
+let now = new Date();
+const tomorrow = new Date(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() + oneDayInMilliseconds);
+let lastDayOfRange = tomorrow;
+let firstDayOfRange = new Date(lastDayOfRange.getTime() - (daysOfRange * oneDayInMilliseconds));
+
+let currentRangeIndex = 0;
+const ranges = [
+    {
+        rangeMethod: getRangeInDays,
+        label: 'Daily'
+    },
+    {
+        rangeMethod: getRangeInWeeks,
+        label: 'Weekly'
+    },
+    {
+        rangeMethod: getRangeInMonths,
+        label: 'Monthly'
+    },
+];
 
 // const originalColor = {r: 82, g: 151, b: 186};
 const originalColor = {r: 82, g: 186, b: 151};
-const oneDayInMilliseconds = 24 * 3600 * 1000;
-const now = new Date();
-const lastDayOfRange = new Date(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() + oneDayInMilliseconds);
-const firstDayOfRange = new Date(lastDayOfRange.getTime() - (daysOfRange * oneDayInMilliseconds));
 const publicationDateDotRadius = 5;
 
 async function sleep(ms) {
@@ -58,14 +76,14 @@ const chartOptions = {
             position: 'nearest',
             mode: 'index',
             titleAlign: 'center',
-            titleFontSize: 16,
-            titleMarginBottom: 12,
-            bodySpacing: 10,
-            bodyFontSize: 14,
+            titleFontSize: 15,
+            titleMarginBottom: 10,
+            bodySpacing: 8,
+            bodyFontSize: 12,
             bodyAlign: 'left',
             footerAlign: 'center',
-            footerFontSize: 15,
-            footerMarginTop: 12,
+            footerFontSize: 14,
+            footerMarginTop: 10,
             yPadding: 10,
             xPadding: 10,
             itemSort: (first, second) => second.value - first.value,
@@ -138,7 +156,7 @@ function scrollToTheTop() {
 }
 
 function getPostsFromTableSummary() {
-    return Array.from(document.querySelectorAll('.sortableTable-row.js-statsTableRow'))
+    const map = Array.from(document.querySelectorAll('.sortableTable-row.js-statsTableRow'))
         .map(row => {
                 return {
                     title: row.querySelector('.sortableTable-title').textContent,
@@ -147,6 +165,8 @@ function getPostsFromTableSummary() {
                 }
             }
         );
+    nextGenerationLog(`Loading data of ${map.length} posts`);
+    return map;
 }
 
 function getStringifiedDate(date) {
@@ -226,7 +246,7 @@ function getViewsOfPost(range, data, post) {
     return data
         .filter(data => data.id === post.id)
         .reduce((acc, data) => {
-            const index = range.findIndex(item =>  item.begin.getTime() <= data.collectedAt && data.collectedAt < item.end.getTime());
+            const index = range.findIndex(item => item.begin.getTime() <= data.collectedAt && data.collectedAt < item.end.getTime());
             acc[index] += data.views;
             return acc;
         }, range.map(() => 0));
@@ -330,24 +350,10 @@ async function generateChart(info, options) {
     new Chart(ctx, chartOptions);
 }
 
-const ranges = [
-    {
-        rangeMethod: getRangeInDays,
-        label: 'Daily'
-    },
-    {
-        rangeMethod: getRangeInWeeks,
-        label: 'Weekly'
-    },
-    {
-        rangeMethod: getRangeInMonths,
-        label: 'Monthly'
-    },
-];
-
 async function rangeButtonClicked(listItems, clickedItemIndex) {
     if (chartOptions.loaded) {
         chartOptions.loaded = false;
+        currentRangeIndex = clickedItemIndex;
         const selectedRange = ranges[clickedItemIndex];
         nextGenerationLog(`Generating ${selectedRange.label} chart`);
         await postsData;
@@ -362,33 +368,9 @@ async function rangeButtonClicked(listItems, clickedItemIndex) {
     }
 }
 
-async function renewOldFashionPage() {
-    document.querySelectorAll('div .stats-title')[1].innerHTML =
-        `<div>
-            <canvas id="chart"></canvas>
-         </div>`;
-    document.querySelector('.bargraph').remove();
-    document.querySelector(".chartPage").remove();
-    const summaryInfo = document.querySelector('.chartTabs');
-    summaryInfo.classList.add('mngs-summary-info');
-    const chartTabs = document.querySelectorAll('.chartTabs li');
-    const viewsTab = chartTabs[0];
-    viewsTab.querySelector('span').textContent = '';
-    viewsTab.onclick = (e) => e.stopPropagation();
-    viewsTab.querySelector('div').style.cursor = 'initial';
-    const publicationsTab = chartTabs[1];
-    publicationsTab.querySelectorAll('div.chartTab div')[1].textContent = 'Publications';
-    publicationsTab.onclick = (e) => e.stopPropagation();
-    publicationsTab.classList.add('is-active');
-    publicationsTab.querySelector('div').style.cursor = 'initial';
-    chartTabs[2].remove();
-
-    const chart = document.querySelector(".stats-title--chart");
+function renewRangeNavbar() {
     const rangeNavBar = document.querySelector("nav");
     rangeNavBar.classList.add('mngs-range-selector');
-    const parent = rangeNavBar.parentNode;
-    parent.insertBefore(rangeNavBar, chart);
-    parent.insertBefore(summaryInfo, rangeNavBar);
     const listItems = Array.from(rangeNavBar.querySelectorAll('ul li'));
     listItems
         .forEach((item, index) => {
@@ -397,6 +379,84 @@ async function renewOldFashionPage() {
             anchor.setAttribute('href', '#');
             anchor.onclick = () => rangeButtonClicked(listItems, index);
         })
+    return rangeNavBar;
+}
+
+function renewSummaryInfo() {
+    const summaryInfo = document.querySelector('.chartTabs');
+    summaryInfo.classList.add('mngs-summary-info');
+    const chartTabs = document.querySelectorAll('.chartTabs li');
+    const viewsTab = chartTabs[0];
+    viewsTab.querySelector('span').textContent = '';
+    viewsTab.onclick = (e) => e.stopPropagation();
+    viewsTab.querySelector('div').style.cursor = 'initial';
+    viewsTab.querySelector('.js-totalViews').innerText = `-`;
+
+    const publicationsTab = chartTabs[1];
+    publicationsTab.querySelector('.js-totalReads').innerText = `-`;
+    publicationsTab.querySelectorAll('div.chartTab div')[1].textContent = 'Publications';
+    publicationsTab.onclick = (e) => e.stopPropagation();
+    publicationsTab.classList.add('is-active');
+    publicationsTab.querySelector('div').style.cursor = 'initial';
+    chartTabs[2].remove();
+    return summaryInfo;
+}
+
+function renewChartPaginator() {
+    const chartPaginator = document.querySelector(".chartPage");
+    const chartPageLabels = chartPaginator.querySelectorAll('.button-label');
+    chartPageLabels[0].textContent = `Prev ${daysOfRange} days`;
+    chartPageLabels[1].textContent = `Next ${daysOfRange} days`;
+    const chartPageButtons = chartPaginator.querySelectorAll('button');
+    const chartPagePrevButton = chartPageButtons[0];
+    const chartPageNextRangeButton = chartPageButtons[1];
+    chartPagePrevButton.onclick = async () => {
+        if (chartOptions.loaded) {
+            chartOptions.loaded = false;
+
+            lastDayOfRange = firstDayOfRange;
+            firstDayOfRange = new Date(lastDayOfRange.getTime() - (daysOfRange * oneDayInMilliseconds));
+            chartPageNextRangeButton.disabled = false;
+            await generateChart(postsData, {
+                firstDayOfRange,
+                lastDayOfRange,
+                rangeMethod: ranges[currentRangeIndex].rangeMethod,
+                label: ranges[currentRangeIndex].label
+            });
+        }
+    };
+    chartPageNextRangeButton.onclick = async () => {
+        if (chartOptions.loaded) {
+            chartOptions.loaded = false;
+            firstDayOfRange = lastDayOfRange;
+            lastDayOfRange = new Date(lastDayOfRange.getTime() + (daysOfRange * oneDayInMilliseconds));
+            if (new Date(lastDayOfRange.getTime() + oneDayInMilliseconds).getTime() >= new Date().getTime()) {
+                chartPageNextRangeButton.disabled = true;
+            }
+            await generateChart(postsData, {
+                firstDayOfRange,
+                lastDayOfRange,
+                rangeMethod: ranges[currentRangeIndex].rangeMethod,
+                label: ranges[currentRangeIndex].label
+            })
+        }
+    };
+    chartPageNextRangeButton.disabled = true;
+}
+
+async function renewOldFashionPage() {
+    document.querySelectorAll('div .stats-title')[1].innerHTML =
+        `<div>
+            <canvas id="chart"></canvas>
+         </div>`;
+    document.querySelector('.bargraph').remove();
+    renewChartPaginator();
+    const summaryInfo = renewSummaryInfo();
+    const chart = document.querySelector(".stats-title--chart");
+    const rangeNavBar = renewRangeNavbar();
+    const parent = rangeNavBar.parentNode;
+    parent.insertBefore(rangeNavBar, chart);
+    parent.insertBefore(summaryInfo, rangeNavBar);
 }
 
 function getPostsData(postsSummary) {
@@ -433,6 +493,7 @@ function request(url) {
         .then(text => JSON.parse(text.slice(16)).payload)
 }
 
+
 nextGenerationLog('Started');
 let postsData = undefined;
 renewOldFashionPage()
@@ -442,6 +503,11 @@ renewOldFashionPage()
     .then(postsSummary => getPostsData(postsSummary))
     .then(data => {
         postsData = data;
-        generateChart(data, {firstDayOfRange, lastDayOfRange, rangeMethod: getRangeInDays, label: 'Daily'})
-            .then(() => nextGenerationLog('Chart generated'));
-    });
+        return generateChart(data, {
+            firstDayOfRange,
+            lastDayOfRange,
+            rangeMethod: ranges[currentRangeIndex].rangeMethod,
+            label: ranges[currentRangeIndex].label
+        })
+    })
+    .then(() => nextGenerationLog('Chart generated'));
