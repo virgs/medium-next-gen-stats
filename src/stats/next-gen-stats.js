@@ -37,7 +37,9 @@ async function sleep(ms) {
 
 function nextGenerationLog(...params) {
     const now = new Date();
-    console.log(`[Medium Next Gen Stats - ${now.getSeconds()}:${now.getMilliseconds()}] ${params}`)
+    const paddedSeconds = now.getSeconds().toString().padStart(2, '0');
+    const paddedMilliseconds = now.getMilliseconds().toString().padStart(2, '0');
+    console.log(`[Medium Next Gen Stats - ${paddedSeconds}:${paddedMilliseconds}] ${params}`)
 }
 
 function prettifyNumbers(value) {
@@ -135,28 +137,47 @@ const chartOptions = {
     }
 };
 
+const chromeStorageGet = key => {
+    return new Promise(resolve => chrome.storage.sync.get(key, resolve));
+};
+
+const chromeStorageSet = (key, data) => {
+    return new Promise(resolve => chrome.storage.sync.set({[key]: data}, resolve));
+};
+
 async function waitForEveryTitleToLoad() {
     let length = -1;
     let newLength = 0;
-    while (length !== newLength) {
-        length = newLength;
-        let postsTitleDom = document.querySelectorAll('.sortableTable-rowTitle');
-        newLength = postsTitleDom.length;
-        postsTitleDom[newLength - 1].scrollIntoView({block: 'start'});
 
-        await sleep(waitIntervalToLoadPage);
-        postsTitleDom = document.querySelectorAll('.sortableTable-rowTitle');
-        newLength = postsTitleDom.length;
+    const storeKey = 'loadedEveryPublicationKey';
+    const stored = (await chromeStorageGet(storeKey))[storeKey];
+    if (!stored) {
+        nextGenerationLog(`Loading and scrolling the page (almost) forever. It's just once, you crying baby!`);
+        while (length !== newLength) {
+            length = newLength;
+            let postsTitleDom = document.querySelectorAll('.sortableTable-rowTitle');
+            newLength = postsTitleDom.length;
+            postsTitleDom[newLength - 1].scrollIntoView({block: 'start'});
+
+            await sleep(waitIntervalToLoadPage);
+            postsTitleDom = document.querySelectorAll('.sortableTable-rowTitle');
+            newLength = postsTitleDom.length;
+        }
+        await chromeStorageSet(storeKey, true);
+    } else {
+        nextGenerationLog(`Skipping page load`);
     }
-    nextGenerationLog("Every title is described in this page")
+
+    nextGenerationLog("Every title is described in this page");
 }
 
 function scrollToTheTop() {
     document.querySelector('body').scrollIntoView({block: 'start'});
 }
 
-function getPostsFromTableSummary() {
-    const map = Array.from(document.querySelectorAll('.sortableTable-row.js-statsTableRow'))
+async function getPostsFromTableSummary() {
+    const storeKey = 'everyPublicationId';
+    const postsShownInPageTable = Array.from(document.querySelectorAll('.sortableTable-row.js-statsTableRow'))
         .map(row => {
                 return {
                     title: row.querySelector('.sortableTable-title').textContent,
@@ -165,9 +186,21 @@ function getPostsFromTableSummary() {
                 }
             }
         );
-    nextGenerationLog(`Loading data of ${map.length} posts`);
-    return map;
+
+    let stored = (await chromeStorageGet(storeKey))[storeKey] || [];
+
+    const shownButNotStored = postsShownInPageTable
+        .filter(shownItem => stored.findIndex(storedItem => shownItem.id === storedItem.id) < 0);
+
+    if (shownButNotStored.length > 0) {
+        nextGenerationLog(`New post detected ${shownButNotStored.map(post => post.title)}`);
+        stored = stored.concat(shownButNotStored);
+        await chromeStorageSet(storeKey, stored);
+    }
+    return stored
 }
+
+setInterval(() => getPostsFromTableSummary(), 2000);
 
 function getStringifiedDate(date) {
     const day = (date.getDate() + '').padStart(2, '0');
@@ -460,7 +493,7 @@ async function renewOldFashionPage() {
 }
 
 function getPostsData(postsSummary) {
-    nextGenerationLog(`Loading posts data`);
+    nextGenerationLog(`Loading data of ${postsSummary.length} posts`);
     return Promise
         .all(postsSummary.map((post) => loadPostStats(post)))
         .then(postsData => postsData

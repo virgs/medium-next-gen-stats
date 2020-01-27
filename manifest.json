@@ -5,11 +5,7 @@
   "manifest_version": 2,
   "author": "Guilherme Virgs Moraes <@virgs>",
   "permissions": [
-    "storage",
-    "activeTab",
-    "declarativeContent",
-    "https://medium.com/",
-    "https://cdn-images-1.medium.com/"
+    "storage"
   ],
   "content_scripts": [
     {
