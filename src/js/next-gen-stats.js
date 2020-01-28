@@ -1,10 +1,6 @@
 const daysOfRange = 120;
 let currentRangeIndex = 0;
 const oneDayInMilliseconds = 24 * 3600 * 1000;
-const now = new Date();
-const tomorrow = new Date(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() + oneDayInMilliseconds);
-let lastDayOfRange = tomorrow;
-let firstDayOfRange = new Date(lastDayOfRange.getTime() - (daysOfRange * oneDayInMilliseconds));
 // const originalColor = {r: 82, g: 151, b: 186};
 const originalColor = {r: 82, g: 186, b: 151};
 
@@ -57,12 +53,9 @@ async function rangeButtonClicked(listItems, clickedItemIndex) {
         await postsData;
         listItems
             .forEach((item, index) => index === clickedItemIndex ? item.classList.add('is-active') : item.classList.remove('is-active'));
-        await generateChart(postsData, {
-            firstDayOfRange,
-            lastDayOfRange,
-            rangeMethod: selectedRange.rangeMethod,
-            label: selectedRange.label
-        });
+        statsOptions.rangeMethod = selectedRange.rangeMethod;
+        statsOptions.label = selectedRange.label;
+        await generateChart(postsData, statsOptions);
     }
 }
 
@@ -104,6 +97,19 @@ function request(url) {
         .then(text => JSON.parse(text.slice(16)).payload)
 }
 
+const getViewOfData = (data) => data.views;
+const getClapsOfData = (data) => data.claps;
+
+
+const now = new Date();
+const tomorrow = new Date(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() + oneDayInMilliseconds);
+const statsOptions = {
+    firstDayOfRange: new Date(tomorrow.getTime() - (daysOfRange * oneDayInMilliseconds)),
+    lastDayOfRange: tomorrow,
+    relevantDatum: getViewOfData,
+    rangeMethod: ranges[currentRangeIndex].rangeMethod,
+    label: ranges[currentRangeIndex].label
+};
 nextGenerationLog('Started');
 let postsData = undefined;
 renewOldFashionPage()
@@ -111,11 +117,6 @@ renewOldFashionPage()
     .then(postsSummary => getPostsData(postsSummary))
     .then(data => {
         postsData = data;
-        return generateChart(data, {
-            firstDayOfRange,
-            lastDayOfRange,
-            rangeMethod: ranges[currentRangeIndex].rangeMethod,
-            label: ranges[currentRangeIndex].label
-        })
+        return generateChart(data, statsOptions)
     })
     .then(() => nextGenerationLog('Done'));

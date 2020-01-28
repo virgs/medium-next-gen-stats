@@ -8,7 +8,7 @@ Get rid of the old fashion informationless default medium stats and get Next Gen
 Don't you think medium.com provides way less information that they should?
 I got tired of waiting for them to make it better and decided to make it by myself.
 
-This extension provides larger time period, daily/weekly/monthly views, and, specially, describes which article was view in which period.
+This extension provides larger time period, daily/weekly/monthly views/claps, and, specially, describes which article was view in which period.
 
 Have fun!
 
@@ -17,7 +17,7 @@ Have fun!
 ### Features
 
 -  Last 90 days range
--  Total stories views
+-  Total stories views/claps
 -  Total views in different ranges: daily, weekly and yearly
 
 ### How to use

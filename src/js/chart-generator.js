@@ -84,26 +84,26 @@ const chartOptions = {
     }
 };
 
-async function generateChart(info, options) {
+async function generateChart(info, statsOptions) {
     const infoFilteredByRange = info
-        .filter(post => post.collectedAt >= options.firstDayOfRange.getTime() && post.collectedAt < options.lastDayOfRange.getTime());
-    const range = options.rangeMethod(options.firstDayOfRange, options.lastDayOfRange);
+        .filter(post => post.collectedAt >= statsOptions.firstDayOfRange.getTime() && post.collectedAt < statsOptions.lastDayOfRange.getTime());
+    const range = statsOptions.rangeMethod(statsOptions.firstDayOfRange, statsOptions.lastDayOfRange);
     const labels = range.map(interval => interval.label);
-    const chartData = generateChartData(range, infoFilteredByRange);
+    const chartData = generateChartData(range, infoFilteredByRange, statsOptions.relevantDatum);
     chartOptions.data = {
         datasets: chartData,
         labels
     };
-    chartOptions.options.title.text = `${options.label} views from '${getStringifiedDate(options.firstDayOfRange)}' to '${getStringifiedDate(options.lastDayOfRange)}'`;
+    chartOptions.options.title.text = `${statsOptions.label} views from '${getStringifiedDate(statsOptions.firstDayOfRange)}' to '${getStringifiedDate(statsOptions.lastDayOfRange)}'`;
     chartOptions.options.tooltips.callbacks.title = tooltipItems => range[tooltipItems[0].index].label;
     const ctx = document.getElementById('chart').getContext('2d');
     new Chart(ctx, chartOptions);
-    updateSummaryTabs(infoFilteredByRange, options);
+    updateSummaryTabs(infoFilteredByRange, statsOptions);
     nextGenerationLog("Chart rendered");
 }
 
 
-function generateChartData(range, data) {
+function generateChartData(range, data, relevantDatum) {
     const publicationDateDataset = {
         label: 'Publication original date\n',
         data: range.map((_, index) => undefined),
@@ -125,7 +125,7 @@ function generateChartData(range, data) {
             checkPublicationDot(indexOfDate, publicationDateDataset, post);
             const backgroundColor = getShadeOfColor(vec.length, index);
             const dataOfPostId = getDataOfPostInRange(range, data, post);
-            post.data = post.data.map((datum, index) => datum + dataOfPostId[index].views);
+            post.data = post.data.map((datum, index) => datum + relevantDatum(dataOfPostId[index]));
             post.backgroundColor = `rgb(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, 0.75)`;
             return post;
         })
