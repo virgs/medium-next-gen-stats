@@ -1,5 +1,3 @@
-const publicationDateDotRadius = 5;
-
 const chartOptions = {
     type: 'bar',
     data: {},
@@ -84,12 +82,12 @@ const chartOptions = {
     }
 };
 
-async function generateChart(info, statsOptions) {
-    const infoFilteredByRange = info
+async function generateChart() {
+    const filteredByRangePostsData = postsData
         .filter(post => post.collectedAt >= statsOptions.firstDayOfRange.getTime() && post.collectedAt < statsOptions.lastDayOfRange.getTime());
     const range = statsOptions.rangeMethod(statsOptions.firstDayOfRange, statsOptions.lastDayOfRange);
     const labels = range.map(interval => interval.label);
-    const chartData = generateChartData(range, infoFilteredByRange, statsOptions.relevantDatum);
+    const chartData = generateChartData(range, filteredByRangePostsData, statsOptions.relevantDatum);
     chartOptions.data = {
         datasets: chartData,
         labels
@@ -98,20 +96,13 @@ async function generateChart(info, statsOptions) {
     chartOptions.options.tooltips.callbacks.title = tooltipItems => range[tooltipItems[0].index].label;
     const ctx = document.getElementById('chart').getContext('2d');
     new Chart(ctx, chartOptions);
-    updateSummaryTabs(infoFilteredByRange, statsOptions);
+    updateSummaryTabs(filteredByRangePostsData, statsOptions);
     nextGenerationLog("Chart rendered");
 }
 
 
 function generateChartData(range, data, relevantDatum) {
-    const publicationDateDataset = {
-        label: 'Publication original date\n',
-        data: range.map((_, index) => undefined),
-        backgroundColor: `rgb(0, 0, 0)`,
-        type: 'bubble',
-        order: -1,
-        borderWidth: 10
-    };
+    const publicationDatasets = [];
     return Object.values(data
         .reduce((acc, info) => {
             if (acc[info.id] === undefined) {
@@ -122,7 +113,10 @@ function generateChartData(range, data, relevantDatum) {
         .map((post, index, vec) => {
             const indexOfDate = range
                 .findIndex(item => post.publicationDate.getTime() >= item.begin.getTime() && post.publicationDate.getTime() < item.end.getTime());
-            checkPublicationDot(indexOfDate, publicationDateDataset, post);
+            const dataset = checkPublicationDataset(indexOfDate, post, range, publicationDatasets);
+            if (dataset) {
+                publicationDatasets.push(dataset);
+            }
             const backgroundColor = getShadeOfColor(vec.length, index);
             const dataOfPostId = getDataOfPostInRange(range, data, post);
             post.data = post.data.map((datum, index) => datum + relevantDatum(dataOfPostId[index]));
@@ -130,15 +124,20 @@ function generateChartData(range, data, relevantDatum) {
             return post;
         })
         .filter((post => post.data.reduce((acc, current) => acc + current, 0) > 0))
-        .concat(publicationDateDataset);
+        .concat(publicationDatasets);
 }
 
 
 function initialValueOfEveryBar(info, range) {
     return {
-        publicationDate: info.publicationDate,
         id: info.id,
+        claps: info.claps,
+        reads: info.reads,
         label: info.title,
+        views: info.views,
+        readingTime: info.readingTime,
+        publicationDate: info.publicationDate,
+
         stack: 'unique',
         barPercentage: 0.95,
         categoryPercentage: 1,
@@ -146,15 +145,38 @@ function initialValueOfEveryBar(info, range) {
     };
 }
 
-function checkPublicationDot(indexOfDate, publicationDateDataset, post) {
-    const publicationDay = indexOfDate >= 0;
-    if (publicationDay) {
-        if (publicationDateDataset.data[indexOfDate]) {
-            publicationDateDataset.data[indexOfDate].r += publicationDateDotRadius;
-        } else {
-            publicationDateDataset.data[indexOfDate] = {x: 0, y: 0, r: publicationDateDotRadius, post};
-        }
+function checkPublicationDataset(indexOfDate, post, range, previousDatasets) {
+    let hasData = false;
+    const publicationDateDataset = {
+        label: 'Publication original date',
+        data: range.map((_, index) => {
+            if (index === indexOfDate) {
+                hasData = true;
+                const radius = Math.max(Math.min(1.3 * post.readingTime, 12), 3);
+                const y =  previousDatasets
+                    .map(dataset => dataset.data[indexOfDate])
+                    .filter(dataset => dataset)
+                    .reduce((acc, bubble) => {
+                        return acc + 2 * statsOptions.relevantDatum(bubble.post) + bubble.r + radius;
+                    }, 0);
+                return {
+                    x: 0,
+                    y: y,
+                    r: radius,
+                    post
+                };
+            }
+        }),
+        backgroundColor: `rgb(0, 0, 0, 0.95)`,
+        type: 'bubble',
+        order: -1,
+        borderWidth: 10
+    };
+
+    if (hasData) {
+        return publicationDateDataset;
     }
+    return undefined;
 }
 
 function getDataOfPostInRange(range, data, post) {

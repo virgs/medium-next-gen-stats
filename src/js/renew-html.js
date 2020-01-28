@@ -25,7 +25,7 @@ function renewSummaryInfo() {
             clapsTab.classList.remove('is-active');
             statsOptions.relevantDatum = getViewOfData;
             chartOptions.loaded = false;
-            await generateChart(postsData, statsOptions)
+            await generateChart();
         }
     };
     viewsTab.querySelector('.js-totalViews').innerText = `-`;
@@ -40,7 +40,7 @@ function renewSummaryInfo() {
             viewsTab.classList.remove('is-active');
             statsOptions.relevantDatum = getClapsOfData;
             chartOptions.loaded = false;
-            await generateChart(postsData, statsOptions)
+            await generateChart();
         }
     };
 
@@ -68,7 +68,7 @@ function renewChartPaginator() {
             statsOptions.lastDayOfRange = statsOptions.firstDayOfRange;
             statsOptions.firstDayOfRange = new Date(statsOptions.lastDayOfRange.getTime() - (daysOfRange * oneDayInMilliseconds));
             chartPageNextRangeButton.disabled = false;
-            await generateChart(postsData, statsOptions)
+            await generateChart();
         }
     };
     chartPageNextRangeButton.onclick = async () => {
@@ -80,7 +80,7 @@ function renewChartPaginator() {
             if (new Date(statsOptions.lastDayOfRange.getTime() + oneDayInMilliseconds).getTime() >= new Date().getTime()) {
                 chartPageNextRangeButton.disabled = true;
             }
-            await generateChart(postsData, statsOptions)
+            await generateChart();
         }
     };
     chartPageNextRangeButton.disabled = true;

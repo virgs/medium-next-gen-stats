@@ -29,7 +29,6 @@ async function getPostsFromUser() {
         .map(post => {
                 return {
                     ...post,
-                    readingTime: post.readingTime,
                     id: post.postId
                 }
             }
@@ -50,12 +49,11 @@ async function rangeButtonClicked(listItems, clickedItemIndex) {
         currentRangeIndex = clickedItemIndex;
         const selectedRange = ranges[clickedItemIndex];
         nextGenerationLog(`Generating ${selectedRange.label} chart`);
-        await postsData;
         listItems
             .forEach((item, index) => index === clickedItemIndex ? item.classList.add('is-active') : item.classList.remove('is-active'));
         statsOptions.rangeMethod = selectedRange.rangeMethod;
         statsOptions.label = selectedRange.label;
-        await generateChart(postsData, statsOptions);
+        await generateChart();
     }
 }
 
@@ -63,7 +61,7 @@ function getPostsData(postsSummary) {
     nextGenerationLog(`Loading data of ${postsSummary.length} posts`);
     return Promise
         .all(postsSummary.map((post) => loadPostStats(post)))
-        .then(postsData => postsData
+        .then(postsInformation => postsInformation
             .reduce((acc, item) => acc.concat(item), [])
         );
 }
@@ -117,6 +115,6 @@ renewOldFashionPage()
     .then(postsSummary => getPostsData(postsSummary))
     .then(data => {
         postsData = data;
-        return generateChart(data, statsOptions)
+        return generateChart();
     })
     .then(() => nextGenerationLog('Done'));
