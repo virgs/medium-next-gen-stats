@@ -15,11 +15,6 @@ function getRangeInDays(beginDate, endDate) {
         }, []);
 }
 
-function getStringifiedMonth(monthIterator) {
-    const monthName = monthIterator.toLocaleString('default', {month: 'long'});
-    return monthName.substr(0, 1).toUpperCase() + monthName.substr(1) + '/' + monthIterator.getFullYear();
-}
-
 function getRangeInMonths(beginDate, endDate) {
     const differenceInMonths = endDate.getMonth() - beginDate.getMonth() + (12 * (endDate.getFullYear() - beginDate.getFullYear())) + 1;
     let monthIterator = beginDate;
@@ -37,14 +32,6 @@ function getRangeInMonths(beginDate, endDate) {
         }, []);
 }
 
-function getStringifiedWeek(date) {
-    const day = (date.getDate() + '').padStart(2, '0');
-    const monthShort = date.toLocaleString('default', {month: 'long'}).substr(0, 3);
-    const month = monthShort.substr(0, 1).toUpperCase() + monthShort.substr(1);
-    return `${day}/${month}`;
-
-}
-
 function getRangeInWeeks(beginDate, endDate) {
     const oneWeekInMilliseconds = oneDayInMilliseconds * 7;
     const differenceInWeeks = Math.abs(Math.round((endDate.getTime() - beginDate.getTime()) / oneWeekInMilliseconds)) + 1;
@@ -55,7 +42,7 @@ function getRangeInWeeks(beginDate, endDate) {
             const interval = {
                 begin: weekIterator,
                 end: nextWeek,
-                label: `${getStringifiedWeek(weekIterator)} to ${getStringifiedWeek(new Date(nextWeek.getTime() - oneDayInMilliseconds))}`
+                label: getStringifiedWeekDifference(weekIterator, new Date(nextWeek.getTime() - oneDayInMilliseconds))
             };
             acc = acc.concat(interval);
             weekIterator = nextWeek;
@@ -63,17 +50,48 @@ function getRangeInWeeks(beginDate, endDate) {
         }, []);
 }
 
+function getStringifiedDate(date) {
+    const day = (date.getDate() + '').padStart(2, '0');
+    const monthShort = date.toLocaleString('default', {month: 'long'}).substr(0, 3);
+    const month = monthShort.substr(0, 1).toUpperCase() + monthShort.substr(1);
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
+function getStringifiedWeekDifference(initial, end) {
+    const differentYears = initial.getFullYear() !== end.getFullYear();
+    const differentMonth = initial.getMonth() !== end.getMonth();
+
+    let initialString = (initial.getDate() + '').padStart(2, '0');
+    const initialMonth = initial.toLocaleString('default', {month: 'long'}).substr(0, 3);
+
+    if (differentYears) {
+        initialString = getStringifiedDate(initial);
+    } else if (differentMonth) {
+         initialString = `${initialString}/${initialMonth}`;
+    }
+    return `${initialString} to ${getStringifiedDate(end)}`;
+}
+
+function getStringifiedMonth(monthIterator) {
+    const monthName = monthIterator.toLocaleString('default', {month: 'long'});
+    return monthName.substr(0, 1).toUpperCase() + monthName.substr(1) + '/' + monthIterator.getFullYear();
+}
+
 const ranges = [
     {
         rangeMethod: getRangeInDays,
-        label: 'Daily'
+        label: 'Daily',
+        daysOfRange: 60,
     },
     {
         rangeMethod: getRangeInWeeks,
-        label: 'Weekly'
+        label: 'Weekly',
+        daysOfRange: 20 * 7,
     },
     {
         rangeMethod: getRangeInMonths,
-        label: 'Monthly'
+        label: 'Monthly',
+        daysOfRange: 365,
     },
 ];

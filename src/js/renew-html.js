@@ -53,11 +53,16 @@ function renewSummaryInfo() {
     return summaryInfo;
 }
 
-function renewChartPaginator() {
+function updateChartPageLabels() {
     const chartPaginator = document.querySelector(".chartPage");
     const chartPageLabels = chartPaginator.querySelectorAll('.button-label');
-    chartPageLabels[0].textContent = `Prev ${daysOfRange} days`;
-    chartPageLabels[1].textContent = `Next ${daysOfRange} days`;
+    chartPageLabels[0].textContent = `Prev ${ranges[currentRangeIndex].daysOfRange} days`;
+    chartPageLabels[1].textContent = `Next ${ranges[currentRangeIndex].daysOfRange} days`;
+}
+
+function renewChartPaginator() {
+    updateChartPageLabels();
+    const chartPaginator = document.querySelector(".chartPage");
     const chartPageButtons = chartPaginator.querySelectorAll('button');
     const chartPagePrevButton = chartPageButtons[0];
     const chartPageNextRangeButton = chartPageButtons[1];
@@ -66,7 +71,8 @@ function renewChartPaginator() {
             chartOptions.loaded = false;
 
             statsOptions.lastDayOfRange = statsOptions.firstDayOfRange;
-            statsOptions.firstDayOfRange = new Date(statsOptions.lastDayOfRange.getTime() - (daysOfRange * oneDayInMilliseconds));
+            statsOptions.firstDayOfRange = new Date(statsOptions.lastDayOfRange.getTime() -
+                (ranges[currentRangeIndex].daysOfRange * oneDayInMilliseconds));
             chartPageNextRangeButton.disabled = false;
             await generateChart();
         }
@@ -76,7 +82,8 @@ function renewChartPaginator() {
             chartOptions.loaded = false;
 
             statsOptions.firstDayOfRange = statsOptions.lastDayOfRange;
-            statsOptions.lastDayOfRange = new Date(statsOptions.lastDayOfRange.getTime() + (daysOfRange * oneDayInMilliseconds));
+            statsOptions.lastDayOfRange = new Date(statsOptions.lastDayOfRange.getTime() +
+                (ranges[currentRangeIndex].daysOfRange * oneDayInMilliseconds));
             if (new Date(statsOptions.lastDayOfRange.getTime() + oneDayInMilliseconds).getTime() >= new Date().getTime()) {
                 chartPageNextRangeButton.disabled = true;
             }

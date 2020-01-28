@@ -21,7 +21,7 @@
         "src/js/chart-generator.js",
         "src/js/ranges.js",
         "src/js/renew-html.js",
-        "src/js/next-gen-stats.js"
+        "src/js/main.js"
       ]
     }
   ],

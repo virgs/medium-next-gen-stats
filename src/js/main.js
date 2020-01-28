@@ -1,4 +1,3 @@
-const daysOfRange = 120;
 let currentRangeIndex = 0;
 const oneDayInMilliseconds = 24 * 3600 * 1000;
 // const originalColor = {r: 82, g: 151, b: 186};
@@ -35,14 +34,6 @@ async function getPostsFromUser() {
         );
 }
 
-function getStringifiedDate(date) {
-    const day = (date.getDate() + '').padStart(2, '0');
-    const monthShort = date.toLocaleString('default', {month: 'long'}).substr(0, 3);
-    const month = monthShort.substr(0, 1).toUpperCase() + monthShort.substr(1);
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-}
-
 async function rangeButtonClicked(listItems, clickedItemIndex) {
     if (chartOptions.loaded) {
         chartOptions.loaded = false;
@@ -53,6 +44,10 @@ async function rangeButtonClicked(listItems, clickedItemIndex) {
             .forEach((item, index) => index === clickedItemIndex ? item.classList.add('is-active') : item.classList.remove('is-active'));
         statsOptions.rangeMethod = selectedRange.rangeMethod;
         statsOptions.label = selectedRange.label;
+        statsOptions.firstDayOfRange = new Date(statsOptions.lastDayOfRange.getTime() -
+            (selectedRange.daysOfRange * oneDayInMilliseconds));
+
+        updateChartPageLabels();
         await generateChart();
     }
 }
@@ -101,12 +96,13 @@ const getClapsOfData = (data) => data.claps;
 
 const now = new Date();
 const tomorrow = new Date(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() + oneDayInMilliseconds);
+const initiallySelectedRange = ranges[currentRangeIndex];
 const statsOptions = {
-    firstDayOfRange: new Date(tomorrow.getTime() - (daysOfRange * oneDayInMilliseconds)),
+    firstDayOfRange: new Date(tomorrow.getTime() - (initiallySelectedRange.daysOfRange * oneDayInMilliseconds)),
     lastDayOfRange: tomorrow,
     relevantDatum: getViewOfData,
-    rangeMethod: ranges[currentRangeIndex].rangeMethod,
-    label: ranges[currentRangeIndex].label
+    rangeMethod: initiallySelectedRange.rangeMethod,
+    label: initiallySelectedRange.label
 };
 nextGenerationLog('Started');
 let postsData = undefined;
