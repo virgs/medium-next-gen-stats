@@ -90,7 +90,6 @@ async function generateChart(info, options) {
     const range = options.rangeMethod(options.firstDayOfRange, options.lastDayOfRange);
     const labels = range.map(interval => interval.label);
     const chartData = generateChartData(range, infoFilteredByRange);
-    updateSummaryTabs(chartData);
     chartOptions.data = {
         datasets: chartData,
         labels
@@ -99,6 +98,7 @@ async function generateChart(info, options) {
     chartOptions.options.tooltips.callbacks.title = tooltipItems => range[tooltipItems[0].index].label;
     const ctx = document.getElementById('chart').getContext('2d');
     new Chart(ctx, chartOptions);
+    updateSummaryTabs(infoFilteredByRange, options);
     nextGenerationLog("Chart rendered");
 }
 
@@ -181,23 +181,4 @@ function getShadeOfColor(max, index) {
         g: (originalColor.g / (max)) * (index + 1),
         b: (originalColor.b / (max)) * (index + 1)
     };
-}
-
-function updateSummaryTabs(chartData) {
-    const summary = chartData.reduce((acc, dataSet) => {
-        if (dataSet.type === 'bubble') {
-            acc.publicationDates += dataSet.data.reduce((sum, item) => sum + (item !== undefined ? item.r / publicationDateDotRadius : 0), 0);
-        } else {
-            acc.views += dataSet.data.reduce((sum, item) => sum + item, 0);
-        }
-        return acc;
-    }, {
-        views: 0,
-        publicationDates: 0
-    });
-    const chartTabs = document.querySelectorAll('.chartTabs li');
-    const viewsTab = chartTabs[0];
-    viewsTab.querySelector('.js-totalViews').innerText = `${prettifyNumbers(summary.views)}`;
-    const publicationsTab = chartTabs[1];
-    publicationsTab.querySelector('.js-totalReads').innerText = `${prettifyNumbers(summary.publicationDates)}`;
 }

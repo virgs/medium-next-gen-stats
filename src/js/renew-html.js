@@ -22,13 +22,19 @@ function renewSummaryInfo() {
     viewsTab.querySelector('div').style.cursor = 'initial';
     viewsTab.querySelector('.js-totalViews').innerText = `-`;
 
-    const publicationsTab = chartTabs[1];
-    publicationsTab.querySelector('.js-totalReads').innerText = `-`;
-    publicationsTab.querySelectorAll('div.chartTab div')[1].textContent = 'Publications';
+    const clapsTab = chartTabs[1];
+    clapsTab.querySelector('.js-totalReads').innerText = `-`;
+    clapsTab.querySelectorAll('div.chartTab div')[1].textContent = 'Claps';
+    clapsTab.onclick = (e) => e.stopPropagation();
+    clapsTab.classList.add('is-active');
+    clapsTab.querySelector('div').style.cursor = 'initial';
+
+    const publicationsTab = chartTabs[2];
+    publicationsTab.querySelector('.js-totalFans').innerText = `-`;
+    publicationsTab.querySelectorAll('div.chartTab div')[1].textContent = 'New articles';
     publicationsTab.onclick = (e) => e.stopPropagation();
     publicationsTab.classList.add('is-active');
     publicationsTab.querySelector('div').style.cursor = 'initial';
-    chartTabs[2].remove();
     return summaryInfo;
 }
 
@@ -84,7 +90,42 @@ async function renewOldFashionPage() {
     const summaryInfo = renewSummaryInfo();
     const chart = document.querySelector(".stats-title--chart");
     const rangeNavBar = renewRangeNavbar();
-    const parent = rangeNavBar.parentNode;
+    const parent = chart.parentNode;
     parent.insertBefore(rangeNavBar, chart);
     parent.insertBefore(summaryInfo, rangeNavBar);
+}
+
+function updateSummaryTabs(data, options) {
+    const publicationsDates = Object.values(data
+        .reduce((acc, post) => {
+            if (post.publicationDate.getTime() >= options.firstDayOfRange.getTime() &&
+                post.publicationDate.getTime() < options.lastDayOfRange.getTime()) {
+                acc[post.id] = post.id;
+            }
+            return acc;
+        }, {}))
+        .length;
+
+    const summary = data
+        .reduce((acc, post) => {
+            acc.views += post.views;
+            acc.claps += post.claps;
+            acc.reads += post.reads;
+            acc.upvotes += post.upvotes;
+            return acc;
+        }, {
+            views: 0,
+            claps: 0,
+            reads: 0,
+            upvotes: 0
+        });
+
+
+    const chartTabs = document.querySelectorAll('.chartTabs li');
+    const viewsTab = chartTabs[0];
+    viewsTab.querySelector('.js-totalViews').innerText = `${prettifyNumbers(summary.views)}`;
+    const clapsTab = chartTabs[1];
+    clapsTab.querySelector('.js-totalReads').innerText = `${prettifyNumbers(summary.claps)}`;
+    const publicationsTab = chartTabs[2];
+    publicationsTab.querySelector('.js-totalFans').innerText = `${prettifyNumbers(publicationsDates)}`;
 }

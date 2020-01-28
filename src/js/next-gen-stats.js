@@ -79,13 +79,13 @@ function loadPostStats(post) {
     delete post.views;
     delete post.claps;
     delete post.internalReferrerViews;
+    delete post.createdAt;
     delete post.reads;
     delete post.upvotes;
     const publicationDate = new Date(post.firstPublishedAt);
     return getPostStats(post.id)
         .then(postStats => postStats
             .map(postStat => {
-                //"createdAt": 1528332103705,
                 const fullStats = {...postStat, ...post, publicationDate: publicationDate};
                 delete fullStats.postId;
                 return fullStats
