@@ -98,7 +98,7 @@ function renewChartPaginator() {
     chartPageNextRangeButton.disabled = true;
 }
 
-function updateSummaryTabs(data, options) {
+function updateSummaryTabs(data) {
     // const publicationsDates = Object.values(data
     //     .reduce((acc, post) => {
     //         if (post.publicationDate.getTime() >= options.firstDayOfRange.getTime() &&
@@ -134,17 +134,29 @@ function updateSummaryTabs(data, options) {
 }
 
 async function renewOldFashionPage() {
-    document.querySelector('h1.stats-title').classList.add('mngs-stats-page-title')
-    document.querySelectorAll('div .stats-title')[1].innerHTML =
+    document.querySelector('h1.stats-title').classList.add('mngs-stats-page-title');
+    document.querySelector('.bargraph').remove();
+
+    const statsTitleDetails = document.querySelectorAll('div .stats-title')[1];
+    statsTitleDetails.classList.add('mngs-stats-title-details');
+    const detailsLink = statsTitleDetails.querySelector('.chartHelper a');
+    detailsLink.textContent = 'Get back to the old fashion medium stats';
+    detailsLink.target = '_self';
+    detailsLink.href = '/me/stats/';
+    statsTitleDetails.querySelector('.chartHelper').innerHTML = detailsLink.outerHTML;
+    const chart = statsTitleDetails.cloneNode();
+    chart.innerHTML =
         `<div>
             <canvas id="chart"></canvas>
          </div>`;
-    document.querySelector('.bargraph').remove();
+    statsTitleDetails.insertAdjacentElement('afterend', chart);
+
     renewChartPaginator();
     const summaryInfo = renewSummaryInfo();
-    const chart = document.querySelector(".stats-title--chart");
+    const startTitle = document.querySelector(".stats-title--chart");
     const rangeNavBar = renewRangeNavbar();
-    const parent = chart.parentNode;
-    parent.insertBefore(rangeNavBar, chart);
+    const parent = startTitle.parentNode;
+    parent.insertBefore(rangeNavBar, startTitle);
     parent.insertBefore(summaryInfo, rangeNavBar);
+    parent.insertBefore(statsTitleDetails, summaryInfo);
 }

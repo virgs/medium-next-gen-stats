@@ -1,11 +1,10 @@
 {
   "name": "Medium Next Generation Stats",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Medium Next Generation Stats",
   "manifest_version": 2,
-  "author": "Guilherme Virgs Moraes <http://pagehub.me/virgs>",
+  "author": "Guilherme Virgs Moraes <https://pagehub.me/virgs>",
   "permissions": [
-    "storage"
   ],
   "content_scripts": [
     {

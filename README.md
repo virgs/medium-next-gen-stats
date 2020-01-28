@@ -16,9 +16,9 @@ Have fun!
 
 ### Features
 
--  Last 90 days range
+-  Larger range
 -  Total stories views/claps
--  Total views in different ranges: daily, weekly and yearly
+-  Total in different ranges: daily, weekly and yearly
 
 ### How to use
 1. Go to your medium stats page: https://medium.com/me/stats
