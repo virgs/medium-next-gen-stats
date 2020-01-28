@@ -93,7 +93,6 @@ function request(url) {
 const getViewOfData = (data) => data.views;
 const getClapsOfData = (data) => data.claps;
 
-
 const now = new Date();
 const tomorrow = new Date(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() + oneDayInMilliseconds);
 const initiallySelectedRange = ranges[currentRangeIndex];
@@ -101,6 +100,7 @@ const statsOptions = {
     firstDayOfRange: new Date(tomorrow.getTime() - (initiallySelectedRange.daysOfRange * oneDayInMilliseconds)),
     lastDayOfRange: tomorrow,
     relevantDatum: getViewOfData,
+    relevantDatumLabel: 'views',
     rangeMethod: initiallySelectedRange.rangeMethod,
     label: initiallySelectedRange.label
 };

@@ -42,7 +42,7 @@ const chartOptions = {
                 },
                 footer: (tooltipItems) => {
                     const total = tooltipItems.reduce((acc, tooltipItem) => parseInt(tooltipItem.value) + acc, 0);
-                    return `Total:\t ${prettifyNumbers(total)} views of ${tooltipItems.length} articles`;
+                    return `Total:\t ${prettifyNumbers(total)} ${statsOptions.relevantDatumLabel} of ${tooltipItems.length} articles`;
                 },
             },
             footerFontStyle: 'bold',
@@ -92,7 +92,7 @@ async function generateChart() {
         datasets: chartData,
         labels
     };
-    chartOptions.options.title.text = `${statsOptions.label} views from '${getStringifiedDate(statsOptions.firstDayOfRange)}' to '${getStringifiedDate(statsOptions.lastDayOfRange)}'`;
+    chartOptions.options.title.text = `${statsOptions.label} ${statsOptions.relevantDatumLabel} from '${getStringifiedDate(statsOptions.firstDayOfRange)}' to '${getStringifiedDate(statsOptions.lastDayOfRange)}'`;
     chartOptions.options.tooltips.callbacks.title = tooltipItems => range[tooltipItems[0].index].label;
     const ctx = document.getElementById('chart').getContext('2d');
     new Chart(ctx, chartOptions);

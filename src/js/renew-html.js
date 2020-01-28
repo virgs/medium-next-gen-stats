@@ -24,6 +24,7 @@ function renewSummaryInfo() {
             viewsTab.classList.add('is-active');
             clapsTab.classList.remove('is-active');
             statsOptions.relevantDatum = getViewOfData;
+            statsOptions.relevantDatumLabel = 'views';
             chartOptions.loaded = false;
             await generateChart();
         }
@@ -38,6 +39,7 @@ function renewSummaryInfo() {
         if (chartOptions.loaded) {
             clapsTab.classList.add('is-active');
             viewsTab.classList.remove('is-active');
+            statsOptions.relevantDatumLabel = 'claps';
             statsOptions.relevantDatum = getClapsOfData;
             chartOptions.loaded = false;
             await generateChart();
@@ -86,26 +88,14 @@ function renewChartPaginator() {
                 (ranges[currentRangeIndex].daysOfRange * oneDayInMilliseconds));
             if (new Date(statsOptions.lastDayOfRange.getTime() + oneDayInMilliseconds).getTime() >= new Date().getTime()) {
                 chartPageNextRangeButton.disabled = true;
+                statsOptions.lastDayOfRange = tomorrow;
+                statsOptions.firstDayOfRange = new Date(statsOptions.lastDayOfRange.getTime() -
+                    (ranges[currentRangeIndex].daysOfRange * oneDayInMilliseconds));
             }
             await generateChart();
         }
     };
     chartPageNextRangeButton.disabled = true;
-}
-
-async function renewOldFashionPage() {
-    document.querySelectorAll('div .stats-title')[1].innerHTML =
-        `<div>
-            <canvas id="chart"></canvas>
-         </div>`;
-    document.querySelector('.bargraph').remove();
-    renewChartPaginator();
-    const summaryInfo = renewSummaryInfo();
-    const chart = document.querySelector(".stats-title--chart");
-    const rangeNavBar = renewRangeNavbar();
-    const parent = chart.parentNode;
-    parent.insertBefore(rangeNavBar, chart);
-    parent.insertBefore(summaryInfo, rangeNavBar);
 }
 
 function updateSummaryTabs(data, options) {
@@ -141,4 +131,20 @@ function updateSummaryTabs(data, options) {
     clapsTab.querySelector('.js-totalReads').innerText = `${prettifyNumbers(summary.claps)}`;
     // const publicationsTab = chartTabs[2];
     // publicationsTab.querySelector('.js-totalFans').innerText = `${prettifyNumbers(publicationsDates)}`;
+}
+
+async function renewOldFashionPage() {
+    document.querySelector('h1.stats-title').classList.add('mngs-stats-page-title')
+    document.querySelectorAll('div .stats-title')[1].innerHTML =
+        `<div>
+            <canvas id="chart"></canvas>
+         </div>`;
+    document.querySelector('.bargraph').remove();
+    renewChartPaginator();
+    const summaryInfo = renewSummaryInfo();
+    const chart = document.querySelector(".stats-title--chart");
+    const rangeNavBar = renewRangeNavbar();
+    const parent = chart.parentNode;
+    parent.insertBefore(rangeNavBar, chart);
+    parent.insertBefore(summaryInfo, rangeNavBar);
 }
