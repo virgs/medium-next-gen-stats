@@ -31,7 +31,9 @@ const chartOptions = {
             footerFontSize: 14,
             footerMarginTop: 10,
             yPadding: 10,
-            xPadding: 10,
+            xPadding: 20,
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            displayColors: false,
             currentExcludedItems: 0,
             topPostsOfTooltip: undefined,
             itemSort: (first, second) => second.value - first.value,
@@ -60,14 +62,14 @@ const chartOptions = {
                 label: (tooltipItem, chart) => {
                     // const publicationDay = chart.datasets.filter(dataset => dataset.type === 'bubble')[0].data[tooltipItem.index];
                     const dataset = chart.datasets[tooltipItem.datasetIndex];
-                    return ` "${dataset.label}":    ${prettifyNumbers(tooltipItem.value)}`
+                    return ` "${dataset.label}":    ${prettifyNumbersWithCommas(tooltipItem.value)}`
                 },
                 afterBody: () => {
                     if (chartOptions.options.tooltips.currentExcludedItems > 0) {
                         if (chartOptions.options.tooltips.currentExcludedItems === 1) {
-                            return `      and another one...`;
+                            return `   and another one...`;
                         }
-                        return `      and ${chartOptions.options.tooltips.currentExcludedItems} others...`;
+                        return `   and ${chartOptions.options.tooltips.currentExcludedItems} others...`;
                     }
                 },
                 footer: (tooltipItems) => {
@@ -75,7 +77,7 @@ const chartOptions = {
                     const excludedItems = chartOptions.options.tooltips.currentExcludedItems;
                     chartOptions.options.tooltips.currentExcludedItems = 0;
                     delete chartOptions.options.tooltips.topPostsOfTooltip;
-                    return `Total:\t ${prettifyNumbers(total)} ${statsOptions.relevantDatumLabel} of ${tooltipItems.length + excludedItems} articles`;
+                    return `Total:\t ${prettifyNumbersWithCommas(total)} ${statsOptions.relevantDatumLabel} of ${tooltipItems.length + excludedItems} articles`;
                 },
             },
             footerFontStyle: 'bold',
@@ -92,7 +94,7 @@ const chartOptions = {
                     borderDash: [2, 3],
                 },
                 ticks: {
-                    callback: value => prettifyNumbers(value),
+                    callback: value => prettifyNumbersWithUnits(value),
                     beginAtZero: true
                 }
             }],

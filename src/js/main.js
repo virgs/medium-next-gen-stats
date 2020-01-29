@@ -10,7 +10,7 @@ function nextGenerationLog(...params) {
     console.log(`[Medium Next Gen Stats - ${paddedSeconds}:${paddedMilliseconds}] ${params}`)
 }
 
-function prettifyNumbers(number) {
+function prettifyNumbersWithUnits(number) {
     const unity = ['', 'K', 'M', 'G', 'T', 'P', 'E'];
     const tier = (Math.log10(number) / 3) | 0;
     if (tier === 0) {
@@ -19,7 +19,20 @@ function prettifyNumbers(number) {
     const suffix = unity[tier];
     const scale = Math.pow(10, tier * 3);
     const scaled = number / scale;
-    return scaled.toFixed(2) + suffix;
+    return scaled.toFixed(1) + suffix;
+}
+
+function prettifyNumbersWithCommas(number) {
+    return number
+        .toString()
+        .split('')
+        .reverse()
+        .reduce((acc, letter, index, vec) => {
+            acc.push((index % 3 === 2 && index !== vec.length - 1 ? ',' : '') + letter);
+            return acc;
+        }, [])
+        .reverse()
+        .join('');
 }
 
 async function getPostsFromUser() {
@@ -52,24 +65,26 @@ async function rangeButtonClicked(listItems, clickedItemIndex) {
     }
 }
 
-function getPostsData() {
-    nextGenerationLog(`Loading data of ${postsSummary.length} posts`);
+function getInitialPostsData() {
+    nextGenerationLog(`Loading initial data of ${postsSummary.length} posts`);
     return Promise
-        .all(postsSummary.map((post) => loadPostStats(post)))
+        .all(postsSummary.map((post) => loadInitialPostStats(post)))
         .then(postsInformation => postsInformation
             .reduce((acc, item) => acc.concat(item), [])
         );
 }
 
-function loadPostStats(post) {
-    // delete post.views;
-    // delete post.claps;
-    // delete post.internalReferrerViews;
-    // delete post.createdAt;
-    // delete post.reads;
-    // delete post.upvotes;
-    // post.publicationDate = new Date(post.firstPublishedAt);
-    return getPostStats(post.id)
+function getFullPostsData() {
+    nextGenerationLog(`Loading full data of ${postsSummary.length} posts`);
+    return Promise
+        .all(postsSummary.map((post) => loadFullPostsStats(post)))
+        .then(postsInformation => postsInformation
+            .reduce((acc, item) => acc.concat(item), [])
+        );
+}
+
+function loadInitialPostStats(post) {
+    return getInitialPostStats(post.id)
         .then(postStats => postStats
             .map(postStat => {
                 const fullStats = {...postStat, id: post.id, title: post.title};
@@ -78,8 +93,23 @@ function loadPostStats(post) {
             }));
 }
 
-function getPostStats(postId) {
-    return request(`https://medium.com/stats/${postId}/0/${Date.now()}`)
+function loadFullPostsStats(post) {
+    return getFullPostStats(post.id)
+        .then(postStats => postStats
+            .map(postStat => {
+                const fullStats = {...postStat, id: post.id, title: post.title};
+                delete fullStats.postId;
+                return fullStats
+            }));
+}
+
+function getInitialPostStats(postId) {
+    return request(`https://medium.com/stats/${postId}/${statsOptions.firstDayOfRange.getTime()}/${statsOptions.lastDayOfRange.getTime()}`)
+        .then(data => data && data.value || []);
+}
+
+function getFullPostStats(postId) {
+    return request(`https://medium.com/stats/${postId}/0}/${Date.now()}`)
         .then(data => data && data.value || []);
 }
 
@@ -121,10 +151,9 @@ renewOldFashionPage()
     .then(data => {
         postsSummary = data;
     })
-    .then(() => getPostsData()
-        .then(data => {
-            postsData = data;
-        })
+    .then(() => getInitialPostsData()
+        .then(data => postsData = data)
         .then(() => generateChart())
+        .then(() => getFullPostsData())
+        .then(data => postsData = data)
         .then(() => nextGenerationLog('Done')))
-    .catch(() => window.location.replace("https://medium.com/me/stats/"));

@@ -116,9 +116,9 @@ function updateSummaryTabs(data) {
 
     const chartTabs = document.querySelectorAll('.chartTabs li');
     const viewsTab = chartTabs[0];
-    viewsTab.querySelector('.js-totalViews').innerText = `${prettifyNumbers(summary.views)}`;
+    viewsTab.querySelector('.js-totalViews').innerText = `${prettifyNumbersWithCommas(summary.views)}`;
     const clapsTab = chartTabs[1];
-    clapsTab.querySelector('.js-totalReads').innerText = `${prettifyNumbers(summary.claps)}`;
+    clapsTab.querySelector('.js-totalReads').innerText = `${prettifyNumbersWithCommas(summary.claps)}`;
     // const publicationsTab = chartTabs[2];
     // publicationsTab.querySelector('.js-totalFans').innerText = `${prettifyNumbers(publicationsDates)}`;
 }
