@@ -17,11 +17,16 @@ function renewSummaryInfo() {
     summaryInfo.classList.add('mngs-summary-info');
     const chartTabs = document.querySelectorAll('.chartTabs li');
     const viewsTab = chartTabs[0];
+    const readsTab = chartTabs[1];
+    const clapsTab = chartTabs[2];
+
+    viewsTab.querySelector('.js-totalViews').innerText = `-`;
     viewsTab.querySelector('span').textContent = '';
     viewsTab.onclick = async event => {
         event.stopPropagation();
         if (chartOptions.loaded) {
             viewsTab.classList.add('is-active');
+            readsTab.classList.remove('is-active');
             clapsTab.classList.remove('is-active');
             statsOptions.relevantDatum = getViewOfData;
             statsOptions.relevantDatumLabel = 'views';
@@ -29,29 +34,36 @@ function renewSummaryInfo() {
             await generateChart();
         }
     };
-    viewsTab.querySelector('.js-totalViews').innerText = `-`;
 
-    const clapsTab = chartTabs[1];
-    clapsTab.querySelector('.js-totalReads').innerText = `-`;
+    readsTab.querySelector('.js-totalReads').innerText = `-`;
+    readsTab.querySelectorAll('div.chartTab div')[1].textContent = 'Reads';
+    readsTab.onclick = async event => {
+        event.stopPropagation();
+        if (chartOptions.loaded) {
+            viewsTab.classList.remove('is-active');
+            readsTab.classList.add('is-active');
+            clapsTab.classList.remove('is-active');
+            statsOptions.relevantDatumLabel = 'reads';
+            statsOptions.relevantDatum = getReadsOfData;
+            chartOptions.loaded = false;
+            await generateChart();
+        }
+    };
+
+    clapsTab.querySelector('.js-totalFans').innerText = `-`;
     clapsTab.querySelectorAll('div.chartTab div')[1].textContent = 'Claps';
     clapsTab.onclick = async event => {
         event.stopPropagation();
         if (chartOptions.loaded) {
-            clapsTab.classList.add('is-active');
             viewsTab.classList.remove('is-active');
+            readsTab.classList.remove('is-active');
+            clapsTab.classList.add('is-active');
             statsOptions.relevantDatumLabel = 'claps';
             statsOptions.relevantDatum = getClapsOfData;
             chartOptions.loaded = false;
             await generateChart();
         }
     };
-
-    const publicationsTab = chartTabs[2].remove();
-    // publicationsTab.querySelector('.js-totalFans').innerText = `-`;
-    // publicationsTab.querySelectorAll('div.chartTab div')[1].textContent = 'New articles';
-    // publicationsTab.onclick = (e) => e.stopPropagation();
-    // publicationsTab.classList.add('is-active');
-    // publicationsTab.querySelector('div').style.cursor = 'initial';
     return summaryInfo;
 }
 
@@ -117,10 +129,10 @@ function updateSummaryTabs(data) {
     const chartTabs = document.querySelectorAll('.chartTabs li');
     const viewsTab = chartTabs[0];
     viewsTab.querySelector('.js-totalViews').innerText = `${prettifyNumbersWithCommas(summary.views)}`;
-    const clapsTab = chartTabs[1];
-    clapsTab.querySelector('.js-totalReads').innerText = `${prettifyNumbersWithCommas(summary.claps)}`;
-    // const publicationsTab = chartTabs[2];
-    // publicationsTab.querySelector('.js-totalFans').innerText = `${prettifyNumbers(publicationsDates)}`;
+    const reads = chartTabs[1];
+    reads.querySelector('.js-totalReads').innerText = `${prettifyNumbersWithCommas(summary.reads)}`;
+    const clapsTab = chartTabs[2];
+    clapsTab.querySelector('.js-totalFans').innerText = `${prettifyNumbersWithCommas(summary.claps)}`;
 }
 
 async function renewOldFashionPage() {
@@ -148,5 +160,6 @@ async function renewOldFashionPage() {
     const parent = startTitle.parentNode;
     parent.insertBefore(rangeNavBar, startTitle);
     parent.insertBefore(summaryInfo, rangeNavBar);
-    parent.insertBefore(statsTitleDetails, summaryInfo);
+    statsTitleDetails.remove();
+    // parent.insertBefore(statsTitleDetails, summaryInfo);
 }

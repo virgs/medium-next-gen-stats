@@ -128,6 +128,7 @@ function request(url) {
 }
 
 const getViewOfData = (data) => data.views;
+const getReadsOfData = (data) => data.reads;
 const getClapsOfData = (data) => data.claps;
 
 const now = new Date();

@@ -82,7 +82,7 @@ const ranges = [
     {
         rangeMethod: getRangeInDays,
         label: 'Daily',
-        daysOfRange: 60,
+        daysOfRange: 30,
     },
     {
         rangeMethod: getRangeInWeeks,

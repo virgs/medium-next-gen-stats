@@ -16,8 +16,10 @@ Have fun!
 ![dailyScreenshot](images/medium-next-gen-snapshot-daily.png)
 
 ### Features
--  Larger range
--  Total stories views/claps
+-  Larger ranges
+-  Super cool and animated charts
+-  Total stories views/reads/claps
+-  Description of top articles read in the range
 -  Total in different ranges: daily, weekly and yearly
 
 ### How to use
