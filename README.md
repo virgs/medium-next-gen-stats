@@ -16,7 +16,6 @@ Have fun!
 ![dailyScreenshot](images/medium-next-gen-snapshot-daily.png)
 
 ### Features
-
 -  Larger range
 -  Total stories views/claps
 -  Total in different ranges: daily, weekly and yearly
@@ -25,18 +24,23 @@ Have fun!
 1. Go to your medium stats page: https://medium.com/me/stats
 1. This is it
 
-
 ### Source Code
 You can find the source code on the link below: 
 https://github.com/virgs/medium-next-gen-stats
+
+### Development
+1. Clone this repo
+1. Go to chrome://extensions
+1. Enable developer mode
+1. Click on load unpacked extension and select the generated folder.
+
+PRs are most welcome :)
 
 ### Contact
 Medium: https://medium.com/@virgs  
 Github: https://github.com/virgs  
 Pagehub: https://pagehub.me/virgs  
 
-#### Acknowledgement
+### Acknowledgement
 Thanks to [tomastrajan](https://github.com/tomastrajan/medium-enhanced-stats) and [HcwXd](https://github.com/HcwXd/better-medium-stats) for sharing their ideas and source code.   
 You made my life a lot easier.
-
-
