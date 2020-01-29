@@ -99,16 +99,6 @@ function renewChartPaginator() {
 }
 
 function updateSummaryTabs(data) {
-    // const publicationsDates = Object.values(data
-    //     .reduce((acc, post) => {
-    //         if (post.publicationDate.getTime() >= options.firstDayOfRange.getTime() &&
-    //             post.publicationDate.getTime() < options.lastDayOfRange.getTime()) {
-    //             acc[post.id] = post.id;
-    //         }
-    //         return acc;
-    //     }, {}))
-    //     .length;
-
     const summary = data
         .reduce((acc, post) => {
             acc.views += post.views;

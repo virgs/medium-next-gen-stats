@@ -52,7 +52,7 @@ async function rangeButtonClicked(listItems, clickedItemIndex) {
     }
 }
 
-function getPostsData(postsSummary) {
+function getPostsData() {
     nextGenerationLog(`Loading data of ${postsSummary.length} posts`);
     return Promise
         .all(postsSummary.map((post) => loadPostStats(post)))
@@ -62,17 +62,17 @@ function getPostsData(postsSummary) {
 }
 
 function loadPostStats(post) {
-    delete post.views;
-    delete post.claps;
-    delete post.internalReferrerViews;
-    delete post.createdAt;
-    delete post.reads;
-    delete post.upvotes;
-    const publicationDate = new Date(post.firstPublishedAt);
+    // delete post.views;
+    // delete post.claps;
+    // delete post.internalReferrerViews;
+    // delete post.createdAt;
+    // delete post.reads;
+    // delete post.upvotes;
+    // post.publicationDate = new Date(post.firstPublishedAt);
     return getPostStats(post.id)
         .then(postStats => postStats
             .map(postStat => {
-                const fullStats = {...postStat, ...post, publicationDate: publicationDate};
+                const fullStats = {...postStat, id: post.id, title: post.title};
                 delete fullStats.postId;
                 return fullStats
             }));
@@ -86,7 +86,14 @@ function getPostStats(postId) {
 
 function request(url) {
     return fetch(url, {credentials: "same-origin", headers: {accept: 'application/json'}})
-        .then(res => res.text())
+        .then(res => {
+            if (res.status !== 200) {
+                const message = `Fail to fetch data: (${res.status}) - ${res.statusText}`;
+                console.log(message);
+                throw message;
+            }
+            return res.text();
+        })
         .then(text => JSON.parse(text.slice(16)).payload)
 }
 
@@ -104,13 +111,20 @@ const statsOptions = {
     rangeMethod: initiallySelectedRange.rangeMethod,
     label: initiallySelectedRange.label
 };
+
 nextGenerationLog('Started');
 let postsData = undefined;
+let postsSummary = undefined;
+
 renewOldFashionPage()
     .then(() => getPostsFromUser())
-    .then(postsSummary => getPostsData(postsSummary))
     .then(data => {
-        postsData = data;
-        return generateChart();
+        postsSummary = data;
     })
-    .then(() => nextGenerationLog('Done'));
+    .then(() => getPostsData()
+        .then(data => {
+            postsData = data;
+        })
+        .then(() => generateChart())
+        .then(() => nextGenerationLog('Done')))
+    .catch(() => window.location.replace("https://medium.com/me/stats/"));
