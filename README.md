@@ -1,6 +1,7 @@
 # Medium Next Generation Stats
 
 A [google chrome browser extension](https://chrome.google.com/webstore/detail/medium-next-generation-st/fhopcbdfcaleefngfpglahlpfhagendo) that provides richer information about your texts.  
+
 ![weeklyScreenshot](images/medium-next-gen-snapshot-weekly.png)  
 
 Get rid of the old fashion informationless default medium stats and get Next Generation Stats.
