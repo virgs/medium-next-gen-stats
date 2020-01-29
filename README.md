@@ -36,7 +36,7 @@ Github: https://github.com/virgs
 Pagehub: https://pagehub.me/virgs  
 
 #### Acknowledgement
-Thanks to and [tomastrajan](https://github.com/tomastrajan/medium-enhanced-stats) and [HcwXd](https://github.com/HcwXd/better-medium-stats) for sharing their ideas and source code.   
+Thanks to [tomastrajan](https://github.com/tomastrajan/medium-enhanced-stats) and [HcwXd](https://github.com/HcwXd/better-medium-stats) for sharing their ideas and source code.   
 You made my life a lot easier.
 
 
