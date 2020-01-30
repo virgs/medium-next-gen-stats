@@ -24,13 +24,12 @@ function renewSummaryInfo() {
     viewsTab.querySelector('span').textContent = '';
     viewsTab.onclick = async event => {
         event.stopPropagation();
-        if (chartOptions.loaded) {
+        if (chartRenderingAnimationCompleted) {
             viewsTab.classList.add('is-active');
             readsTab.classList.remove('is-active');
             clapsTab.classList.remove('is-active');
             statsOptions.relevantDatum = getViewOfData;
             statsOptions.relevantDatumLabel = 'views';
-            chartOptions.loaded = false;
             await generateChart();
         }
     };
@@ -39,13 +38,12 @@ function renewSummaryInfo() {
     readsTab.querySelectorAll('div.chartTab div')[1].textContent = 'Reads';
     readsTab.onclick = async event => {
         event.stopPropagation();
-        if (chartOptions.loaded) {
+        if (chartRenderingAnimationCompleted) {
             viewsTab.classList.remove('is-active');
             readsTab.classList.add('is-active');
             clapsTab.classList.remove('is-active');
             statsOptions.relevantDatumLabel = 'reads';
             statsOptions.relevantDatum = getReadsOfData;
-            chartOptions.loaded = false;
             await generateChart();
         }
     };
@@ -54,13 +52,12 @@ function renewSummaryInfo() {
     clapsTab.querySelectorAll('div.chartTab div')[1].textContent = 'Claps';
     clapsTab.onclick = async event => {
         event.stopPropagation();
-        if (chartOptions.loaded) {
+        if (chartRenderingAnimationCompleted) {
             viewsTab.classList.remove('is-active');
             readsTab.classList.remove('is-active');
             clapsTab.classList.add('is-active');
             statsOptions.relevantDatumLabel = 'claps';
             statsOptions.relevantDatum = getClapsOfData;
-            chartOptions.loaded = false;
             await generateChart();
         }
     };
@@ -81,9 +78,7 @@ function renewChartPaginator() {
     const chartPagePrevButton = chartPageButtons[0];
     const chartPageNextRangeButton = chartPageButtons[1];
     chartPagePrevButton.onclick = async () => {
-        if (chartOptions.loaded) {
-            chartOptions.loaded = false;
-
+        if (chartRenderingAnimationCompleted) {
             statsOptions.lastDayOfRange = statsOptions.firstDayOfRange;
             statsOptions.firstDayOfRange = new Date(statsOptions.lastDayOfRange.getTime() -
                 (ranges[currentRangeIndex].daysOfRange * oneDayInMilliseconds));
@@ -92,9 +87,7 @@ function renewChartPaginator() {
         }
     };
     chartPageNextRangeButton.onclick = async () => {
-        if (chartOptions.loaded) {
-            chartOptions.loaded = false;
-
+        if (chartRenderingAnimationCompleted) {
             statsOptions.firstDayOfRange = statsOptions.lastDayOfRange;
             statsOptions.lastDayOfRange = new Date(statsOptions.lastDayOfRange.getTime() +
                 (ranges[currentRangeIndex].daysOfRange * oneDayInMilliseconds));
@@ -135,22 +128,49 @@ function updateSummaryTabs(data) {
     clapsTab.querySelector('.js-totalFans').innerText = `${prettifyNumbersWithCommas(summary.claps)}`;
 }
 
+function addActionToChartTypeIcons() {
+    const chartBarIcon = document.querySelector('.fa-chart-bar');
+    const pieChartIcon = document.querySelector('.fa-chart-pie');
+
+    chartBarIcon.parentNode.onclick = async () => {
+        if (statsOptions.chartGenerator !== generateVerticalStackedBarChart) {
+            statsOptions.chartGenerator = generateVerticalStackedBarChart;
+            document.querySelector('.fa-chart-bar').classList.add('mngs-chart-type-icon-active');
+            document.querySelector('.fa-chart-pie').classList.remove('mngs-chart-type-icon-active');
+            await generateChart();
+        }
+    };
+
+    pieChartIcon.parentNode.onclick = async () => {
+        if (statsOptions.chartGenerator !== generatePieBarChart) {
+            statsOptions.chartGenerator = generatePieBarChart;
+            document.querySelector('.fa-chart-bar').classList.remove('mngs-chart-type-icon-active');
+            document.querySelector('.fa-chart-pie').classList.add('mngs-chart-type-icon-active');
+            await generateChart();
+        }
+    }
+}
+
 async function renewOldFashionPage() {
     document.querySelector('h1.stats-title').classList.add('mngs-stats-page-title');
     document.querySelector('.bargraph').remove();
 
     const statsTitleDetails = document.querySelectorAll('div .stats-title')[1];
-    statsTitleDetails.classList.add('mngs-stats-title-details');
-    const detailsLink = statsTitleDetails.querySelector('.chartHelper a');
-    detailsLink.textContent = 'Get back to the old fashion medium stats';
-    detailsLink.target = '_self';
-    detailsLink.href = '/me/stats/';
-    statsTitleDetails.querySelector('.chartHelper').innerHTML = detailsLink.outerHTML;
     const chart = statsTitleDetails.cloneNode();
     chart.innerHTML =
         `<div>
             <canvas id="chart"></canvas>
-         </div>`;
+         </div>
+         <div style="text-align: right">
+            <span class="tooltip">
+                <div class="tooltiptext">Compare articles ${statsOptions.label.toLowerCase()} by time</div>
+                <i class="far fa-chart-bar mngs-chart-type-icon mngs-chart-type-icon-active"></i>
+            </span>
+            <span class="tooltip">
+                <div class="tooltiptext">Compare articles ${statsOptions.label.toLowerCase()} with each other</div>
+                <i class="fas fa-chart-pie mngs-chart-type-icon"></i> 
+            </span>
+        </div>`;
     statsTitleDetails.insertAdjacentElement('afterend', chart);
 
     renewChartPaginator();
@@ -160,6 +180,7 @@ async function renewOldFashionPage() {
     const parent = startTitle.parentNode;
     parent.insertBefore(rangeNavBar, startTitle);
     parent.insertBefore(summaryInfo, rangeNavBar);
+    addActionToChartTypeIcons();
     statsTitleDetails.remove();
     // parent.insertBefore(statsTitleDetails, summaryInfo);
 }

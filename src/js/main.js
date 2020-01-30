@@ -10,6 +10,14 @@ function nextGenerationLog(...params) {
     console.log(`[Medium Next Gen Stats - ${paddedSeconds}:${paddedMilliseconds}] ${params}`)
 }
 
+function getShadeOfColor(max, index) {
+    return {
+        r: (originalColor.r / (max)) * (index + 1),
+        g: (originalColor.g / (max)) * (index + 1),
+        b: (originalColor.b / (max)) * (index + 1)
+    };
+}
+
 function prettifyNumbersWithUnits(number) {
     const unity = ['', 'K', 'M', 'G', 'T', 'P', 'E'];
     const tier = (Math.log10(number) / 3) | 0;
@@ -48,8 +56,7 @@ async function getPostsFromUser() {
 }
 
 async function rangeButtonClicked(listItems, clickedItemIndex) {
-    if (chartOptions.loaded) {
-        chartOptions.loaded = false;
+    if (chartRenderingAnimationCompleted) {
         currentRangeIndex = clickedItemIndex;
         const selectedRange = ranges[clickedItemIndex];
         nextGenerationLog(`Generating ${selectedRange.label} chart`);
@@ -137,6 +144,7 @@ const initiallySelectedRange = ranges[currentRangeIndex];
 const statsOptions = {
     firstDayOfRange: new Date(tomorrow.getTime() - (initiallySelectedRange.daysOfRange * oneDayInMilliseconds)),
     lastDayOfRange: tomorrow,
+    chartGenerator: generateVerticalStackedBarChart,
     relevantDatum: getViewOfData,
     relevantDatumLabel: 'views',
     rangeMethod: initiallySelectedRange.rangeMethod,

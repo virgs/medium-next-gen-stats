@@ -17,7 +17,12 @@
         "src/css/mngs.css"
       ],
       "js": [
+        "src/libs/regular.js",
+        "src/libs/solid.js",
+        "src/libs/fontawesome.js",
         "src/libs/Chart.bundle.js",
+        "src/js/vertical-stacked-bar-chart-generator.js",
+        "src/js/pie-chart-generator.js",
         "src/js/chart-generator.js",
         "src/js/ranges.js",
         "src/js/renew-html.js",
