@@ -59,10 +59,19 @@ const verticalStackedBarChartGenerator = {
                 return false;
             },
             callbacks: {
-                label: (tooltipItem, chart) => {
-                    // const publicationDay = chart.datasets.filter(dataset => dataset.type === 'bubble')[0].data[tooltipItem.index];
-                    const dataset = chart.datasets[tooltipItem.datasetIndex];
-                    return ` "${dataset.label}":    ${prettifyNumbersWithCommas(tooltipItem.value)}`
+                label: (tooltipItem, chartData) => {
+                    // const publicationDay = chartData.datasets.filter(dataset => dataset.type === 'bubble')[0].data[tooltipItem.index];
+                    const total = chartData
+                        .datasets
+                        .reduce((acc, dataset) => {
+                            const value = dataset.data[tooltipItem.index];
+                            if (typeof value === 'number') {
+                                return acc + value;
+                            }
+                            return acc;
+                        }, 0);
+                    const dataset = chartData.datasets[tooltipItem.datasetIndex];
+                    return ` "${dataset.label}":    ${prettifyNumbersWithCommas(tooltipItem.value)}   (${(100 * tooltipItem.value / total).toFixed(1)}%)`
                 },
                 afterBody: () => {
                     if (verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems > 0) {
