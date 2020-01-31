@@ -82,11 +82,12 @@ const verticalStackedBarChartGenerator = {
                     }
                 },
                 footer: (tooltipItems) => {
-                    const total = tooltipItems.reduce((acc, tooltipItem) => parseInt(tooltipItem.value) + acc, 0);
+                    const value = tooltipItems.reduce((acc, tooltipItem) => parseInt(tooltipItem.value) + acc, 0);
                     const excludedItems = verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems;
                     verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems = 0;
                     delete verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip;
-                    return `Total:\t ${prettifyNumbersWithCommas(total)} ${statsOptions.relevantDatumLabel} of ${tooltipItems.length + excludedItems} articles`;
+                    const total = tooltipItems.length + excludedItems;
+                    return `Total: ${prettifyNumbersWithCommas(value)} ${statsOptions.relevantDatumLabel} of ${total} article${total > 1 ? 's' : ''}`;
                 },
             },
             footerFontStyle: 'bold',

@@ -1,5 +1,6 @@
 function renewRangeNavbar() {
     const rangeNavBar = document.querySelector("nav");
+    rangeNavBar.setAttribute('id', 'rangeNavBar');
     rangeNavBar.classList.add('mngs-range-selector');
     const listItems = Array.from(rangeNavBar.querySelectorAll('ul li'));
     listItems
@@ -67,8 +68,8 @@ function renewSummaryInfo() {
 function updateChartPageLabels() {
     const chartPaginator = document.querySelector(".chartPage");
     const chartPageLabels = chartPaginator.querySelectorAll('.button-label');
-    chartPageLabels[0].textContent = `Prev ${ranges[currentRangeIndex].daysOfRange} days`;
-    chartPageLabels[1].textContent = `Next ${ranges[currentRangeIndex].daysOfRange} days`;
+    chartPageLabels[0].textContent = `Prev ${timeRanges[currentTimeRangeIndex]} days`;
+    chartPageLabels[1].textContent = `Next ${timeRanges[currentTimeRangeIndex]} days`;
 }
 
 function renewChartPaginator() {
@@ -81,7 +82,7 @@ function renewChartPaginator() {
         if (chartRenderingAnimationCompleted) {
             statsOptions.lastDayOfRange = statsOptions.firstDayOfRange;
             statsOptions.firstDayOfRange = new Date(statsOptions.lastDayOfRange.getTime() -
-                (ranges[currentRangeIndex].daysOfRange * oneDayInMilliseconds));
+                (timeRanges[currentTimeRangeIndex] * oneDayInMilliseconds));
             chartPageNextRangeButton.disabled = false;
             await generateChart();
         }
@@ -90,12 +91,12 @@ function renewChartPaginator() {
         if (chartRenderingAnimationCompleted) {
             statsOptions.firstDayOfRange = statsOptions.lastDayOfRange;
             statsOptions.lastDayOfRange = new Date(statsOptions.lastDayOfRange.getTime() +
-                (ranges[currentRangeIndex].daysOfRange * oneDayInMilliseconds));
+                (timeRanges[currentTimeRangeIndex] * oneDayInMilliseconds));
             if (new Date(statsOptions.lastDayOfRange.getTime() + oneDayInMilliseconds).getTime() >= new Date().getTime()) {
                 chartPageNextRangeButton.disabled = true;
                 statsOptions.lastDayOfRange = tomorrow;
                 statsOptions.firstDayOfRange = new Date(statsOptions.lastDayOfRange.getTime() -
-                    (ranges[currentRangeIndex].daysOfRange * oneDayInMilliseconds));
+                    (timeRanges[currentTimeRangeIndex] * oneDayInMilliseconds));
             }
             await generateChart();
         }
@@ -134,6 +135,7 @@ function addActionToChartTypeIcons() {
 
     chartBarIcon.parentNode.onclick = async () => {
         if (statsOptions.chartGenerator !== generateVerticalStackedBarChart) {
+            document.querySelector('#rangeNavBar').style.opacity = 1;
             statsOptions.chartGenerator = generateVerticalStackedBarChart;
             document.querySelector('.fa-chart-bar').classList.add('mngs-chart-type-icon-active');
             document.querySelector('.fa-chart-pie').classList.remove('mngs-chart-type-icon-active');
@@ -143,12 +145,70 @@ function addActionToChartTypeIcons() {
 
     pieChartIcon.parentNode.onclick = async () => {
         if (statsOptions.chartGenerator !== generatePieBarChart) {
+            document.querySelector('#rangeNavBar').style.opacity = 0;
             statsOptions.chartGenerator = generatePieBarChart;
             document.querySelector('.fa-chart-bar').classList.remove('mngs-chart-type-icon-active');
             document.querySelector('.fa-chart-pie').classList.add('mngs-chart-type-icon-active');
             await generateChart();
         }
     }
+}
+
+
+async function rangeButtonClicked(listItems, clickedItemIndex) {
+    if (chartRenderingAnimationCompleted) {
+        currentRangeIndex = clickedItemIndex;
+        const selectedRange = ranges[clickedItemIndex];
+        nextGenerationLog(`Generating ${selectedRange.label} chart`);
+        listItems
+            .forEach((item, index) => index === clickedItemIndex ? item.classList.add('is-active') : item.classList.remove('is-active'));
+        statsOptions.rangeMethod = selectedRange.rangeMethod;
+        statsOptions.label = selectedRange.label;
+
+        await generateChart();
+    }
+}
+
+async function timeRangeButtonClicked(listItems, clickedItemIndex) {
+    if (chartRenderingAnimationCompleted) {
+        currentTimeRangeIndex = clickedItemIndex;
+        const days = timeRanges[currentTimeRangeIndex];
+        nextGenerationLog(`Generating ${days} days chart`);
+        listItems
+            .forEach((item, index) => index === clickedItemIndex ? item.classList.add('is-active') : item.classList.remove('is-active'));
+        statsOptions.firstDayOfRange = new Date(statsOptions.lastDayOfRange.getTime() -
+            (days * oneDayInMilliseconds));
+
+        updateChartPageLabels();
+        await generateChart();
+    }
+}
+
+
+function createTimeNavBar() {
+    const navBar = document.createElement('nav');
+    navBar.setAttribute('id', 'timeNavBar');
+    navBar.classList.add('u-flex', 'heading', 'heading--borderedBottom', 'heading--paddedTop', 'mngs-range-selector');
+    navBar.innerHTML = `
+         <span class="u-minWidth0">
+             <ul class="heading-tabs">
+                ${timeRanges.map((range, index) => {
+                    return ` <li class="heading-tabsItem u-inlineBlock js-tabsItem ${index === 0 ? 'is-active' : ''} u-fontSize16">
+                                 <span class="heading-title u-inlineBlock u-fontSize16">
+                                     <a class="button button--chromeless u-baseColor--buttonNormal"
+                                        href="#">${range} days</a>
+                                 </span>
+                             </li>`
+                    }).join('')}
+             </ul>
+         </span>    
+    `;
+    const listItems = Array.from(navBar.querySelectorAll('ul li'));
+    listItems
+        .forEach((item, index) => {
+            item.querySelector('a').addEventListener('click', () => timeRangeButtonClicked(listItems, index));
+        });
+    return navBar;
 }
 
 async function renewOldFashionPage() {
@@ -176,10 +236,13 @@ async function renewOldFashionPage() {
     renewChartPaginator();
     const summaryInfo = renewSummaryInfo();
     const startTitle = document.querySelector(".stats-title--chart");
-    const rangeNavBar = renewRangeNavbar();
     const parent = startTitle.parentNode;
+    const rangeNavBar = renewRangeNavbar();
+    const timeNavBar = createTimeNavBar();
+    parent.appendChild(timeNavBar);
     parent.insertBefore(rangeNavBar, startTitle);
-    parent.insertBefore(summaryInfo, rangeNavBar);
+    parent.insertBefore(timeNavBar, rangeNavBar);
+    parent.insertBefore(summaryInfo, timeNavBar);
     addActionToChartTypeIcons();
     statsTitleDetails.remove();
     // parent.insertBefore(statsTitleDetails, summaryInfo);

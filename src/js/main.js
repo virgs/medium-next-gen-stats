@@ -1,4 +1,5 @@
 let currentRangeIndex = 0;
+let currentTimeRangeIndex = 0;
 const oneDayInMilliseconds = 24 * 3600 * 1000;
 // const originalColor = {r: 82, g: 151, b: 186};
 const originalColor = {r: 82, g: 186, b: 151};
@@ -53,23 +54,6 @@ async function getPostsFromUser() {
                 }
             }
         );
-}
-
-async function rangeButtonClicked(listItems, clickedItemIndex) {
-    if (chartRenderingAnimationCompleted) {
-        currentRangeIndex = clickedItemIndex;
-        const selectedRange = ranges[clickedItemIndex];
-        nextGenerationLog(`Generating ${selectedRange.label} chart`);
-        listItems
-            .forEach((item, index) => index === clickedItemIndex ? item.classList.add('is-active') : item.classList.remove('is-active'));
-        statsOptions.rangeMethod = selectedRange.rangeMethod;
-        statsOptions.label = selectedRange.label;
-        statsOptions.firstDayOfRange = new Date(statsOptions.lastDayOfRange.getTime() -
-            (selectedRange.daysOfRange * oneDayInMilliseconds));
-
-        updateChartPageLabels();
-        await generateChart();
-    }
 }
 
 function getInitialPostsData() {
@@ -142,7 +126,7 @@ const now = new Date();
 const tomorrow = new Date(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() + oneDayInMilliseconds);
 const initiallySelectedRange = ranges[currentRangeIndex];
 const statsOptions = {
-    firstDayOfRange: new Date(tomorrow.getTime() - (initiallySelectedRange.daysOfRange * oneDayInMilliseconds)),
+    firstDayOfRange: new Date(tomorrow.getTime() - (timeRanges[currentTimeRangeIndex] * oneDayInMilliseconds)),
     lastDayOfRange: tomorrow,
     chartGenerator: generateVerticalStackedBarChart,
     relevantDatum: getViewOfData,

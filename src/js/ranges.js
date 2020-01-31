@@ -82,16 +82,15 @@ const ranges = [
     {
         rangeMethod: getRangeInDays,
         label: 'Daily',
-        daysOfRange: 30,
     },
     {
         rangeMethod: getRangeInWeeks,
         label: 'Weekly',
-        daysOfRange: 20 * 7,
     },
     {
         rangeMethod: getRangeInMonths,
         label: 'Monthly',
-        daysOfRange: 365,
     },
 ];
+
+const timeRanges = [30, 60, 120, 360];
