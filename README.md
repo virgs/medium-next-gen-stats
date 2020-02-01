@@ -2,7 +2,7 @@
 
 A [google chrome browser extension](https://chrome.google.com/webstore/detail/medium-next-generation-st/fhopcbdfcaleefngfpglahlpfhagendo) that provides richer information about your texts.  
 
-![weeklyScreenshot](images/medium-next-gen-snapshot-weekly.png)  
+![snapshot1](images/snapshot1.png)  
 
 Get rid of the old fashion informationless default medium stats and get Next Generation Stats.
 
@@ -13,7 +13,7 @@ This extension provides larger time period, daily/weekly/monthly views/claps, an
 
 Have fun!
 
-![dailyScreenshot](images/medium-next-gen-snapshot-daily.png)
+![snapshot2](images/snapshot2.png)
 
 ### Features
 -  Larger ranges
@@ -22,9 +22,16 @@ Have fun!
 -  Description of top articles read in the range
 -  Total in different ranges: daily, weekly and yearly
 
+![snapshot3](images/snapshot3.png)
+
 ### How to use
 1. Go to your medium stats page: https://medium.com/me/stats
 2. This is it
+
+### Contact
+Medium: https://medium.com/@virgs  
+Github: https://github.com/virgs  
+Pagehub: https://pagehub.me/virgs  
 
 ### Source Code
 You can find the source code on the link below: 
@@ -37,11 +44,6 @@ https://github.com/virgs/medium-next-gen-stats
 4. Click on load unpacked extension and select the generated folder.
 
 PRs are most welcome :)
-
-### Contact
-Medium: https://medium.com/@virgs  
-Github: https://github.com/virgs  
-Pagehub: https://pagehub.me/virgs  
 
 ### Acknowledgement
 Thanks to [tomastrajan](https://github.com/tomastrajan/medium-enhanced-stats) and [HcwXd](https://github.com/HcwXd/better-medium-stats) for sharing their ideas and source code.   
