@@ -1,7 +1,7 @@
 const pieChartOptions = {
     type: 'pie',
     options: {
-        cutoutPercentage: 20,
+        cutoutPercentage: 40,
         rotation: Math.PI,
         animation: {
             duration: 750,
@@ -14,7 +14,34 @@ const pieChartOptions = {
             padding: 12,
         },
         legend: {
-            display: false,
+            position: 'bottom',
+            align: 'start',
+            labels: {
+                boxWidth: 10,
+                padding: 30,
+                filter: legendItem => legendItem.index < 5,
+                generateLabels: chart => {
+                    const data = chart.data;
+                    if (data.labels.length && data.datasets.length) {
+                        return data.labels.map((label, index) => {
+                            const meta = chart.getDatasetMeta(0);
+                            const style = meta.controller.getStyle(index);
+
+                            return {
+                                text: `${ordinalNumber(index + 1)} - ` + label,
+                                fillStyle: style.backgroundColor,
+                                strokeStyle: style.borderColor,
+                                lineWidth: style.borderWidth,
+                                hidden: isNaN(data.datasets[0].data[index]) || meta.data[index].hidden,
+
+                                // Extra data used for toggling the correct item
+                                index: index
+                            };
+                        });
+                    }
+                    return [];
+                }
+            }
         },
         responsive: true,
         tooltips: {
@@ -49,6 +76,17 @@ const pieChartOptions = {
             intersect: true
         },
     }
+};
+
+const ordinalNumber = (value) => {
+    if (value === 1) {
+        return '1st';
+    } else if (value === 2) {
+        return '2nd';
+    } else if (value === 3) {
+        return '3rd';
+    }
+    return `${value}th`;
 };
 
 

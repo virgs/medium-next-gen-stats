@@ -24,7 +24,7 @@ Have fun!
 
 ### How to use
 1. Go to your medium stats page: https://medium.com/me/stats
-1. This is it
+2. This is it
 
 ### Source Code
 You can find the source code on the link below: 
@@ -32,9 +32,9 @@ https://github.com/virgs/medium-next-gen-stats
 
 ### Development
 1. Clone this repo
-1. Go to chrome://extensions
-1. Enable developer mode
-1. Click on load unpacked extension and select the generated folder.
+2. Go to chrome://extensions
+3. Enable developer mode
+4. Click on load unpacked extension and select the generated folder.
 
 PRs are most welcome :)
 

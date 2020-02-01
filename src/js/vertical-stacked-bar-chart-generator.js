@@ -1,6 +1,5 @@
 const verticalStackedBarChartGenerator = {
     type: 'bar',
-    data: {},
     options: {
         animation: {
             duration: 750,
@@ -14,8 +13,6 @@ const verticalStackedBarChartGenerator = {
         },
         legend: {
             display: false,
-            position: 'bottom',
-            align: 'start'
         },
         responsive: true,
         tooltips: {
@@ -209,8 +206,7 @@ function checkPublicationDataset(indexOfDate, post, range, previousDatasets) {
                 return {
                     x: 0,
                     y: y,
-                    r: radius,
-                    post
+                    r: radius
                 };
             }
         }),

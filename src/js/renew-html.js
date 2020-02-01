@@ -242,7 +242,7 @@ async function renewOldFashionPage() {
     parent.appendChild(timeNavBar);
     parent.insertBefore(rangeNavBar, startTitle);
     parent.insertBefore(timeNavBar, rangeNavBar);
-    parent.insertBefore(summaryInfo, timeNavBar);
+    parent.insertBefore(summaryInfo, rangeNavBar);
     addActionToChartTypeIcons();
     statsTitleDetails.remove();
     // parent.insertBefore(statsTitleDetails, summaryInfo);
