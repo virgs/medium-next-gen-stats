@@ -16,7 +16,7 @@
     margin-top: 20px !important;
 }
 
-.mngs-chart-type-icon {
+.mngs-chart-type-icon, .mngs-chart-action-icon {
     font-size: 24px;
     cursor: pointer;
     padding: 18px 10px 0 10px;
@@ -32,7 +32,7 @@
     color: #141414 !important;
 }
 
-.mngs-chart-type-icon-active:hover {
+.mngs-chart-type-icon-active:hover, .mngs-chart-action-icon:hover {
     color: #141414 !important;
 }
 

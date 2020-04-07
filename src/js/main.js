@@ -138,15 +138,33 @@ const statsOptions = {
 nextGenerationLog('Started');
 let postsData = undefined;
 let postsSummary = undefined;
+let downloadData = undefined;
+
+async function aggregateDownloadData() {
+    downloadData = postsSummary.reduce((acc, post) => {
+        acc[post.id] = {...post, data: []};
+        return acc;
+    }, {});
+    postsData.forEach(datum => {
+        if (downloadData[datum.id] !== undefined) {
+            const clone = {...datum};
+            delete clone.id;
+            delete clone.title;
+            downloadData[datum.id].data.push(clone);
+        }
+    });
+    downloadData = Object.values(downloadData);
+    nextGenerationLog('Downloadable data aggregated');
+    enableDownloadButton();
+}
 
 renewOldFashionPage()
     .then(() => getPostsFromUser())
-    .then(data => {
-        postsSummary = data;
-    })
+    .then(data => postsSummary = data)
     .then(() => getInitialPostsData()
         .then(data => postsData = data)
         .then(() => generateChart())
         .then(() => getFullPostsData())
         .then(data => postsData = data)
-        .then(() => nextGenerationLog('Done')))
+        .then(() => aggregateDownloadData())
+        .then(() => nextGenerationLog('Done')));

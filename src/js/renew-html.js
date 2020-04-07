@@ -130,12 +130,26 @@ function updateSummaryTabs(data) {
 }
 
 function addActionToChartTypeIcons() {
+    const downloadIcon = document.querySelector('.fa-file-download');
     const chartBarIcon = document.querySelector('.fa-chart-bar');
     const pieChartIcon = document.querySelector('.fa-chart-pie');
 
+    downloadIcon.parentNode.onclick = async () => {
+        if (document.querySelector('.fa-file-download').style.pointerEvents !== 'none') {
+            const element = document.createElement('a');
+            const stringifiedContent = JSON.stringify(downloadData, null, 2);
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(stringifiedContent));
+            element.setAttribute('download', 'medium-next-generation-stats.json');
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+    };
+
     chartBarIcon.parentNode.onclick = async () => {
         if (statsOptions.chartGenerator !== generateVerticalStackedBarChart) {
-            document.querySelector('#rangeNavBar').style.opacity = 1;
+            document.querySelector('#rangeNavBar').style.opacity = '1';
             statsOptions.chartGenerator = generateVerticalStackedBarChart;
             document.querySelector('.fa-chart-bar').classList.add('mngs-chart-type-icon-active');
             document.querySelector('.fa-chart-pie').classList.remove('mngs-chart-type-icon-active');
@@ -145,7 +159,7 @@ function addActionToChartTypeIcons() {
 
     pieChartIcon.parentNode.onclick = async () => {
         if (statsOptions.chartGenerator !== generatePieBarChart) {
-            document.querySelector('#rangeNavBar').style.opacity = 0;
+            document.querySelector('#rangeNavBar').style.opacity = '0';
             statsOptions.chartGenerator = generatePieBarChart;
             document.querySelector('.fa-chart-bar').classList.remove('mngs-chart-type-icon-active');
             document.querySelector('.fa-chart-pie').classList.add('mngs-chart-type-icon-active');
@@ -154,6 +168,11 @@ function addActionToChartTypeIcons() {
     }
 }
 
+function enableDownloadButton() {
+    document.querySelector('.fa-file-download').style.pointerEvents = 'initial';
+    document.querySelector('.fa-file-download').style.visibility = 'initial';
+
+}
 
 async function rangeButtonClicked(listItems, clickedItemIndex) {
     if (chartRenderingAnimationCompleted) {
@@ -193,13 +212,13 @@ function createTimeNavBar() {
          <span class="u-minWidth0">
              <ul class="heading-tabs">
                 ${timeRanges.map((range, index) => {
-                    return ` <li class="heading-tabsItem u-inlineBlock js-tabsItem ${index === 0 ? 'is-active' : ''} u-fontSize16">
+        return ` <li class="heading-tabsItem u-inlineBlock js-tabsItem ${index === 0 ? 'is-active' : ''} u-fontSize16">
                                  <span class="heading-title u-inlineBlock u-fontSize16">
                                      <a class="button button--chromeless u-baseColor--buttonNormal"
                                         href="#">${range} days</a>
                                  </span>
                              </li>`
-                    }).join('')}
+    }).join('')}
              </ul>
          </span>    
     `;
@@ -221,15 +240,21 @@ async function renewOldFashionPage() {
         `<div>
             <canvas id="chart"></canvas>
          </div>
-         <div style="text-align: right">
-            <span class="tooltip">
-                <div class="tooltiptext">Compare articles ${statsOptions.label.toLowerCase()} by time</div>
-                <i class="far fa-chart-bar mngs-chart-type-icon mngs-chart-type-icon-active"></i>
+         <div style="position: relative">
+             <span class="tooltip">
+                <div class="tooltiptext">Export to JSON file</div>
+                <i style="pointer-events: none; visibility: hidden" class="fas fa-file-download mngs-chart-action-icon"></i>
             </span>
-            <span class="tooltip">
-                <div class="tooltiptext">Compare articles ${statsOptions.label.toLowerCase()} with each other</div>
-                <i class="fas fa-chart-pie mngs-chart-type-icon"></i> 
-            </span>
+            <div style="top: 0; right: 0; position: absolute;">
+                <span class="tooltip">
+                    <div class="tooltiptext">Compare articles ${statsOptions.label.toLowerCase()} by time</div>
+                    <i class="far fa-chart-bar mngs-chart-type-icon mngs-chart-type-icon-active"></i>
+                </span>
+                <span class="tooltip">
+                    <div class="tooltiptext">Compare articles ${statsOptions.label.toLowerCase()} with each other</div>
+                    <i class="fas fa-chart-pie mngs-chart-type-icon"></i> 
+                </span>            
+            </div>
         </div>`;
     statsTitleDetails.insertAdjacentElement('afterend', chart);
 

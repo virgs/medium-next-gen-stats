@@ -28,7 +28,7 @@ const pieChartOptions = {
                             const style = meta.controller.getStyle(index);
 
                             return {
-                                text: `${ordinalNumber(index + 1)} - ` + label,
+                                text: `${ordinalNumber(index + 1)} - "${label}"`,
                                 fillStyle: style.backgroundColor,
                                 strokeStyle: style.borderColor,
                                 lineWidth: style.borderWidth,
