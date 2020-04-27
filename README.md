@@ -21,6 +21,7 @@ Have fun!
 -  Total stories views/reads/claps
 -  Description of top articles read in the range
 -  Total in different ranges: daily, weekly and yearly
+-  Download data file
 
 ![snapshot3](images/snapshot3.png)
 

@@ -99,14 +99,20 @@ function getInitialPostStats(postId) {
         .then(data => data && data.value || []);
 }
 
-function getFullPostStats(postId) {
-    return request(`https://medium.com/stats/${postId}/0}/${Date.now()}`)
-        .then(data => data && data.value || []);
+async function getFullPostStats(postId) {
+    const stats = await request(`https://medium.com/stats/${postId}/0}/${Date.now()}`);
+    return stats.value ? stats.value : [];
 }
 
 
 function request(url) {
-    return fetch(url, {credentials: "same-origin", headers: {accept: 'application/json'}})
+    return fetch(url,
+        {
+            credentials: 'same-origin',
+            headers: {
+                accept: 'application/json'
+            }
+        })
         .then(res => {
             if (res.status !== 200) {
                 const message = `Fail to fetch data: (${res.status}) - ${res.statusText}`;
@@ -118,9 +124,39 @@ function request(url) {
         .then(text => JSON.parse(text.slice(16)).payload)
 }
 
-const getViewOfData = (data) => data.views;
-const getReadsOfData = (data) => data.reads;
-const getClapsOfData = (data) => data.claps;
+function graphQL(postId) {
+    return fetch('https://medium.com/_/graphql',
+        {
+            credentials: 'same-origin',
+            method: 'POST',
+            headers: {
+                accept: '*/*',
+                'graphql-operation': 'StatsPostChart',
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+                'operationName': 'StatsPostChart',
+                'variables': {
+                    'postId': postId,
+                    'startAt': 0,
+                    'endAt': Date.now()
+                },
+                'query': 'query StatsPostChart($postId: ID!, $startAt: Long!, $endAt: Long!) {\n  post(id: $postId) {\n    id\n    ...StatsPostChart_dailyStats\n    ...StatsPostChart_dailyEarnings\n    __typename\n  }\n}\n\nfragment StatsPostChart_dailyStats on Post {\n  dailyStats(startAt: $startAt, endAt: $endAt) {\n    periodStartedAt\n    views\n    internalReferrerViews\n    memberTtr\n    __typename\n  }\n  __typename\n}\n\nfragment StatsPostChart_dailyEarnings on Post {\n  earnings {\n    dailyEarnings(startAt: $startAt, endAt: $endAt) {\n      periodEndedAt\n      periodStartedAt\n      amount\n      __typename\n    }\n    lastCommittedPeriodStartedAt\n    __typename\n  }\n  __typename\n}\n'
+            })
+        })
+        .then(res => {
+            if (res.status !== 200) {
+                const message = `Fail to fetch data: (${res.status}) - ${res.statusText}`;
+                console.log(message);
+                throw message;
+            }
+            return res.text();
+        });
+}
+
+const getViewOfData = (data) => data.views || 0;
+const getReadsOfData = (data) => data.reads || 0;
+const getClapsOfData = (data) => data.claps || 0;
 
 const now = new Date();
 const tomorrow = new Date(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() + oneDayInMilliseconds);
@@ -141,19 +177,32 @@ let postsSummary = undefined;
 let downloadData = undefined;
 
 async function aggregateDownloadData() {
-    downloadData = postsSummary.reduce((acc, post) => {
-        acc[post.id] = {...post, data: []};
-        return acc;
-    }, {});
-    postsData.forEach(datum => {
-        if (downloadData[datum.id] !== undefined) {
-            const clone = {...datum};
-            delete clone.id;
-            delete clone.title;
-            downloadData[datum.id].data.push(clone);
-        }
-    });
-    downloadData = Object.values(downloadData);
+    downloadData = postsSummary
+        .reduce((acc, post) => {
+            acc[post.id] = {
+                ...post,
+                data: []
+            };
+            return acc;
+        }, {});
+
+    postsData
+        .forEach(datum => {
+            if (downloadData[datum.id] !== undefined) {
+                const clone = {...datum};
+                delete clone.id;
+                delete clone.title;
+                downloadData[datum.id].data.push(clone);
+            }
+        });
+    downloadData = await Promise.all(Object
+        .values(downloadData)
+        .map(async data => {
+            const payload = JSON.parse(await graphQL(data.postId));
+            data.earnings = payload.data.post.earnings;
+            return data;
+        }));
+
     nextGenerationLog('Downloadable data aggregated');
     enableDownloadButton();
 }
