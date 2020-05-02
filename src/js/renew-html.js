@@ -132,6 +132,7 @@ function updateSummaryTabs(data) {
 function addActionToChartTypeIcons() {
     const downloadIcon = document.querySelector('.fa-file-download');
     const chartBarIcon = document.querySelector('.fa-chart-bar');
+    const lineIcon = document.querySelector('.fa-chart-line');
     const pieChartIcon = document.querySelector('.fa-chart-pie');
 
     downloadIcon.parentNode.onclick = async () => {
@@ -152,6 +153,18 @@ function addActionToChartTypeIcons() {
             document.querySelector('#rangeNavBar').style.opacity = '1';
             statsOptions.chartGenerator = generateVerticalStackedBarChart;
             document.querySelector('.fa-chart-bar').classList.add('mngs-chart-type-icon-active');
+            document.querySelector('.fa-chart-line').classList.remove('mngs-chart-type-icon-active');
+            document.querySelector('.fa-chart-pie').classList.remove('mngs-chart-type-icon-active');
+            await generateChart();
+        }
+    };
+
+    lineIcon.parentNode.onclick = async () => {
+        if (statsOptions.chartGenerator !== generateLineChart) {
+            document.querySelector('#rangeNavBar').style.opacity = '1';
+            statsOptions.chartGenerator = generateLineChart;
+            document.querySelector('.fa-chart-bar').classList.remove('mngs-chart-type-icon-active');
+            document.querySelector('.fa-chart-line').classList.add('mngs-chart-type-icon-active');
             document.querySelector('.fa-chart-pie').classList.remove('mngs-chart-type-icon-active');
             await generateChart();
         }
@@ -162,6 +175,7 @@ function addActionToChartTypeIcons() {
             document.querySelector('#rangeNavBar').style.opacity = '0';
             statsOptions.chartGenerator = generatePieBarChart;
             document.querySelector('.fa-chart-bar').classList.remove('mngs-chart-type-icon-active');
+            document.querySelector('.fa-chart-line').classList.remove('mngs-chart-type-icon-active');
             document.querySelector('.fa-chart-pie').classList.add('mngs-chart-type-icon-active');
             await generateChart();
         }
@@ -247,8 +261,13 @@ async function renewOldFashionPage() {
             </span>
             <div style="top: 0; right: 0; position: absolute;">
                 <span class="tooltip">
-                    <div class="tooltiptext">Compare articles ${statsOptions.label.toLowerCase()} by time</div>
+                    <div class="tooltiptext">Compare aggregated articles ${statsOptions.label.toLowerCase()} by time</div>
                     <i class="far fa-chart-bar mngs-chart-type-icon mngs-chart-type-icon-active"></i>
+                </span>
+                <span class="tooltip">
+                    <div class="tooltiptext">Compare individually articles ${statsOptions.label.toLowerCase()} by time</div>
+                    <i class="fas fa-chart-line mngs-chart-type-icon"></i>
+<!--                    <i class="fas fa-chart-area mngs-chart-type-icon"></i>-->
                 </span>
                 <span class="tooltip">
                     <div class="tooltiptext">Compare articles ${statsOptions.label.toLowerCase()} with each other</div>

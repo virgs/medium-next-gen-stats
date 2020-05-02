@@ -154,9 +154,9 @@ function graphQL(postId) {
         });
 }
 
-const getViewOfData = (data) => data.views || 0;
-const getReadsOfData = (data) => data.reads || 0;
-const getClapsOfData = (data) => data.claps || 0;
+const getViewOfData = data => data.views || 0;
+const getReadsOfData = data => data.reads || 0;
+const getClapsOfData = data => data.claps || 0;
 
 const now = new Date();
 const tomorrow = new Date(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() + oneDayInMilliseconds);

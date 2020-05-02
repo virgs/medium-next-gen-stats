@@ -92,7 +92,7 @@ const ordinalNumber = (value) => {
 
 async function generatePieBarChart(postsDataOfChart) {
     let pieChartData = Object.values(postsDataOfChart
-        .reduce((acc, data, index, vec) => {
+        .reduce((acc, data) => {
             const id = data.id;
             if (!acc[id]) {
                 acc[id] = {

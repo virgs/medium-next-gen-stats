@@ -1,5 +1,5 @@
-const verticalStackedBarChartGenerator = {
-    type: 'bar',
+const lineChartGenerator = {
+    type: 'line',
     options: {
         animation: {
             duration: 750,
@@ -12,7 +12,13 @@ const verticalStackedBarChartGenerator = {
             padding: 12,
         },
         legend: {
-            display: false,
+            // display: false,
+            position: 'bottom',
+            align: 'start',
+            labels: {
+                boxWidth: 10,
+                padding: 30
+            }
         },
         responsive: true,
         tooltips: {
@@ -39,8 +45,8 @@ const verticalStackedBarChartGenerator = {
                 if (parsedValue <= 0) {
                     return false;
                 }
-                if (!verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip) {
-                    verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip = chartData.datasets
+                if (!lineChartGenerator.options.tooltips.topPostsOfTooltip) {
+                    lineChartGenerator.options.tooltips.topPostsOfTooltip = chartData.datasets
                         .filter(dataset => dataset.type !== 'bubble')
                         .map(dataset => dataset.data[item.index])
                         .filter(item => item > 0)
@@ -48,10 +54,10 @@ const verticalStackedBarChartGenerator = {
                         .reverse()
                         .filter((_, index) => index < 10);
                 }
-                if (verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip.includes(parsedValue)) {
+                if (lineChartGenerator.options.tooltips.topPostsOfTooltip.includes(parsedValue)) {
                     return true;
                 }
-                ++verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems;
+                ++lineChartGenerator.options.tooltips.currentExcludedItems;
 
                 return false;
             },
@@ -71,18 +77,18 @@ const verticalStackedBarChartGenerator = {
                     return ` "${dataset.label}":    ${prettifyNumbersWithCommas(tooltipItem.value)}   (${(100 * tooltipItem.value / total).toFixed(1)}%)`
                 },
                 afterBody: () => {
-                    if (verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems > 0) {
-                        if (verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems === 1) {
+                    if (lineChartGenerator.options.tooltips.currentExcludedItems > 0) {
+                        if (lineChartGenerator.options.tooltips.currentExcludedItems === 1) {
                             return `   and another one...`;
                         }
-                        return `   and ${verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems} others...`;
+                        return `   and ${lineChartGenerator.options.tooltips.currentExcludedItems} others...`;
                     }
                 },
                 footer: (tooltipItems) => {
                     const value = tooltipItems.reduce((acc, tooltipItem) => parseInt(tooltipItem.value) + acc, 0);
-                    const excludedItems = verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems;
-                    verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems = 0;
-                    delete verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip;
+                    const excludedItems = lineChartGenerator.options.tooltips.currentExcludedItems;
+                    lineChartGenerator.options.tooltips.currentExcludedItems = 0;
+                    delete lineChartGenerator.options.tooltips.topPostsOfTooltip;
                     const total = tooltipItems.length + excludedItems;
                     return `Total: ${prettifyNumbersWithCommas(value)} ${statsOptions.relevantDatumLabel} of ${total} article${total > 1 ? 's' : ''}`;
                 },
@@ -96,6 +102,7 @@ const verticalStackedBarChartGenerator = {
         },
         scales: {
             yAxes: [{
+                // stacked: true,
                 gridLines: {
                     drawBorder: false,
                     borderDash: [2, 3],
@@ -124,24 +131,22 @@ const verticalStackedBarChartGenerator = {
     }
 };
 
-async function generateVerticalStackedBarChart(postsDataOfChart, postsSummaryOfChart) {
+async function generateLineChart(postsDataOfChart) {
 
     const range = statsOptions.rangeMethod(statsOptions.firstDayOfRange, statsOptions.lastDayOfRange);
     const labels = range.map(interval => interval.label);
-    const chartData = generateBarChartData(range, postsDataOfChart, statsOptions.relevantDatum)
-        .concat(generateBubbleChartData(range, postsSummaryOfChart));
-    verticalStackedBarChartGenerator.data = {
+    const chartData = generateLineData(range, postsDataOfChart, statsOptions.relevantDatum);
+    lineChartGenerator.data = {
         datasets: chartData,
         labels
     };
-    verticalStackedBarChartGenerator.options.title.text = `${statsOptions.label} ${statsOptions.relevantDatumLabel} from '${getStringifiedDate(statsOptions.firstDayOfRange)}' to '${
+    lineChartGenerator.options.title.text = `${statsOptions.label} ${statsOptions.relevantDatumLabel} from '${getStringifiedDate(statsOptions.firstDayOfRange)}' to '${
         getStringifiedDate(new Date(statsOptions.lastDayOfRange.getTime() - oneDayInMilliseconds))}'`;
-    verticalStackedBarChartGenerator.options.tooltips.callbacks.title = tooltipItems => range[tooltipItems[0].index].label;
 
-    return verticalStackedBarChartGenerator;
+    return lineChartGenerator;
 }
 
-function generateBarChartData(range, data, relevantDatum) {
+function generateLineData(range, data, relevantDatum) {
     return Object.values(data
         .reduce((acc, info) => {
             if (acc[info.id] === undefined) {
@@ -149,30 +154,23 @@ function generateBarChartData(range, data, relevantDatum) {
             }
             return acc;
         }, {}))
-        .map((post, index, vec) => {
-            const backgroundColor = getShadeOfColor(vec.length, index);
+        .map(post => {
             const dataOfPostId = getDataOfPostInRange(range, data, post);
-            // post.data = post.data.map((datum, index) => relevantDatum(dataOfPostId[index]));
             post.data = dataOfPostId.map(value => relevantDatum(value));
-            post.backgroundColor = `rgb(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, 0.75)`;
+            post.relevantDataSum = post.data.reduce((acc, current) => acc + current, 0);
+            post.fill = false;
             return post;
         })
-        .filter((post => post.data.reduce((acc, current) => acc + current, 0) > 0));
+        .sort((first, second) => second.relevantDataSum - first.relevantDataSum)
+        .filter((post, index) => post.relevantDataSum > 0)
+        .filter((post, index) => index < 5)
+        .map((post, index, vec) => {
+            const backgroundColor = getShadeOfColor(vec.length, index);
+            post.backgroundColor = `rgb(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, 0.75)`;
+            post.borderColor = `rgb(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, 0.75)`;
+            return post;
+        });
 }
-
-function generateBubbleChartData(range, filteredByRangePostsSummary) {
-    return filteredByRangePostsSummary
-        .reduce((acc, summary) => {
-            const indexOfDate = range
-                .findIndex(item => summary.firstPublishedAt >= item.begin.getTime() && summary.firstPublishedAt < item.end.getTime());
-            const dataset = checkPublicationDataset(indexOfDate, summary, range, acc);
-            if (dataset) {
-                acc.push(dataset);
-            }
-            return acc;
-        }, []);
-}
-
 
 function initialValueOfEveryBar(info, range) {
     return {
@@ -182,45 +180,13 @@ function initialValueOfEveryBar(info, range) {
         label: info.title,
         views: info.views,
         readingTime: info.readingTime,
+        relevantDataSum: 0,
 
         stack: 'unique',
         barPercentage: 0.95,
         categoryPercentage: 1,
         data: range.map((_, index) => 0)
     };
-}
-
-function checkPublicationDataset(indexOfDate, post, range, previousDatasets) {
-    let hasData = false;
-    const publicationDateDataset = {
-        label: 'Publication original date',
-        data: range.map((_, index) => {
-            if (index === indexOfDate) {
-                hasData = true;
-                const radius = Math.max(Math.min(1.3 * post.readingTime, 12), 3);
-                const y = previousDatasets
-                    .map(dataset => dataset.data[indexOfDate])
-                    .filter(dataset => dataset)
-                    .reduce((acc, bubble) => {
-                        return acc + 5 + 2 * bubble.r;
-                    }, 0);
-                return {
-                    x: 0,
-                    y: y,
-                    r: radius
-                };
-            }
-        }),
-        backgroundColor: `rgb(0, 0, 0, 0.95)`,
-        type: 'bubble',
-        order: -1,
-        borderWidth: 10
-    };
-
-    if (hasData) {
-        return publicationDateDataset;
-    }
-    return undefined;
 }
 
 function getDataOfPostInRange(range, data, post) {
