@@ -44,16 +44,24 @@ function prettifyNumbersWithCommas(number) {
         .join('');
 }
 
-async function getPostsFromUser() {
-    const posts = await request(`https://medium.com/me/stats?format=json&limit=100000`);
+async function getPosts(url) {
+    const posts = await request(url);
     return posts.value
         .map(post => {
-                return {
-                    ...post,
-                    id: post.postId
-                }
+            return {
+                ...post,
+                id: post.postId
             }
+        }
         );
+}
+
+async function getPostsFromUser() {
+    return getPosts(`https://medium.com/me/stats?format=json&limit=100000`);
+}
+
+async function getPostsFromPublication(publication) {
+    return getPosts(`https://medium.com/${publication}/stats?format=json&limit=100000`);
 }
 
 function getInitialPostsData() {
@@ -212,8 +220,24 @@ function isPublicationStatPage() {
     return publicationRegex.test(document.location.href);
 }
 
+function getPublicationName() {
+    const publicationRegex = /https:\/\/medium.com\/(.+)\/stats\/stories/;
+    const match = document.location.href.match(publicationRegex);
+    return match ? match[1] : '';
+}
+
 if (isPublicationStatPage()) {
-    // TODO
+    renewOldFashionPublicationPage()
+        .then(() => getPostsFromPublication(getPublicationName()))
+        .then(data => postsSummary = data)
+        .then(() => getInitialPostsData()
+            .then(data => postsData = data)
+            .then(() => generateChart())
+            .then(() => getFullPostsData())
+            .then(data => postsData = data)
+            .then(() => aggregateDownloadData())
+            .then(() => nextGenerationLog('Done'))
+        );
 }
 else {
     renewOldFashionPage()
