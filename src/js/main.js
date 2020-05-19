@@ -207,13 +207,24 @@ async function aggregateDownloadData() {
     enableDownloadButton();
 }
 
-renewOldFashionPage()
-    .then(() => getPostsFromUser())
-    .then(data => postsSummary = data)
-    .then(() => getInitialPostsData()
-        .then(data => postsData = data)
-        .then(() => generateChart())
-        .then(() => getFullPostsData())
-        .then(data => postsData = data)
-        .then(() => aggregateDownloadData())
-        .then(() => nextGenerationLog('Done')));
+function isPublicationStatPage() {
+    const publicationRegex = /https:\/\/medium.com\/(.+)\/stats\/stories/;
+    return publicationRegex.test(document.location.href);
+}
+
+if (isPublicationStatPage()) {
+    // TODO
+}
+else {
+    renewOldFashionPage()
+        .then(() => getPostsFromUser())
+        .then(data => postsSummary = data)
+        .then(() => getInitialPostsData()
+            .then(data => postsData = data)
+            .then(() => generateChart())
+            .then(() => getFullPostsData())
+            .then(data => postsData = data)
+            .then(() => aggregateDownloadData())
+            .then(() => nextGenerationLog('Done'))
+        );
+}

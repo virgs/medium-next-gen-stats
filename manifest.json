@@ -1,6 +1,6 @@
 {
   "name": "Medium Next Generation Stats",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Get rid of the old fashion dataless default medium stats and get Next Generation Stats",
   "manifest_version": 2,
   "author": "Guilherme Virgs Moraes <https://pagehub.me/virgs>",
@@ -10,7 +10,8 @@
     {
       "matches": [
         "https://medium.com/*/stats",
-        "https://medium.com/*/stats/"
+        "https://medium.com/*/stats/",
+        "https://medium.com/*/stats/stories"
       ],
       "run_at": "document_idle",
       "css": [
