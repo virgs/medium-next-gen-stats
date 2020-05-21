@@ -28,6 +28,7 @@
         "src/js/chart-generator.js",
         "src/js/ranges.js",
         "src/js/renew-html.js",
+        "src/js/renew-publication-html.js",
         "src/js/main.js"
       ]
     }
