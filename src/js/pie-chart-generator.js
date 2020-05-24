@@ -1,3 +1,5 @@
+const MAX_LEGEND_ITEMS = 10;
+
 const pieChartOptions = {
     type: 'pie',
     options: {
@@ -14,12 +16,12 @@ const pieChartOptions = {
             padding: 12,
         },
         legend: {
-            position: 'bottom',
+            position: 'right',
             align: 'start',
             labels: {
-                boxWidth: 10,
+                boxWidth: 25,
                 padding: 30,
-                filter: legendItem => legendItem.index < 5,
+                filter: legendItem => legendItem.index < MAX_LEGEND_ITEMS,
                 generateLabels: chart => {
                     const data = chart.data;
                     if (data.labels.length && data.datasets.length) {

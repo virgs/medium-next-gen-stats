@@ -3,15 +3,17 @@ function createSummary() {
     summary.classList.add('chartTabs');
     summary.innerHTML = `
         <li class="is-active" data-action="switch-graph" data-action-value="views">
-            <div class="chartTab"><div class="stats-totalNumber js-totalViews">-</div><div>Views <span class="u-fontWeightNormal u-xs-hide"></span></div></div>
+            <div class="chartTab"><div class="stats-totalNumber js-totalViews">-</div>
+            <div>Views <span class="u-fontWeightNormal u-xs-hide"></span></div></div>
         </li>
         <li data-action="switch-graph" data-action-value="reads"><div class="chartTab">
-            <div class="stats-totalNumber js-totalReads">-</div><div>Reads</div></div>
+            <div class="stats-totalNumber js-totalReads">-</div
+            ><div>Reads</div></div>
         </li>
         <li data-action="switch-graph" data-action-value="fans">
-            <div class="chartTab"><div class="stats-totalNumber js-totalFans">-</div><div>Claps</div></div>
-        </li>
-    `;
+            <div class="chartTab"><div class="stats-totalNumber js-totalFans">-</div>
+            <div>Claps</div></div>
+        </li>`;
 
     return summary;
 }
@@ -61,35 +63,8 @@ function createChartPagination() {
                     </path>
                 </svg>
             </span>
-        </button>
-    `;
+        </button>`;
     return chartPage;
-}
-
-function createChartInnerHtml() {
-    return `<div>
-            <canvas id="chart"></canvas>
-         </div>
-         <div style="position: relative">
-             <span class="tooltip">
-                <div class="tooltiptext">Export to JSON file</div>
-                <i style="pointer-events: none; visibility: hidden" class="fas fa-file-download mngs-chart-action-icon"></i>
-            </span>
-            <div style="top: 0; right: 0; position: absolute;">
-                <span class="tooltip">
-                    <div class="tooltiptext">Compare aggregated articles ${statsOptions.label.toLowerCase()} by time</div>
-                    <i class="far fa-chart-bar mngs-chart-type-icon mngs-chart-type-icon-active"></i>
-                </span>
-                <span class="tooltip">
-                    <div class="tooltiptext">Compare individually articles ${statsOptions.label.toLowerCase()} by time</div>
-                    <i class="fas fa-chart-line mngs-chart-type-icon"></i>
-                </span>
-                <span class="tooltip">
-                    <div class="tooltiptext">Compare articles ${statsOptions.label.toLowerCase()} with each other</div>
-                    <i class="fas fa-chart-pie mngs-chart-type-icon"></i> 
-                </span>            
-            </div>
-        </div>`;
 }
 
 async function renewOldFashionPublicationPage() {
