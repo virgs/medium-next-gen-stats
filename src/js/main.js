@@ -1,7 +1,6 @@
 let currentRangeIndex = 0;
 let currentTimeRangeIndex = 0;
 const oneDayInMilliseconds = 24 * 3600 * 1000;
-// const originalColor = {r: 82, g: 151, b: 186};
 const originalColor = {r: 82, g: 186, b: 151};
 
 function nextGenerationLog(...params) {
@@ -11,11 +10,11 @@ function nextGenerationLog(...params) {
     console.log(`[Medium Next Gen Stats - ${paddedSeconds}:${paddedMilliseconds}] ${params}`)
 }
 
-function getShadeOfColor(max, index) {
+function getShadeOfColor(max, index, color = originalColor) {
     return {
-        r: (originalColor.r / (max)) * (index + 1),
-        g: (originalColor.g / (max)) * (index + 1),
-        b: (originalColor.b / (max)) * (index + 1)
+        r: (color.r / (max)) * (index + 1),
+        g: (color.g / (max)) * (index + 1),
+        b: (color.b / (max)) * (index + 1)
     };
 }
 
@@ -48,11 +47,11 @@ async function getPosts(url) {
     const posts = await request(url);
     return posts.value
         .map(post => {
-            return {
-                ...post,
-                id: post.postId
+                return {
+                    ...post,
+                    id: post.postId
+                }
             }
-        }
         );
 }
 
@@ -162,9 +161,9 @@ function graphQL(postId) {
         });
 }
 
-const getViewOfData = data => data.views || 0;
-const getReadsOfData = data => data.reads || 0;
-const getClapsOfData = data => data.claps || 0;
+const getViewOfData = data => data.views;
+const getReadsOfData = data => data.reads;
+const getClapsOfData = data => data.claps;
 
 const now = new Date();
 const tomorrow = new Date(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() + oneDayInMilliseconds);
@@ -215,9 +214,15 @@ async function aggregateDownloadData() {
     enableDownloadButton();
 }
 
-function isPublicationStatPage() {
+async function remodelHtml() {
     const publicationRegex = /https:\/\/medium.com\/(.+)\/stats\/stories/;
-    return publicationRegex.test(document.location.href);
+    if (publicationRegex.test(document.location.href)) {
+        return renewOldFashionPublicationPage()
+            .then(() => getPostsFromPublication(getPublicationName()))
+    } else {
+        return renewOldFashionPage()
+            .then(() => getPostsFromUser());
+    }
 }
 
 function getPublicationName() {
@@ -226,29 +231,13 @@ function getPublicationName() {
     return match ? match[1] : '';
 }
 
-if (isPublicationStatPage()) {
-    renewOldFashionPublicationPage()
-        .then(() => getPostsFromPublication(getPublicationName()))
-        .then(data => postsSummary = data)
-        .then(() => getInitialPostsData()
-            .then(data => postsData = data)
-            .then(() => generateChart())
-            .then(() => getFullPostsData())
-            .then(data => postsData = data)
-            .then(() => aggregateDownloadData())
-            .then(() => nextGenerationLog('Done'))
-        );
-}
-else {
-    renewOldFashionPage()
-        .then(() => getPostsFromUser())
-        .then(data => postsSummary = data)
-        .then(() => getInitialPostsData()
-            .then(data => postsData = data)
-            .then(() => generateChart())
-            .then(() => getFullPostsData())
-            .then(data => postsData = data)
-            .then(() => aggregateDownloadData())
-            .then(() => nextGenerationLog('Done'))
-        );
-}
+remodelHtml()
+    .then(data => postsSummary = data)
+    .then(() => getInitialPostsData()
+        .then(data => postsData = data)
+        .then(() => generateChart())
+        .then(() => getFullPostsData())
+        .then(data => postsData = data)
+        .then(() => aggregateDownloadData())
+        .then(() => nextGenerationLog('Done'))
+    );

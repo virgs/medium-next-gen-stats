@@ -1,5 +1,13 @@
+const postsIdsToHighlight = [];
+
+const LINE_TYPE = 'line';
+const BUBBLE_TYPE = 'bubble';
+const BAR_TYPE = 'bar';
+
+const MAX_TOOLTIP_ITEMS = 10;
+
 const verticalStackedBarChartGenerator = {
-    type: 'bar',
+    type: BAR_TYPE,
     options: {
         animation: {
             duration: 750,
@@ -41,23 +49,26 @@ const verticalStackedBarChartGenerator = {
                 }
                 if (!verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip) {
                     verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip = chartData.datasets
-                        .filter(dataset => dataset.type !== 'bubble')
+                        .filter(dataset => dataset.type === BAR_TYPE)
                         .map(dataset => dataset.data[item.index])
                         .filter(item => item > 0)
                         .sort((a, b) => a - b)
                         .reverse()
-                        .filter((_, index) => index < 10);
+                        .filter((_, index) => index < MAX_TOOLTIP_ITEMS);
                 }
-                if (verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip.includes(parsedValue)) {
+                const foundItemIndex = verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip
+                    .findIndex(item => item === parsedValue);
+                if (foundItemIndex !== -1) {
+                    verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip =
+                        verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip
+                            .filter((_, index) => index !== foundItemIndex);
                     return true;
                 }
                 ++verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems;
-
                 return false;
             },
             callbacks: {
                 label: (tooltipItem, chartData) => {
-                    // const publicationDay = chartData.datasets.filter(dataset => dataset.type === 'bubble')[0].data[tooltipItem.index];
                     const total = chartData
                         .datasets
                         .reduce((acc, dataset) => {
@@ -128,21 +139,22 @@ async function generateVerticalStackedBarChart(postsDataOfChart, postsSummaryOfC
 
     const range = statsOptions.rangeMethod(statsOptions.firstDayOfRange, statsOptions.lastDayOfRange);
     const labels = range.map(interval => interval.label);
-    const chartData = generateBarChartData(range, postsDataOfChart, statsOptions.relevantDatum)
-        .concat(generateBubbleChartData(range, postsSummaryOfChart));
     verticalStackedBarChartGenerator.data = {
-        datasets: chartData,
+        datasets: generateBarChartData(range, postsDataOfChart, statsOptions.relevantDatum)
+            .concat(generateBubbleChartData(range, postsSummaryOfChart))
+            .concat(generateLineChartData(range, postsDataOfChart, statsOptions.relevantDatum)),
         labels
     };
+
     verticalStackedBarChartGenerator.options.title.text = `${statsOptions.label} ${statsOptions.relevantDatumLabel} from '${getStringifiedDate(statsOptions.firstDayOfRange)}' to '${
         getStringifiedDate(new Date(statsOptions.lastDayOfRange.getTime() - oneDayInMilliseconds))}'`;
     verticalStackedBarChartGenerator.options.tooltips.callbacks.title = tooltipItems => range[tooltipItems[0].index].label;
-
     return verticalStackedBarChartGenerator;
 }
 
-function generateBarChartData(range, data, relevantDatum) {
-    return Object.values(data
+function generateBarChartData(range, postsDataOfChart, relevantDatum) {
+    const alpha = postsIdsToHighlight.length > 0 ? 0.5 : 0.75;
+    return Object.values(postsDataOfChart
         .reduce((acc, info) => {
             if (acc[info.id] === undefined) {
                 acc[info.id] = initialValueOfEveryBar(info, range);
@@ -151,10 +163,45 @@ function generateBarChartData(range, data, relevantDatum) {
         }, {}))
         .map((post, index, vec) => {
             const backgroundColor = getShadeOfColor(vec.length, index);
-            const dataOfPostId = getDataOfPostInRange(range, data, post);
-            // post.data = post.data.map((datum, index) => relevantDatum(dataOfPostId[index]));
+            const dataOfPostId = getDataOfPostInRange(range, postsDataOfChart, post);
             post.data = dataOfPostId.map(value => relevantDatum(value));
-            post.backgroundColor = `rgb(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, 0.75)`;
+            post.backgroundColor = `rgb(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, ${alpha})`;
+            return post;
+        })
+        .filter((post => post.data.reduce((acc, current) => acc + current, 0) > 0));
+}
+
+function generateLineChartData(range, postsDataOfChart, relevantDatum) {
+    return Object.values(postsDataOfChart
+        .reduce((acc, info) => {
+            if (acc[info.id] === undefined && postsIdsToHighlight.includes(info.id)) {
+                acc[info.id] = {
+                    id: info.id,
+                    claps: info.claps,
+                    reads: info.reads,
+                    label: info.title,
+                    views: info.views,
+                    readingTime: info.readingTime,
+
+                    type: LINE_TYPE,
+                    order: -2,
+                    spanGaps: false,
+                    pointRadius: 2,
+                    borderWidth: 4,
+                    fill: false,
+                    data: range.map((_, index) => 0)
+                }
+            }
+            return acc;
+        }, {}))
+        .map((post, index, vec) => {
+            const backgroundColor = getShadeOfColor(vec.length, index, {r: 173, g: 49, b: 104});
+            const color = `rgb(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, 0.75)`;
+            const dataOfPostId = getDataOfPostInRange(range, postsDataOfChart, post);
+            post.data = dataOfPostId.map(value => relevantDatum(value));
+            post.borderColor = color;
+            post.pointBackgroundColor = color;
+            post.pointBorderColor = color;
             return post;
         })
         .filter((post => post.data.reduce((acc, current) => acc + current, 0) > 0));
@@ -183,6 +230,7 @@ function initialValueOfEveryBar(info, range) {
         views: info.views,
         readingTime: info.readingTime,
 
+        type: BAR_TYPE,
         stack: 'unique',
         barPercentage: 0.95,
         categoryPercentage: 1,
@@ -212,7 +260,7 @@ function checkPublicationDataset(indexOfDate, post, range, previousDatasets) {
             }
         }),
         backgroundColor: `rgb(0, 0, 0, 0.95)`,
-        type: 'bubble',
+        type: BUBBLE_TYPE,
         order: -1,
         borderWidth: 10
     };

@@ -1,7 +1,7 @@
 {
   "name": "Medium Next Generation Stats",
-  "version": "1.0.6",
-  "description": "Get rid of the old fashion dataless default medium stats and get Next Generation Stats",
+  "version": "1.0.7",
+  "description": "Enrich medium stats with Next Generation ones",
   "manifest_version": 2,
   "author": "Guilherme Virgs Moraes <https://pagehub.me/virgs>",
   "permissions": [
@@ -23,7 +23,6 @@
         "src/libs/fontawesome.js",
         "src/libs/Chart.bundle.js",
         "src/js/vertical-stacked-bar-chart-generator.js",
-        "src/js/line-chart-generator.js",
         "src/js/pie-chart-generator.js",
         "src/js/chart-generator.js",
         "src/js/ranges.js",
