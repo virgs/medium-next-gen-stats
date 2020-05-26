@@ -6,7 +6,8 @@ const originalColor = {r: 82, g: 186, b: 151};
 const highlightColor = {r: 173, g: 49, b: 104};
 
 let postsIdsToHighlight = [];
-const alpha = postsIdsToHighlight.length > 0 ? 0.35 : 0.75;
+const HIGHLIGHTED_ALPHA = 0.35;
+const NOT_HIGHLIGHTED_ALPHA = 0.75;
 
 function nextGenerationLog(...params) {
     const now = new Date();

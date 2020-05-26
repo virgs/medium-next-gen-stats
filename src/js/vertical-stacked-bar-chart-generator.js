@@ -8,10 +8,6 @@ let barChartData = [];
 let bubbleChartData = [];
 let lineChartData = [];
 
-const isLineChartDataset = (datasetId) => datasetId < lineChartData.length;
-const isBubbleChartDataset = (datasetId) => datasetId >= lineChartData.length && datasetId < bubbleChartData.length + lineChartData.length;
-const isBarChartDataset = (datasetId) => datasetId >= bubbleChartData.length && datasetId < barChartData.length + bubbleChartData.length + lineChartData.length;
-
 const verticalStackedBarChartGenerator = {
     type: BAR_TYPE,
     options: {
@@ -81,6 +77,7 @@ const verticalStackedBarChartGenerator = {
                 }
                 const foundItemIndex = verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip
                     .findIndex(item => item === parsedValue);
+
                 if (foundItemIndex !== -1) {
                     verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip =
                         verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip
@@ -130,6 +127,7 @@ const verticalStackedBarChartGenerator = {
         },
         scales: {
             yAxes: [{
+                type: 'linear',
                 gridLines: {
                     drawBorder: false,
                     borderDash: [2, 3],
@@ -179,6 +177,7 @@ async function generateVerticalStackedBarChart(postsDataOfChart, postsSummaryOfC
 }
 
 function generateBarChartData(range, postsDataOfChart, relevantDatum) {
+    const alpha = postsIdsToHighlight.length > 0 ? HIGHLIGHTED_ALPHA : NOT_HIGHLIGHTED_ALPHA;
     return Object.values(postsDataOfChart
         .reduce((acc, info) => {
             if (acc[info.id] === undefined) {

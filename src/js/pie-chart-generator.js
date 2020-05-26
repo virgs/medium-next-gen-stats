@@ -112,6 +112,7 @@ function getPieChartData(postsDataOfChart) {
 }
 
 function setBackgroundColor(pieChartData) {
+    const alpha = postsIdsToHighlight.length > 0 ? HIGHLIGHTED_ALPHA : NOT_HIGHLIGHTED_ALPHA;
     pieChartData
         .forEach((item, index, vec) => {
             const findIndex = postsIdsToHighlight.findIndex(highlightedItem => highlightedItem === item.id);
