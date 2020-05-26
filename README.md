@@ -43,7 +43,7 @@ https://github.com/virgs/medium-next-gen-stats
 1. Clone this repo
 2. Go to chrome://extensions
 3. Enable developer mode
-4. Click on load unpacked extension and select the generated folder.
+4. Click on `load unpacked extension` and select the `medium-next-gen-stats` folder.
 
 PRs are most welcome :)
 
