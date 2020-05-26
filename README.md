@@ -1,27 +1,27 @@
 # Medium Next Generation Stats
 
-A [google chrome browser extension](https://chrome.google.com/webstore/detail/medium-next-generation-st/fhopcbdfcaleefngfpglahlpfhagendo) that provides richer information about your texts.  
+Don't you think medium.com provides way less information that they should?
+I got tired of waiting for them to make it better and decided to make it by myself.
+Get rid of the old fashion informationless default medium stats and get Next Generation ones.
+
+A [google chrome browser extension](https://chrome.google.com/webstore/detail/medium-next-generation-st/fhopcbdfcaleefngfpglahlpfhagendo) that provides richer information about your texts.
 
 ![snapshot1](images/snapshot1.png)  
 
-Get rid of the old fashion informationless default medium stats and get Next Generation Stats.
-
-Don't you think medium.com provides way less information that they should?
-I got tired of waiting for them to make it better and decided to make it by myself.
-
-This extension provides larger time period, daily/weekly/monthly views/claps, and, specially, describes which article was view in which period.
+This extension provides larger time period, daily/weekly/monthly read/views/claps, and, specially, describes which article was view in which period.
 
 Have fun!
 
 ![snapshot2](images/snapshot2.png)
 
 ### Features
--  Larger ranges
+-  Highlight post/publication
+-  Larger time ranges
 -  Super cool and animated charts
 -  Total stories views/reads/claps
--  Description of top articles read in the range
--  Total in different ranges: daily, weekly and yearly
--  Download data file
+-  Top articles/publications read/viewed/clapped in the time range
+-  Different ranges visualization: daily, weekly and yearly
+-  Download JSON data file
 
 ![snapshot3](images/snapshot3.png)
 
@@ -30,6 +30,7 @@ Have fun!
 2. This is it
 
 ### Contact
+Official website: https://virgs.me/mngs  
 Medium: https://medium.com/@virgs  
 Github: https://github.com/virgs  
 Pagehub: https://pagehub.me/virgs  
