@@ -92,12 +92,13 @@ const ordinalNumber = (value) => {
 };
 
 
-async function generatePieBarChart(postsDataOfChart) {
-    let pieChartData = Object.values(postsDataOfChart
+function getPieChartData(postsDataOfChart) {
+    return Object.values(postsDataOfChart
         .reduce((acc, data) => {
             const id = data.id;
             if (!acc[id]) {
                 acc[id] = {
+                    id: id,
                     title: data.title,
                     value: statsOptions.relevantDatum(data),
                 }
@@ -108,11 +109,25 @@ async function generatePieBarChart(postsDataOfChart) {
         }, {}))
         .filter(item => item.value > 0)
         .sort((a, b) => b.value - a.value);
+}
+
+function setBackgroundColor(pieChartData) {
     pieChartData
         .forEach((item, index, vec) => {
-            const backgroundColor = getShadeOfColor(vec.length, index);
-            item.backgroundColor = `rgb(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, 0.95)`;
+            const findIndex = postsIdsToHighlight.findIndex(highlightedItem => highlightedItem === item.id);
+            if (findIndex !== -1) {
+                const backgroundColor = getShadeOfColor(postsIdsToHighlight.length, findIndex, highlightColor);
+                item.backgroundColor = `rgb(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, 0.95)`;
+            } else {
+                const backgroundColor = getShadeOfColor(vec.length, index);
+                item.backgroundColor = `rgb(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, ${alpha})`;
+            }
         });
+}
+
+async function generatePieBarChart(postsDataOfChart) {
+    const pieChartData = getPieChartData(postsDataOfChart);
+    setBackgroundColor(pieChartData);
 
     const labels = pieChartData.map(item => item.title);
     const chartData = pieChartData.map(item => item.value);

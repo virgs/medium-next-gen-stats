@@ -1,10 +1,16 @@
-const postsIdsToHighlight = [];
-
 const LINE_TYPE = 'line';
 const BUBBLE_TYPE = 'bubble';
 const BAR_TYPE = 'bar';
 
 const MAX_TOOLTIP_ITEMS = 10;
+
+let barChartData = [];
+let bubbleChartData = [];
+let lineChartData = [];
+
+const isLineChartDataset = (datasetId) => datasetId < lineChartData.length;
+const isBubbleChartDataset = (datasetId) => datasetId >= lineChartData.length && datasetId < bubbleChartData.length + lineChartData.length;
+const isBarChartDataset = (datasetId) => datasetId >= bubbleChartData.length && datasetId < barChartData.length + bubbleChartData.length + lineChartData.length;
 
 const verticalStackedBarChartGenerator = {
     type: BAR_TYPE,
@@ -20,7 +26,24 @@ const verticalStackedBarChartGenerator = {
             padding: 12,
         },
         legend: {
-            display: false,
+            position: 'bottom',
+            align: 'start',
+            labels: {
+                boxWidth: 25,
+                padding: 30,
+                generateLabels: chart => {
+                    return chart.data.datasets
+                        .filter(dataset => dataset.type === LINE_TYPE)
+                        .map(dataset => ({
+                            id: dataset.id,
+                            text: dataset.label,
+                            fillStyle: dataset.borderColor,
+                            strokeStyle: dataset.borderColor,
+                            lineWidth: dataset.borderColor,
+                        }));
+                }
+            },
+            onClick: (event, item) => hidePost(item)
         },
         responsive: true,
         tooltips: {
@@ -49,7 +72,7 @@ const verticalStackedBarChartGenerator = {
                 }
                 if (!verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip) {
                     verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip = chartData.datasets
-                        .filter(dataset => dataset.type === BAR_TYPE)
+                        .filter(dataset => postsIdsToHighlight.length <= 0 ? dataset.type === BAR_TYPE : dataset.type === LINE_TYPE)
                         .map(dataset => dataset.data[item.index])
                         .filter(item => item > 0)
                         .sort((a, b) => a - b)
@@ -139,21 +162,23 @@ async function generateVerticalStackedBarChart(postsDataOfChart, postsSummaryOfC
 
     const range = statsOptions.rangeMethod(statsOptions.firstDayOfRange, statsOptions.lastDayOfRange);
     const labels = range.map(interval => interval.label);
+    barChartData = generateBarChartData(range, postsDataOfChart, statsOptions.relevantDatum);
+    bubbleChartData = generateBubbleChartData(range, postsSummaryOfChart);
+    lineChartData = generateLineChartData(range, postsDataOfChart, statsOptions.relevantDatum);
     verticalStackedBarChartGenerator.data = {
-        datasets: generateBarChartData(range, postsDataOfChart, statsOptions.relevantDatum)
-            .concat(generateBubbleChartData(range, postsSummaryOfChart))
-            .concat(generateLineChartData(range, postsDataOfChart, statsOptions.relevantDatum)),
+        datasets: barChartData
+            .concat(bubbleChartData)
+            .concat(lineChartData),
         labels
     };
 
     verticalStackedBarChartGenerator.options.title.text = `${statsOptions.label} ${statsOptions.relevantDatumLabel} from '${getStringifiedDate(statsOptions.firstDayOfRange)}' to '${
         getStringifiedDate(new Date(statsOptions.lastDayOfRange.getTime() - oneDayInMilliseconds))}'`;
-    verticalStackedBarChartGenerator.options.tooltips.callbacks.title = tooltipItems => range[tooltipItems[0].index].label;
+    verticalStackedBarChartGenerator.options.tooltips.callbacks.title = tooltipItems => tooltipItems.length > 0 ? range[tooltipItems[0].index].label : '';
     return verticalStackedBarChartGenerator;
 }
 
 function generateBarChartData(range, postsDataOfChart, relevantDatum) {
-    const alpha = postsIdsToHighlight.length > 0 ? 0.5 : 0.75;
     return Object.values(postsDataOfChart
         .reduce((acc, info) => {
             if (acc[info.id] === undefined) {
@@ -195,7 +220,7 @@ function generateLineChartData(range, postsDataOfChart, relevantDatum) {
             return acc;
         }, {}))
         .map((post, index, vec) => {
-            const backgroundColor = getShadeOfColor(vec.length, index, {r: 173, g: 49, b: 104});
+            const backgroundColor = getShadeOfColor(vec.length, index, highlightColor);
             const color = `rgb(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, 0.75)`;
             const dataOfPostId = getDataOfPostInRange(range, postsDataOfChart, post);
             post.data = dataOfPostId.map(value => relevantDatum(value));

@@ -22,6 +22,7 @@
         "src/libs/solid.js",
         "src/libs/fontawesome.js",
         "src/libs/Chart.bundle.js",
+        "src/js/show-in-chart-button.js",
         "src/js/vertical-stacked-bar-chart-generator.js",
         "src/js/pie-chart-generator.js",
         "src/js/chart-generator.js",
@@ -33,9 +34,14 @@
     }
   ],
   "icons": {
-    "128": "images/icon-128.png"
+    "48": "images/ic_launcher-48.png",
+    "72": "images/ic_launcher-72.png",
+    "96": "images/ic_launcher-96.png",
+    "144": "images/ic_launcher-144.png",
+    "192": "images/ic_launcher-192.png",
+    "512": "images/ic_launcher-512.png"
   },
   "browser_action": {
-    "default_title": "Medium Next Gen Stats"
+    "default_title": "Medium Next Generation Stats"
   }
 }
