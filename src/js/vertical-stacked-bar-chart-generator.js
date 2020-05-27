@@ -115,7 +115,14 @@ const verticalStackedBarChartGenerator = {
                     verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems = 0;
                     delete verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip;
                     const total = tooltipItems.length + excludedItems;
-                    return `Total: ${prettifyNumbersWithCommas(value)} ${statsOptions.relevantDatumLabel} of ${total} article${total > 1 ? 's' : ''}`;
+
+                    const numOfHighlightedPosts = postsIdsToHighlight.length;
+                    const prefix = `Total: ${prettifyNumbersWithCommas(value)} ${statsOptions.relevantDatumLabel} of ${total} `;
+                    let suffix = `of ${total} article${total > 1 ? 's' : ''}`;
+                    if (numOfHighlightedPosts > 0) {
+                        suffix = `of the ${numOfHighlightedPosts} highlighted article${total > 1 ? 's' : ''}`;
+                    }
+                    return prefix + suffix;
                 },
             },
             footerFontStyle: 'bold',
