@@ -8,7 +8,7 @@ A [google chrome browser extension](https://chrome.google.com/webstore/detail/me
 
 ![snapshot1](images/snapshot1.png)  
 
-This extension provides larger time period, daily/weekly/monthly read/views/claps, and, specially, describes which article was view in which period.
+Get larger time range, daily/weekly/monthly read/views/claps, and, specially, describes which article was view in which period.
 
 Have fun!
 
