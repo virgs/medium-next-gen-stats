@@ -70,18 +70,18 @@ async function getPostsFromPublication(publication) {
 }
 
 function getInitialPostsData() {
-    nextGenerationLog(`Loading initial data of ${postsSummary.length} posts`);
+    nextGenerationLog(`Loading initial data of ${mngsData.postsSummary.length} posts`);
     return Promise
-        .all(postsSummary.map((post) => loadInitialPostStats(post)))
+        .all(mngsData.postsSummary.map((post) => loadInitialPostStats(post)))
         .then(postsInformation => postsInformation
             .reduce((acc, item) => acc.concat(item), [])
         );
 }
 
 function getFullPostsData() {
-    nextGenerationLog(`Loading full data of ${postsSummary.length} posts`);
+    nextGenerationLog(`Loading full data of ${mngsData.postsSummary.length} posts`);
     return Promise
-        .all(postsSummary.map((post) => loadFullPostsStats(post)))
+        .all(mngsData.postsSummary.map((post) => loadFullPostsStats(post)))
         .then(postsInformation => postsInformation
             .reduce((acc, item) => acc.concat(item), [])
         );
@@ -137,7 +137,7 @@ function request(url) {
         .then(text => JSON.parse(text.slice(16)).payload)
 }
 
-function graphQL(postId) {
+function getEarningsOfPost(postId) {
     return fetch('https://medium.com/_/graphql',
         {
             credentials: 'same-origin',
@@ -185,12 +185,10 @@ const statsOptions = {
 };
 
 nextGenerationLog('Started');
-let postsData = undefined;
-let postsSummary = undefined;
-let downloadData = undefined;
+const mngsData = {};
 
 async function aggregateDownloadData() {
-    downloadData = postsSummary
+    const aggregatedData = mngsData.postsSummary
         .reduce((acc, post) => {
             acc[post.id] = {
                 ...post,
@@ -199,29 +197,40 @@ async function aggregateDownloadData() {
             return acc;
         }, {});
 
-    postsData
+    mngsData.postsData
         .forEach(datum => {
-            if (downloadData[datum.id] !== undefined) {
+            if (aggregatedData[datum.id] !== undefined) {
                 const clone = {...datum};
                 delete clone.id;
                 delete clone.title;
-                downloadData[datum.id].data.push(clone);
+                aggregatedData[datum.id].data.push(clone);
             }
         });
-    downloadData = await Promise.all(Object
-        .values(downloadData)
+    mngsData.downloadData = await Promise.all(Object
+        .values(aggregatedData)
         .map(async data => {
-            const payload = JSON.parse(await graphQL(data.postId));
+            const payload = JSON.parse(await getEarningsOfPost(data.postId));
             data.earnings = payload.data.post.earnings;
             return data;
         }));
-
     nextGenerationLog('Downloadable data aggregated');
     enableDownloadButton();
 }
 
+const publicationRegex = /https:\/\/medium.com\/(.+)\/stats\/stories/;
+
 async function remodelHtml() {
-    const publicationRegex = /https:\/\/medium.com\/(.+)\/stats\/stories/;
+    google.payments.inapp.getSkuDetails({
+        'parameters': {'env': 'prod'},
+        'success': (v) => console.log('getSkuDetails.suc: ', v),
+        'failure': (f) => console.log('getSkuDetails.fail', f)
+    });
+    google.payments.inapp.getPurchases({
+        'parameters': {'env': 'prod'},
+        'success': (v) => console.log('getPurchases.suc: ', v),
+        'failure': (f) => console.log('getPurchases.fail', f)
+    });
+
     if (publicationRegex.test(document.location.href)) {
         return renewOldFashionPublicationPage()
             .then(() => getPostsFromPublication(getPublicationName()))
@@ -232,18 +241,17 @@ async function remodelHtml() {
 }
 
 function getPublicationName() {
-    const publicationRegex = /https:\/\/medium.com\/(.+)\/stats\/stories/;
     const match = document.location.href.match(publicationRegex);
     return match ? match[1] : '';
 }
 
 remodelHtml()
-    .then(data => postsSummary = data)
+    .then(data => mngsData.postsSummary = data)
     .then(() => getInitialPostsData()
-        .then(data => postsData = data)
+        .then(data => mngsData.postsData = data)
         .then(() => generateChart())
         .then(() => getFullPostsData())
-        .then(data => postsData = data)
+        .then(data => mngsData.postsData = data)
         .then(() => aggregateDownloadData())
         .then(() => nextGenerationLog('Done'))
     );

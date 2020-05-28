@@ -8,9 +8,9 @@ async function generateChart() {
     }
 
     chartRenderingAnimationCompleted = false;
-    const postsDataOfChart = postsData
+    const postsDataOfChart = mngsData.postsData
         .filter(post => post.collectedAt >= statsOptions.firstDayOfRange.getTime() && post.collectedAt < statsOptions.lastDayOfRange.getTime());
-    const postsSummaryOfChart = postsSummary
+    const postsSummaryOfChart = mngsData.postsSummary
         .filter(post => post.firstPublishedAt >= statsOptions.firstDayOfRange.getTime() && post.firstPublishedAt < statsOptions.lastDayOfRange.getTime());
 
     const chartOptions = await statsOptions.chartGenerator(postsDataOfChart, postsSummaryOfChart);

@@ -132,13 +132,12 @@ function updateSummaryTabs(data) {
 function addActionToChartTypeIcons() {
     const downloadIcon = document.querySelector('.fa-file-download');
     const chartBarIcon = document.querySelector('.fa-chart-bar');
-    // const lineIcon = document.querySelector('.fa-chart-line');
     const pieChartIcon = document.querySelector('.fa-chart-pie');
 
     downloadIcon.parentNode.onclick = async () => {
         if (document.querySelector('.fa-file-download').style.pointerEvents !== 'none') {
             const element = document.createElement('a');
-            const stringifiedContent = JSON.stringify(downloadData, null, 2);
+            const stringifiedContent = JSON.stringify(mngsData.downloadData, null, 2);
             element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(stringifiedContent));
             element.setAttribute('download', 'medium-next-generation-stats.json');
             element.style.display = 'none';
@@ -153,29 +152,16 @@ function addActionToChartTypeIcons() {
             document.querySelector('#rangeNavBar').style.opacity = '1';
             statsOptions.chartGenerator = generateVerticalStackedBarChart;
             document.querySelector('.fa-chart-bar').classList.add('mngs-chart-type-icon-active');
-            // document.querySelector('.fa-chart-line').classList.remove('mngs-chart-type-icon-active');
             document.querySelector('.fa-chart-pie').classList.remove('mngs-chart-type-icon-active');
             await generateChart();
         }
     };
-
-    // lineIcon.parentNode.onclick = async () => {
-    //     if (statsOptions.chartGenerator !== generateLineChart) {
-    //         document.querySelector('#rangeNavBar').style.opacity = '1';
-    //         statsOptions.chartGenerator = generateLineChart;
-    //         document.querySelector('.fa-chart-bar').classList.remove('mngs-chart-type-icon-active');
-    //         document.querySelector('.fa-chart-line').classList.add('mngs-chart-type-icon-active');
-    //         document.querySelector('.fa-chart-pie').classList.remove('mngs-chart-type-icon-active');
-    //         await generateChart();
-    //     }
-    // };
 
     pieChartIcon.parentNode.onclick = async () => {
         if (statsOptions.chartGenerator !== generatePieBarChart) {
             document.querySelector('#rangeNavBar').style.opacity = '0';
             statsOptions.chartGenerator = generatePieBarChart;
             document.querySelector('.fa-chart-bar').classList.remove('mngs-chart-type-icon-active');
-            // document.querySelector('.fa-chart-line').classList.remove('mngs-chart-type-icon-active');
             document.querySelector('.fa-chart-pie').classList.add('mngs-chart-type-icon-active');
             await generateChart();
         }
@@ -286,5 +272,4 @@ async function renewOldFashionPage() {
     parent.insertBefore(summaryInfo, rangeNavBar);
     addActionToChartTypeIcons();
     statsTitleDetails.remove();
-    // parent.insertBefore(statsTitleDetails, summaryInfo);
 }

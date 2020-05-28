@@ -120,7 +120,7 @@ const verticalStackedBarChartGenerator = {
                     const prefix = `Total: ${prettifyNumbersWithCommas(value)} ${statsOptions.relevantDatumLabel} of ${total} `;
                     let suffix = `of ${total} article${total > 1 ? 's' : ''}`;
                     if (numOfHighlightedPosts > 0) {
-                        suffix = `of the ${numOfHighlightedPosts} highlighted article${total > 1 ? 's' : ''}`;
+                        suffix = `of ${numOfHighlightedPosts} highlighted article${numOfHighlightedPosts > 1 ? 's' : ''}`;
                     }
                     return prefix + suffix;
                 },
