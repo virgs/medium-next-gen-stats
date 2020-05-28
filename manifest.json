@@ -23,6 +23,7 @@
         "src/libs/fontawesome.js",
         "src/libs/Chart.bundle.js",
         "src/js/buy.js",
+        "src/js/process-earnings.js",
         "src/js/show-in-chart-button.js",
         "src/js/vertical-stacked-bar-chart-generator.js",
         "src/js/pie-chart-generator.js",

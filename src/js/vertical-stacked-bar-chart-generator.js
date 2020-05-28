@@ -311,11 +311,13 @@ function getDataOfPostInRange(range, data, post) {
             acc[index].claps += data.claps;
             acc[index].reads += data.reads;
             acc[index].upvotes += data.upvotes;
+            acc[index].earnings += data.earnings;
             return acc;
         }, range.map(() => ({
             views: 0,
             claps: 0,
             reads: 0,
+            earnings: 0,
             upvotes: 0
         })));
 }

@@ -110,12 +110,14 @@ function updateSummaryTabs(data) {
             acc.views += post.views;
             acc.claps += post.claps;
             acc.reads += post.reads;
+            acc.earnings += post.earnings;
             acc.upvotes += post.upvotes;
             return acc;
         }, {
             views: 0,
             claps: 0,
             reads: 0,
+            earnings: 0,
             upvotes: 0
         });
 
