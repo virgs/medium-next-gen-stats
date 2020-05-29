@@ -7,6 +7,9 @@ const addHighlightButton = (item) => {
     link.classList.add('link');
     link.classList.add('u-baseColor--link');
     link.classList.add('sortableTable-link');
+    if (!isHighlightPostFeatureEnabled()) {
+        link.classList.add('mngs-highlight-button-disabled');
+    }
     link.text = 'Highlight';
     item.appendChild(link);
 
@@ -52,6 +55,7 @@ const checkNecessityOfAddingHighlightButton = () => {
             }
         });
 };
+
 checkNecessityOfAddingHighlightButton();
 setInterval(checkNecessityOfAddingHighlightButton, 500);
 

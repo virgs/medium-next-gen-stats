@@ -20,6 +20,7 @@ function renewSummaryInfo() {
     const viewsTab = chartTabs[0];
     const readsTab = chartTabs[1];
     const clapsTab = chartTabs[2];
+    const earningsTab = chartTabs[2].cloneNode(true);
 
     viewsTab.querySelector('.js-totalViews').innerText = `-`;
     viewsTab.querySelector('span').textContent = '';
@@ -29,6 +30,7 @@ function renewSummaryInfo() {
             viewsTab.classList.add('is-active');
             readsTab.classList.remove('is-active');
             clapsTab.classList.remove('is-active');
+            earningsTab.classList.remove('is-active');
             statsOptions.relevantDatum = getViewOfData;
             statsOptions.relevantDatumLabel = 'views';
             await generateChart();
@@ -43,6 +45,7 @@ function renewSummaryInfo() {
             viewsTab.classList.remove('is-active');
             readsTab.classList.add('is-active');
             clapsTab.classList.remove('is-active');
+            earningsTab.classList.remove('is-active');
             statsOptions.relevantDatumLabel = 'reads';
             statsOptions.relevantDatum = getReadsOfData;
             await generateChart();
@@ -50,6 +53,7 @@ function renewSummaryInfo() {
     };
 
     clapsTab.querySelector('.js-totalFans').innerText = `-`;
+    clapsTab.setAttribute('data-action-value', 'claps');
     clapsTab.querySelectorAll('div.chartTab div')[1].textContent = 'Claps';
     clapsTab.onclick = async event => {
         event.stopPropagation();
@@ -57,11 +61,34 @@ function renewSummaryInfo() {
             viewsTab.classList.remove('is-active');
             readsTab.classList.remove('is-active');
             clapsTab.classList.add('is-active');
+            earningsTab.classList.remove('is-active');
             statsOptions.relevantDatumLabel = 'claps';
             statsOptions.relevantDatum = getClapsOfData;
             await generateChart();
         }
     };
+
+    earningsTab.querySelector('.js-totalFans').innerText = `$`;
+    earningsTab.setAttribute('data-action-value', 'earnings');
+    if (!isEarningsFeatureEnabled()) {
+        earningsTab.querySelector('div.chartTab').style.color = `var(--mngs-disabled-color)`;
+        earningsTab.style['pointer-events'] = 'none';
+    }
+    earningsTab.querySelectorAll('div.chartTab div')[1].textContent = 'Earnings';
+    earningsTab.onclick = async event => {
+        event.stopPropagation();
+        if (chartRenderingAnimationCompleted) {
+            viewsTab.classList.remove('is-active');
+            readsTab.classList.remove('is-active');
+            clapsTab.classList.remove('is-active');
+            earningsTab.classList.add('is-active');
+            statsOptions.relevantDatumLabel = 'earnings';
+            statsOptions.relevantDatum = getEarningsOfData;
+            await generateChart();
+        }
+    };
+
+    summaryInfo.appendChild(earningsTab);
     return summaryInfo;
 }
 

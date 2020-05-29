@@ -1,3 +1,10 @@
+:root {
+    --mngs-disabled-color: rgb(173, 78, 49);
+}
+
+.mngs-summary-info li {
+    width: 25% !important;
+}
 .mngs-range-selector {
     margin-top: 10px !important;
     border-bottom: 0 ! important;
@@ -58,4 +65,9 @@
 .tooltip:hover .tooltiptext {
     opacity: 1;
     transition: opacity .5s 2s;
+}
+
+.mngs-highlight-button-disabled {
+    pointer-events: none;
+    color: var(--mngs-disabled-color) !important;
 }

@@ -3,16 +3,28 @@ function createSummary() {
     summary.classList.add('chartTabs');
     summary.innerHTML = `
         <li class="is-active" data-action="switch-graph" data-action-value="views">
-            <div class="chartTab"><div class="stats-totalNumber js-totalViews">-</div>
-            <div>Views <span class="u-fontWeightNormal u-xs-hide"></span></div></div>
+            <div class="chartTab">
+                <div class="stats-totalNumber js-totalViews">-</div>
+                <div>Views <span class="u-fontWeightNormal u-xs-hide"></span></div>
+            </div>
         </li>
-        <li data-action="switch-graph" data-action-value="reads"><div class="chartTab">
-            <div class="stats-totalNumber js-totalReads">-</div
-            ><div>Reads</div></div>
+        <li data-action="switch-graph" data-action-value="reads">
+            <div class="chartTab">
+                <div class="stats-totalNumber js-totalReads">-</div>
+                <div>Reads</div>
+            </div>
         </li>
-        <li data-action="switch-graph" data-action-value="fans">
-            <div class="chartTab"><div class="stats-totalNumber js-totalFans">-</div>
-            <div>Claps</div></div>
+        <li data-action="switch-graph" data-action-value="claps">
+            <div class="chartTab">
+                <div class="stats-totalNumber js-totalFans">-</div>
+                <div>Claps</div>
+            </div>
+        </li>
+        <li data-action="switch-graph" data-action-value="earnings" ${!isEarningsFeatureEnabled() || 'style="pointer-events: none"'}>
+            <div class="chartTab" ${!isEarningsFeatureEnabled() || 'style="color: var(--mngs-disabled-color)"'}>
+                <div class="stats-totalNumber js-totalFans">$</div>
+                <div>Earnings</div>
+            </div>
         </li>`;
 
     return summary;
