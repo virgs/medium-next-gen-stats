@@ -2,7 +2,7 @@
 
 Don't you think medium.com provides way less information that they should?
 I got tired of waiting for them to make it better and decided to make it by myself.
-Get rid of the old fashion informationless default medium stats and get Next Generation ones.
+Take your medium text stats to the Next Generation and get rid of the old fashion dataless default medium.
 
 A [google chrome browser extension](https://chrome.google.com/webstore/detail/medium-next-generation-st/fhopcbdfcaleefngfpglahlpfhagendo) that provides richer information about your texts.
 
@@ -16,11 +16,11 @@ Have fun!
 
 ### Features
 -  Highlight post/publication
--  Larger time ranges
+-  Larger time ranges: 30/60/120/360 days.
 -  Super cool and animated charts
--  Total stories views/reads/claps
--  Top articles/publications read/viewed/clapped in the time range
--  Different ranges visualization: daily, weekly and yearly
+-  Total stories views/reads/claps/earnings
+-  Top articles/publications read/viewed/clapped/earned in the time range
+-  Different ranges visualization: daily, weekly and monthly
 -  Download JSON data file
 
 ![snapshot3](images/snapshot3.png)
