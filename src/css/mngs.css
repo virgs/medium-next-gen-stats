@@ -23,12 +23,16 @@
     margin-top: 20px !important;
 }
 
-.mngs-chart-type-icon, .mngs-chart-action-icon {
+.mngs-chart-type-icon, .mngs-chart-action-icon, .mngs-donate-type-icon {
     font-size: 24px;
     cursor: pointer;
     padding: 18px 10px 0 10px;
     color: #b1b1b1;
     transition: all 100ms;
+}
+
+.mngs-donate-type-icon {
+    color: #ba9752;
 }
 
 .mngs-chart-type-icon:hover {
@@ -41,6 +45,10 @@
 
 .mngs-chart-type-icon-active:hover, .mngs-chart-action-icon:hover {
     color: #141414 !important;
+}
+
+.mngs-donate-type-icon:hover {
+    filter: brightness(1.2);
 }
 
 .tooltip {

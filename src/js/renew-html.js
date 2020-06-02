@@ -263,7 +263,13 @@ function createChartInnerHtml() {
                 <canvas id="chart"></canvas>
              </div>
              <div style="position: relative">
-                 <span class="tooltip">
+                <span class="tooltip">
+                    <div class="tooltiptext">Donate to help it keep running and improving</div>
+                    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=J9XP66XJE98LQ&source=url">
+                        <i class="fas fa-donate mngs-donate-type-icon"></i>
+                    </a>
+                </span>
+                <span class="tooltip">
                     <div class="tooltiptext">Export to JSON file</div>
                     <i style="pointer-events: none; visibility: hidden" class="fas fa-file-download mngs-chart-action-icon"></i>
                 </span>
@@ -272,7 +278,7 @@ function createChartInnerHtml() {
                         <div class="tooltiptext">Compare aggregated articles ${statsOptions.label.toLowerCase()} by time</div>
                         <i class="far fa-chart-bar mngs-chart-type-icon mngs-chart-type-icon-active"></i>
                     </span>
-                    <span class="tooltip">
+                    <spa}n class="tooltip">
                         <div class="tooltiptext">Compare articles ${statsOptions.label.toLowerCase()} with each other</div>
                         <i class="fas fa-chart-pie mngs-chart-type-icon"></i> 
                     </span>            
