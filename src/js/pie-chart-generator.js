@@ -29,7 +29,7 @@ const pieChartOptions = {
                             const meta = chart.getDatasetMeta(0);
                             const style = meta.controller.getStyle(index);
                             return {
-                                text: `${ordinalNumber(index + 1).padStart(4, ' ')} (${data.datasets[0].data[index].toString().padStart(3, '0')}) - "${label}"`,
+                                text: `${ordinalNumber(index + 1).padStart(4, ' ')} (${data.datasets[0].data[index]}) - "${label}"`,
                                 fillStyle: style.backgroundColor,
                                 strokeStyle: style.borderColor,
                                 lineWidth: style.borderWidth,
