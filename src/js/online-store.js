@@ -1,2 +1,2 @@
-const isEarningsFeatureEnabled = () => false;
-const isHighlightPostFeatureEnabled = () => false;
+const isEarningsFeatureEnabled = () => true;
+const isHighlightPostFeatureEnabled = () => true;
