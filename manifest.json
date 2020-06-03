@@ -37,12 +37,12 @@
     }
   ],
   "icons": {
-    "48": "images/ic_launcher-48.png",
-    "72": "images/ic_launcher-72.png",
-    "96": "images/ic_launcher-96.png",
-    "144": "images/ic_launcher-144.png",
-    "192": "images/ic_launcher-192.png",
-    "512": "images/ic_launcher-512.png"
+    "16": "images/sym-16.png",
+    "32": "images/sym-32.png",
+    "64": "images/sym-64.png",
+    "128": "images/sym-128.png",
+    "256": "images/sym-256.png",
+    "512": "images/sym-512.png"
   },
   "browser_action": {
     "default_title": "Medium Next Generation Stats"
