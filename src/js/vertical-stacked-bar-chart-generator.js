@@ -117,7 +117,7 @@ const verticalStackedBarChartGenerator = {
                     const total = tooltipItems.length + excludedItems;
 
                     const numOfHighlightedPosts = postsIdsToHighlight.length;
-                    const prefix = `Total: ${prettifyNumbersWithCommas(value)} ${statsOptions.relevantDatumLabel} of ${total} `;
+                    const prefix = `Total: ${prettifyNumbersWithCommas(value)} ${statsOptions.relevantDatumLabel} `;
                     let suffix = `of ${total} article${total > 1 ? 's' : ''}`;
                     if (numOfHighlightedPosts > 0) {
                         suffix = `of ${numOfHighlightedPosts} highlighted article${numOfHighlightedPosts > 1 ? 's' : ''}`;
