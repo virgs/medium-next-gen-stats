@@ -156,6 +156,11 @@ function updateSummaryTabs(data) {
     reads.querySelector('.js-totalReads').innerText = `${prettifyNumbersWithCommas(summary.reads)}`;
     const clapsTab = chartTabs[2];
     clapsTab.querySelector('.js-totalFans').innerText = `${prettifyNumbersWithCommas(summary.claps)}`;
+    const earningsTab = chartTabs[3];
+    const earnings = isNaN(summary.earnings) ? 0 : summary.earnings;
+    const earningIntPart = Math.trunc(earnings);
+    const earningFractionPart = (earnings - earningIntPart).toFixed(2).substring(1);
+    earningsTab.querySelector('.js-totalFans').innerText = `${prettifyNumbersWithCommas(earningIntPart) + earningFractionPart} $`;
 }
 
 function addActionToChartTypeIcons() {
