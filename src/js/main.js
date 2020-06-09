@@ -137,10 +137,18 @@ function request(url) {
         .then(text => JSON.parse(text.slice(16)).payload)
 }
 
-const getViewOfData = data => data.views;
-const getReadsOfData = data => data.reads;
-const getClapsOfData = data => data.claps;
-const getEarningsOfData = data => data.earnings;
+const getNumber = (value) => {
+    if (isNaN(value) ||
+        typeof value !== 'number') {
+        return 0;
+    }
+    return value;
+}
+
+const getViewOfData = data => getNumber(data.views);
+const getReadsOfData = data => getNumber(data.reads);
+const getClapsOfData = data => getNumber(data.claps);
+const getEarningsOfData = data => getNumber(data.earnings);
 
 const now = new Date();
 const tomorrow = new Date(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() + oneDayInMilliseconds);
@@ -182,7 +190,8 @@ async function aggregateDownloadData() {
         .map(async data => {
             const payload = JSON.parse(await getEarningsOfPost(data.postId));
             const dailyEarningsOfPost = payload.data.post.earnings.dailyEarnings;
-            mngsData.postsData = mngsData.postsData.concat(convertDailyEarningToPostData(dailyEarningsOfPost, data.postId));
+            const earningToPostData = convertDailyEarningToPostData(dailyEarningsOfPost, data.postId);
+            earningToPostData.forEach(earning => mngsData.postsData.push(earning));
             data.earnings = dailyEarningsOfPost;
             return data;
         }));
@@ -226,5 +235,6 @@ remodelHtml()
         .then(() => getFullPostsData())
         .then(data => mngsData.postsData = data)
         .then(() => aggregateDownloadData())
+        .then(() => generateChart())
         .then(() => nextGenerationLog('Done'))
     );

@@ -134,11 +134,11 @@ function renewChartPaginator() {
 function updateSummaryTabs(data) {
     const summary = data
         .reduce((acc, post) => {
-            acc.views += post.views;
-            acc.claps += post.claps;
-            acc.reads += post.reads;
-            acc.earnings += post.earnings;
-            acc.upvotes += post.upvotes;
+            acc.views += getNumber(post.views);
+            acc.claps +=  getNumber(post.claps);
+            acc.reads +=  getNumber(post.reads);
+            acc.earnings += getNumber(post.earnings);
+            acc.upvotes += getNumber(post.upvotes);
             return acc;
         }, {
             views: 0,
@@ -147,7 +147,7 @@ function updateSummaryTabs(data) {
             earnings: 0,
             upvotes: 0
         });
-
+    console.log(summary)
 
     const chartTabs = document.querySelectorAll('.chartTabs li');
     const viewsTab = chartTabs[0];

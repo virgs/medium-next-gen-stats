@@ -307,11 +307,11 @@ function getDataOfPostInRange(range, data, post) {
         .filter(data => data.id === post.id)
         .reduce((acc, data) => {
             const index = range.findIndex(item => item.begin.getTime() <= data.collectedAt && data.collectedAt < item.end.getTime());
-            acc[index].views += data.views;
-            acc[index].claps += data.claps;
-            acc[index].reads += data.reads;
-            acc[index].upvotes += data.upvotes;
-            acc[index].earnings += data.earnings;
+            acc[index].views += getNumber(data.views);
+            acc[index].claps += getNumber(data.claps);
+            acc[index].reads += getNumber(data.reads);
+            acc[index].upvotes += getNumber(data.upvotes);
+            acc[index].earnings += getNumber(data.earnings);
             return acc;
         }, range.map(() => ({
             views: 0,

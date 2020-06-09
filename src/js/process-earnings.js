@@ -29,9 +29,9 @@ function getEarningsOfPost(postId) {
 }
 
 const convertDailyEarningToPostData = (dailyEarningsOfPost, postId) => {
-    return dailyEarningsOfPost.map(day => ({
+    return (dailyEarningsOfPost || []).map(day => ({
         id: postId,
-        earnings: day.amount,
+        earnings: day.amount / 100,
         collectedAt: (day.periodEndedAt + day.periodStartedAt) / 2
     }));
 }
