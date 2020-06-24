@@ -28,10 +28,22 @@ function getEarningsOfPost(postId) {
         });
 }
 
-const convertDailyEarningToPostData = (dailyEarningsOfPost, postId) => {
-    return (dailyEarningsOfPost || []).map(day => ({
-        id: postId,
-        earnings: day.amount / 100,
-        collectedAt: (day.periodEndedAt + day.periodStartedAt) / 2
-    }));
+const convertGraphQlToPostData = (dailyEarningsOfPost, postId) => {
+    return (dailyEarningsOfPost || [])
+        .map(day => {
+            let collectedAt = day.collectedAt;
+            if (collectedAt === undefined) {
+                if (day.periodEndedAt) {
+                    collectedAt = (day.periodEndedAt + day.periodStartedAt) / 2;
+                } else {
+                    collectedAt = day.periodStartedAt
+                }
+            }
+            return {
+                id: postId,
+                earnings: getNumber(day.amount) / 100,
+                views: getNumber(day.views),
+                collectedAt: collectedAt + new Date().getTimezoneOffset() * 60 * 1000
+            };
+        });
 }

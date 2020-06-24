@@ -147,7 +147,6 @@ function updateSummaryTabs(data) {
             earnings: 0,
             upvotes: 0
         });
-    console.log(summary)
 
     const chartTabs = document.querySelectorAll('.chartTabs li');
     const viewsTab = chartTabs[0];

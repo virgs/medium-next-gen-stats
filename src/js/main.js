@@ -98,7 +98,7 @@ function loadInitialPostStats(post) {
 }
 
 function loadFullPostsStats(post) {
-    return getFullPostStats(post.id)
+    return getFullPostStats(post.id, post.createdAt)
         .then(postStats => postStats
             .map(postStat => {
                 const fullStats = {...postStat, id: post.id, title: post.title};
@@ -108,12 +108,13 @@ function loadFullPostsStats(post) {
 }
 
 function getInitialPostStats(postId) {
-    return request(`https://medium.com/stats/${postId}/${statsOptions.firstDayOfRange.getTime()}/${statsOptions.lastDayOfRange.getTime()}`)
+    return request(`https://medium.com/stats/${postId}/${statsOptions.firstDayOfRange.getTime()}/${Date.now()}`)
         .then(data => data && data.value || []);
 }
 
-async function getFullPostStats(postId) {
-    const stats = await request(`https://medium.com/stats/${postId}/0}/${Date.now()}`);
+async function getFullPostStats(postId, createdAt) {
+    // const stats = await request(`https://medium.com/stats/${postId}/${createdAt}/${Date.now()}?format=json&limit=1000000`);
+    const stats = await request(`https://medium.com/stats/${postId}/0/${Date.now() + 3600 * 24 * 1000}`);
     return stats.value ? stats.value : [];
 }
 
@@ -139,6 +140,7 @@ function request(url) {
 
 const getNumber = (value) => {
     if (isNaN(value) ||
+        value === undefined ||
         typeof value !== 'number') {
         return 0;
     }
@@ -167,34 +169,23 @@ nextGenerationLog('Started');
 const mngsData = {};
 
 async function aggregateDownloadData() {
-    const aggregatedData = mngsData.postsSummary
-        .reduce((acc, post) => {
-            acc[post.id] = {
-                ...post,
-                data: []
-            };
-            return acc;
-        }, {});
-
     mngsData.postsData
         .forEach(datum => {
-            if (aggregatedData[datum.id] !== undefined) {
-                const clone = {...datum};
-                delete clone.id;
-                delete clone.title;
-                aggregatedData[datum.id].data.push(clone);
-            }
+            datum.views = 0;
         });
-    mngsData.downloadData = await Promise.all(Object
-        .values(aggregatedData)
+
+    await Promise.all(mngsData.postsSummary
         .map(async data => {
-            const payload = JSON.parse(await getEarningsOfPost(data.postId));
+            const payload = JSON.parse(await getEarningsOfPost(data.id));
+            const dailyStatsOfPost = payload.data.post.dailyStats;
             const dailyEarningsOfPost = payload.data.post.earnings.dailyEarnings;
-            const earningToPostData = convertDailyEarningToPostData(dailyEarningsOfPost, data.postId);
-            earningToPostData.forEach(earning => mngsData.postsData.push(earning));
-            data.earnings = dailyEarningsOfPost;
+            const earningToPostData = convertGraphQlToPostData(dailyEarningsOfPost, data.id);
+            const statsToPostData = convertGraphQlToPostData(dailyStatsOfPost, data.id);
+            earningToPostData.forEach(stat => mngsData.postsData.push(stat));
+            statsToPostData.forEach(stat => mngsData.postsData.push(stat));
             return data;
         }));
+    mngsData.downloadData = mngsData.postsData
     nextGenerationLog('Downloadable data aggregated');
     enableDownloadButton();
 }
@@ -229,12 +220,12 @@ function getPublicationName() {
 
 remodelHtml()
     .then(data => mngsData.postsSummary = data)
-    .then(() => getInitialPostsData()
-        .then(data => mngsData.postsData = data)
-        .then(() => generateChart())
-        .then(() => getFullPostsData())
-        .then(data => mngsData.postsData = data)
-        .then(() => aggregateDownloadData())
-        .then(() => generateChart())
-        .then(() => nextGenerationLog('Done'))
+    // .then(() => getInitialPostsData()
+    //     .then(data => mngsData.postsData = data)
+    //     .then(() => generateChart())
+    .then(() => getFullPostsData())
+    .then(data => mngsData.postsData = data)
+    .then(() => aggregateDownloadData())
+    .then(() => generateChart())
+    .then(() => nextGenerationLog('Done')
     );
