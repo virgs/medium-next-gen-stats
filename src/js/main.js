@@ -62,11 +62,11 @@ async function getPosts(url) {
 }
 
 async function getPostsFromUser() {
-    return getPosts(`https://medium.com/me/stats?format=json&limit=100000`);
+    return getPosts(`https://medium.com/me/stats?format=json&limit=1000000`);
 }
 
 async function getPostsFromPublication(publication) {
-    return getPosts(`https://medium.com/${publication}/stats?format=json&limit=100000`);
+    return getPosts(`https://medium.com/${publication}/stats?format=json&limit=1000000`);
 }
 
 function getInitialPostsData() {
@@ -113,9 +113,27 @@ function getInitialPostStats(postId) {
 }
 
 async function getFullPostStats(postId, createdAt) {
-    // const stats = await request(`https://medium.com/stats/${postId}/${createdAt}/${Date.now()}?format=json&limit=1000000`);
-    const stats = await request(`https://medium.com/stats/${postId}/0/${Date.now() + 3600 * 24 * 1000}`);
-    return stats.value ? stats.value : [];
+    // const fullPeriod = Date.now() - createdAt
+    const interval = oneDayInMilliseconds * 360;
+    // let result = await Promise.all(Array.from(Array(Math.ceil(fullPeriod / interval)))
+    //     .map(async _ => {
+    //         const stats = await request(`https://medium.com/stats/${postId}/${initial}/${initial + interval}?format=json&limit=1000000`);
+    //         return stats.value ? stats.value : []
+    //     }))
+    // result = result.reduce(async (acc, item) => acc.concat(await item))
+
+    let result = []
+    for (let initial = createdAt; initial < Date.now(); initial += interval) {
+        const stats = await request(`https://medium.com/stats/${postId}/${initial}/${initial + interval}?format=json&limit=1000000`);
+        result = result.concat(stats.value ? stats.value : [])
+    }
+
+    const payload = JSON.parse(await getEarningsOfPost(postId));
+    const dailyEarningsOfPost = payload.data.post.earnings.dailyEarnings;
+    const earningToPostData = convertGraphQlToPostData(dailyEarningsOfPost, postId);
+    result = result.concat(earningToPostData)
+
+    return result
 }
 
 
@@ -169,22 +187,22 @@ nextGenerationLog('Started');
 const mngsData = {};
 
 async function aggregateDownloadData() {
-    mngsData.postsData
-        .forEach(datum => {
-            datum.views = 0;
-        });
-
-    await Promise.all(mngsData.postsSummary
-        .map(async data => {
-            const payload = JSON.parse(await getEarningsOfPost(data.id));
-            const dailyStatsOfPost = payload.data.post.dailyStats;
-            const dailyEarningsOfPost = payload.data.post.earnings.dailyEarnings;
-            const earningToPostData = convertGraphQlToPostData(dailyEarningsOfPost, data.id);
-            const statsToPostData = convertGraphQlToPostData(dailyStatsOfPost, data.id);
-            earningToPostData.forEach(stat => mngsData.postsData.push(stat));
-            statsToPostData.forEach(stat => mngsData.postsData.push(stat));
-            return data;
-        }));
+    // mngsData.postsData
+    //     .forEach(datum => {
+    //         // datum.views = 0;
+    //     });
+    //
+    // await Promise.all(mngsData.postsSummary
+    //     .map(async data => {
+    //         const payload = JSON.parse(await getEarningsOfPost(data.id));
+    //         const dailyStatsOfPost = payload.data.post.dailyStats;
+    //         const dailyEarningsOfPost = payload.data.post.earnings.dailyEarnings;
+    //         const earningToPostData = convertGraphQlToPostData(dailyEarningsOfPost, data.id);
+    //         const statsToPostData = convertGraphQlToPostData(dailyStatsOfPost, data.id);
+    //         earningToPostData.forEach(stat => mngsData.postsData.push(stat));
+    //         statsToPostData.forEach(stat => mngsData.postsData.push(stat));
+    //         return data;
+    //     }));
     mngsData.downloadData = mngsData.postsData
     nextGenerationLog('Downloadable data aggregated');
     enableDownloadButton();

@@ -42,8 +42,8 @@ const convertGraphQlToPostData = (dailyEarningsOfPost, postId) => {
             return {
                 id: postId,
                 earnings: getNumber(day.amount) / 100,
-                views: getNumber(day.views),
-                collectedAt: collectedAt + new Date().getTimezoneOffset() * 60 * 1000
+                // views: getNumber(day.views),
+                collectedAt: collectedAt
             };
         });
 }
