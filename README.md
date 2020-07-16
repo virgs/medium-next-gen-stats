@@ -4,7 +4,7 @@ Don't you think medium.com provides way less information that they should?
 I got tired of waiting for them to make it better and decided to make it by myself.
 Take your medium text stats to the Next Generation and get rid of the old fashion dataless default medium.
 
-A [google chrome browser extension](https://chrome.google.com/webstore/detail/medium-next-generation-st/fhopcbdfcaleefngfpglahlpfhagendo) that provides richer information about your texts.
+A [browser extension](https://chrome.google.com/webstore/detail/medium-next-generation-st/fhopcbdfcaleefngfpglahlpfhagendo) that provides richer information about your texts.
 
 ![snapshot1](images/snapshot1.png)  
 
@@ -40,10 +40,18 @@ You can find the source code on the link below:
 https://github.com/virgs/medium-next-gen-stats
 
 ### Development
-1. Clone this repo
-2. Go to chrome://extensions
-3. Enable developer mode
-4. Click on `load unpacked extension` and select the `medium-next-gen-stats` folder.
+
+- ##### chrome
+    1. Clone this repo
+    2. Go to `chrome://extensions` 
+    3. Enable developer mode
+    4. Click on `load unpacked extension` and select the `medium-next-gen-stats` folder
+
+- ##### firefox
+    1. Clone this repo
+    2. Go to `about:debugging`
+    3. Click on `load Temporary Add-on`
+    4. Select the `manifest.json` file
 
 PRs are most welcome :)
 

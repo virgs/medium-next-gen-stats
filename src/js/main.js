@@ -15,6 +15,7 @@ function nextGenerationLog(...params) {
     const paddedMilliseconds = now.getMilliseconds().toString().padStart(3, '0');
     console.log(`[Medium Next Gen Stats - ${paddedSeconds}:${paddedMilliseconds}] ${params}`)
 }
+window.requestAnimationFrame = window.requestAnimationFrame.bind(window)
 
 function getShadeOfColor(max, index, color = originalColor) {
     return {
@@ -210,7 +211,7 @@ async function aggregateDownloadData() {
 
 const publicationRegex = /https:\/\/medium.com\/(.+)\/stats\/stories/;
 
-async function remodelHtml() {
+function printGoogleDetails() {
     google.payments.inapp.getSkuDetails({
         'parameters': {'env': 'prod'},
         'success': (v) => console.log('getSkuDetails.suc: ', v),
@@ -221,6 +222,8 @@ async function remodelHtml() {
         'success': (v) => console.log('getPurchases.suc: ', v),
         'failure': (f) => console.log('getPurchases.fail', f)
     });
+}
+async function remodelHtml() {
 
     if (publicationRegex.test(document.location.href)) {
         return renewOldFashionPublicationPage()
@@ -238,9 +241,6 @@ function getPublicationName() {
 
 remodelHtml()
     .then(data => mngsData.postsSummary = data)
-    // .then(() => getInitialPostsData()
-    //     .then(data => mngsData.postsData = data)
-    //     .then(() => generateChart())
     .then(() => getFullPostsData())
     .then(data => mngsData.postsData = data)
     .then(() => aggregateDownloadData())
