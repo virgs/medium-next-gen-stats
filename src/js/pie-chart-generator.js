@@ -28,8 +28,12 @@ const pieChartOptions = {
                         return data.labels.map((label, index) => {
                             const meta = chart.getDatasetMeta(0);
                             const style = meta.controller.getStyle(index);
+                            let text = `${ordinalNumber(index + 1).padStart(4, ' ')} (${data.datasets[0].data[index].toFixed(2)})`;
+                            if (label) {
+                                text += ` - "${label}"`
+                            }
                             return {
-                                text: `${ordinalNumber(index + 1).padStart(4, ' ')} (${data.datasets[0].data[index].toFixed(2)}) - "${label}"`,
+                                text: text,
                                 fillStyle: style.backgroundColor,
                                 strokeStyle: style.borderColor,
                                 lineWidth: style.borderWidth,
@@ -66,7 +70,7 @@ const pieChartOptions = {
                     const total = data.datasets[0].data.reduce((acc, item) => acc + item, 0);
                     const value = data.datasets[0].data[tooltipItem.index];
                     const title = data.labels[tooltipItem.index];
-                    return ` "${title}":    ${prettifyNumbersWithCommas(value)}   (${(100 * value / total).toFixed(1)}%)`
+                    return `${title ? `"${title}:   "` : ''} ${prettifyNumbersWithCommas(value)}   (${(100 * value / total).toFixed(1)}%)`
                 },
             },
             footerFontStyle: 'bold',

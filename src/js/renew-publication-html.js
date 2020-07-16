@@ -20,6 +20,18 @@ function createSummary() {
                 <div>Claps</div>
             </div>
         </li>
+        <li data-action="switch-graph" data-action-value="fans">
+            <div class="chartTab">
+                <div class="stats-totalNumber js-totalFans">-</div>
+                <div>Fans</div>
+            </div>
+        </li>        
+        <li data-action="switch-graph" data-action-value="followers">
+            <div class="chartTab">
+                <div class="stats-totalNumber js-totalFans">-</div>
+                <div>Followers</div>
+            </div>
+        </li>        
         <li data-action="switch-graph" data-action-value="earnings" ${!isEarningsFeatureEnabled() || 'style="pointer-events: none"'}>
             <div class="chartTab" ${!isEarningsFeatureEnabled() || 'style="color: var(--mngs-disabled-color)"'}>
                 <div class="stats-totalNumber js-totalFans">$</div>

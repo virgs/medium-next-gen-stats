@@ -3,12 +3,19 @@
 }
 
 .mngs-summary-info li {
-    width: 25% !important;
+    width: calc(100% / 6) !important;
 }
 
 .mngs-range-selector {
+    position: relative;
     margin-top: 10px !important;
     border-bottom: 0 ! important;
+}
+
+.current-month-button {
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
 .mngs-summary-info {

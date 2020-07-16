@@ -15,6 +15,7 @@ function nextGenerationLog(...params) {
     const paddedMilliseconds = now.getMilliseconds().toString().padStart(3, '0');
     console.log(`[Medium Next Gen Stats - ${paddedSeconds}:${paddedMilliseconds}] ${params}`)
 }
+
 window.requestAnimationFrame = window.requestAnimationFrame.bind(window)
 
 function getShadeOfColor(max, index, color = originalColor) {
@@ -169,6 +170,8 @@ const getNumber = (value) => {
 const getViewOfData = data => getNumber(data.views);
 const getReadsOfData = data => getNumber(data.reads);
 const getClapsOfData = data => getNumber(data.claps);
+const getFollowersOfData = data => getNumber(data.followers);
+const getUpvotesOfData = data => getNumber(data.upvotes);
 const getEarningsOfData = data => getNumber(data.earnings);
 
 const now = new Date();
@@ -187,23 +190,25 @@ const statsOptions = {
 nextGenerationLog('Started');
 const mngsData = {};
 
+async function getActivities() {
+    const response = await request(`https://medium.com/_/api/activity?limit=10000000`);
+    const data = response && response.value || [];
+    const rollUp = data
+        .filter(item => item.activityType === 'users_following_you_rollup')
+        .map(item => item.rollupItems);
+    return data
+        .concat(...rollUp)
+        .filter(item => item.activityType === 'users_following_you')
+        .map(item => ({
+            ...item,
+            followers: 1,
+            collectedAt: item.occurredAt
+        }));
+}
+
 async function aggregateDownloadData() {
-    // mngsData.postsData
-    //     .forEach(datum => {
-    //         // datum.views = 0;
-    //     });
-    //
-    // await Promise.all(mngsData.postsSummary
-    //     .map(async data => {
-    //         const payload = JSON.parse(await getEarningsOfPost(data.id));
-    //         const dailyStatsOfPost = payload.data.post.dailyStats;
-    //         const dailyEarningsOfPost = payload.data.post.earnings.dailyEarnings;
-    //         const earningToPostData = convertGraphQlToPostData(dailyEarningsOfPost, data.id);
-    //         const statsToPostData = convertGraphQlToPostData(dailyStatsOfPost, data.id);
-    //         earningToPostData.forEach(stat => mngsData.postsData.push(stat));
-    //         statsToPostData.forEach(stat => mngsData.postsData.push(stat));
-    //         return data;
-    //     }));
+    const activities = await getActivities();
+    mngsData.postsData = mngsData.postsData.concat(activities);
     mngsData.downloadData = mngsData.postsData
     nextGenerationLog('Downloadable data aggregated');
     enableDownloadButton();
@@ -223,14 +228,14 @@ function printGoogleDetails() {
         'failure': (f) => console.log('getPurchases.fail', f)
     });
 }
-async function remodelHtml() {
 
+async function remodelHtmlAndGetPosts() {
     if (publicationRegex.test(document.location.href)) {
-        return renewOldFashionPublicationPage()
-            .then(() => getPostsFromPublication(getPublicationName()))
+        await renewOldFashionPublicationPage()
+        return getPostsFromPublication(getPublicationName())
     } else {
-        return renewOldFashionPage()
-            .then(() => getPostsFromUser());
+        await renewOldFashionPage()
+        return getPostsFromUser();
     }
 }
 
@@ -239,11 +244,10 @@ function getPublicationName() {
     return match ? match[1] : '';
 }
 
-remodelHtml()
+remodelHtmlAndGetPosts()
     .then(data => mngsData.postsSummary = data)
     .then(() => getFullPostsData())
     .then(data => mngsData.postsData = data)
     .then(() => aggregateDownloadData())
     .then(() => generateChart())
-    .then(() => nextGenerationLog('Done')
-    );
+    .then(() => nextGenerationLog('Done'));

@@ -89,6 +89,10 @@ const verticalStackedBarChartGenerator = {
             },
             callbacks: {
                 label: (tooltipItem, chartData) => {
+                    const dataset = chartData.datasets[tooltipItem.datasetIndex];
+                    if (dataset.label === undefined) {
+                        return ''
+                    }
                     const total = chartData
                         .datasets
                         .reduce((acc, dataset) => {
@@ -98,7 +102,6 @@ const verticalStackedBarChartGenerator = {
                             }
                             return acc;
                         }, 0);
-                    const dataset = chartData.datasets[tooltipItem.datasetIndex];
                     return ` "${dataset.label}":    ${prettifyNumbersWithCommas(tooltipItem.value)}   (${(100 * tooltipItem.value / total).toFixed(1)}%)`
                 },
                 afterBody: () => {
@@ -211,6 +214,8 @@ function generateLineChartData(range, postsDataOfChart, relevantDatum) {
                     claps: info.claps,
                     reads: info.reads,
                     label: info.title,
+                    followers: info.followers,
+                    upvotes: info.upvotes,
                     views: info.views,
                     readingTime: info.readingTime,
 
@@ -257,6 +262,8 @@ function initialValueOfEveryBar(info, range) {
         id: info.id,
         claps: info.claps,
         reads: info.reads,
+        followers: info.followers,
+        upvotes: info.upvotes,
         label: info.title,
         views: info.views,
         readingTime: info.readingTime,
@@ -312,11 +319,13 @@ function getDataOfPostInRange(range, data, post) {
             acc[index].reads += getNumber(data.reads);
             acc[index].upvotes += getNumber(data.upvotes);
             acc[index].earnings += getNumber(data.earnings);
+            acc[index].followers += getNumber(data.followers);
             return acc;
         }, range.map(() => ({
             views: 0,
             claps: 0,
             reads: 0,
+            followers: 0,
             earnings: 0,
             upvotes: 0
         })));

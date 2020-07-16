@@ -20,6 +20,8 @@ function renewSummaryInfo() {
     const viewsTab = chartTabs[0];
     const readsTab = chartTabs[1];
     const clapsTab = chartTabs[2];
+    const fansTab = chartTabs[2].cloneNode(true);
+    const followersTab = chartTabs[2].cloneNode(true);
     const earningsTab = chartTabs[2].cloneNode(true);
 
     viewsTab.querySelector('.js-totalViews').innerText = `-`;
@@ -30,6 +32,8 @@ function renewSummaryInfo() {
             viewsTab.classList.add('is-active');
             readsTab.classList.remove('is-active');
             clapsTab.classList.remove('is-active');
+            fansTab.classList.remove('is-active');
+            followersTab.classList.remove('is-active');
             earningsTab.classList.remove('is-active');
             statsOptions.relevantDatum = getViewOfData;
             statsOptions.relevantDatumLabel = 'views';
@@ -45,6 +49,8 @@ function renewSummaryInfo() {
             viewsTab.classList.remove('is-active');
             readsTab.classList.add('is-active');
             clapsTab.classList.remove('is-active');
+            fansTab.classList.remove('is-active');
+            followersTab.classList.remove('is-active');
             earningsTab.classList.remove('is-active');
             statsOptions.relevantDatumLabel = 'reads';
             statsOptions.relevantDatum = getReadsOfData;
@@ -61,12 +67,52 @@ function renewSummaryInfo() {
             viewsTab.classList.remove('is-active');
             readsTab.classList.remove('is-active');
             clapsTab.classList.add('is-active');
+            fansTab.classList.remove('is-active');
+            followersTab.classList.remove('is-active');
             earningsTab.classList.remove('is-active');
             statsOptions.relevantDatumLabel = 'claps';
             statsOptions.relevantDatum = getClapsOfData;
             await generateChart();
         }
     };
+
+    fansTab.querySelector('.js-totalFans').innerText = `-`;
+    fansTab.setAttribute('data-action-value', 'fans');
+    fansTab.querySelectorAll('div.chartTab div')[1].textContent = 'Fans';
+    fansTab.onclick = async event => {
+        event.stopPropagation();
+        if (chartRenderingAnimationCompleted) {
+            viewsTab.classList.remove('is-active');
+            readsTab.classList.remove('is-active');
+            clapsTab.classList.remove('is-active');
+            fansTab.classList.add('is-active');
+            followersTab.classList.remove('is-active');
+            earningsTab.classList.remove('is-active');
+            statsOptions.relevantDatumLabel = 'fans';
+            statsOptions.relevantDatum = getUpvotesOfData;
+            await generateChart();
+        }
+    };
+    summaryInfo.appendChild(fansTab);
+
+    followersTab.querySelector('.js-totalFans').innerText = `-`;
+    followersTab.setAttribute('data-action-value', 'followers');
+    followersTab.querySelectorAll('div.chartTab div')[1].textContent = 'Followers';
+    followersTab.onclick = async event => {
+        event.stopPropagation();
+        if (chartRenderingAnimationCompleted) {
+            viewsTab.classList.remove('is-active');
+            readsTab.classList.remove('is-active');
+            clapsTab.classList.remove('is-active');
+            fansTab.classList.remove('is-active');
+            followersTab.classList.add('is-active');
+            earningsTab.classList.remove('is-active');
+            statsOptions.relevantDatumLabel = 'followers';
+            statsOptions.relevantDatum = getFollowersOfData;
+            await generateChart();
+        }
+    };
+    summaryInfo.appendChild(followersTab);
 
     earningsTab.querySelector('.js-totalFans').innerText = `$`;
     earningsTab.setAttribute('data-action-value', 'earnings');
@@ -81,13 +127,14 @@ function renewSummaryInfo() {
             viewsTab.classList.remove('is-active');
             readsTab.classList.remove('is-active');
             clapsTab.classList.remove('is-active');
+            fansTab.classList.remove('is-active');
+            followersTab.classList.remove('is-active');
             earningsTab.classList.add('is-active');
             statsOptions.relevantDatumLabel = 'earnings';
             statsOptions.relevantDatum = getEarningsOfData;
             await generateChart();
         }
     };
-
     summaryInfo.appendChild(earningsTab);
     return summaryInfo;
 }
@@ -138,12 +185,14 @@ function updateSummaryTabs(data) {
             acc.claps +=  getNumber(post.claps);
             acc.reads +=  getNumber(post.reads);
             acc.earnings += getNumber(post.earnings);
+            acc.followers += getNumber(post.followers);
             acc.upvotes += getNumber(post.upvotes);
             return acc;
         }, {
             views: 0,
             claps: 0,
             reads: 0,
+            followers: 0,
             earnings: 0,
             upvotes: 0
         });
@@ -155,7 +204,11 @@ function updateSummaryTabs(data) {
     reads.querySelector('.js-totalReads').innerText = `${prettifyNumbersWithCommas(summary.reads)}`;
     const clapsTab = chartTabs[2];
     clapsTab.querySelector('.js-totalFans').innerText = `${prettifyNumbersWithCommas(summary.claps)}`;
-    const earningsTab = chartTabs[3];
+    const fansTab = chartTabs[3];
+    fansTab.querySelector('.js-totalFans').innerText = `${prettifyNumbersWithCommas(summary.upvotes)}`;
+    const followersTab = chartTabs[4];
+    followersTab.querySelector('.js-totalFans').innerText = `${prettifyNumbersWithCommas(summary.followers)}`;
+    const earningsTab = chartTabs[5];
     const earnings = isNaN(summary.earnings) ? 0 : summary.earnings;
     const earningIntPart = Math.trunc(earnings);
     const earningFractionPart = (earnings - earningIntPart).toFixed(2).substring(1);
@@ -237,22 +290,29 @@ async function timeRangeButtonClicked(listItems, clickedItemIndex) {
 
 
 function createTimeNavBar() {
-    const navBar = document.createElement('nav');
+    const navBar = document.createElement('div');
     navBar.setAttribute('id', 'timeNavBar');
     navBar.classList.add('u-flex', 'heading', 'heading--borderedBottom', 'heading--paddedTop', 'mngs-range-selector');
     navBar.innerHTML = `
          <span class="u-minWidth0">
              <ul class="heading-tabs">
                 ${timeRanges.map((range, index) => {
-        return ` <li class="heading-tabsItem u-inlineBlock js-tabsItem ${index === 0 ? 'is-active' : ''} u-fontSize16">
-                                 <span class="heading-title u-inlineBlock u-fontSize16">
-                                     <a class="button button--chromeless u-baseColor--buttonNormal"
-                                        href="#">${range} days</a>
-                                 </span>
-                             </li>`
-    }).join('')}
+                    return ` <li class="heading-tabsItem u-inlineBlock js-tabsItem ${index === 0 ? 'is-active' : ''} u-fontSize16">
+                                             <span class="heading-title u-inlineBlock u-fontSize16">
+                                                 <a class="button button--chromeless u-baseColor--buttonNormal"
+                                                    href="#">${range} days</a>
+                                             </span>
+                                         </li>`
+                }).join('')}
              </ul>
-         </span>    
+         </span>   
+<!--         <div class="current-month-button">-->
+<!--            <li class="heading-tabsItem u-inlineBlock js-tabsItem u-fontSize16">-->
+<!--                <span class="heading-title u-inlineBlock u-fontSize16">-->
+<!--                    <a class="button button&#45;&#45;chromeless u-baseColor&#45;&#45;buttonNormal" href="#">Current month</a>-->
+<!--                </span>-->
+<!--            </li>         -->
+<!--         </div> -->
     `;
     const listItems = Array.from(navBar.querySelectorAll('ul li'));
     listItems
@@ -282,7 +342,7 @@ function createChartInnerHtml() {
                         <div class="tooltiptext">Compare aggregated articles ${statsOptions.label.toLowerCase()} by time</div>
                         <i class="far fa-chart-bar mngs-chart-type-icon mngs-chart-type-icon-active"></i>
                     </span>
-                    <spa}n class="tooltip">
+                    <span class="tooltip">
                         <div class="tooltiptext">Compare articles ${statsOptions.label.toLowerCase()} with each other</div>
                         <i class="fas fa-chart-pie mngs-chart-type-icon"></i> 
                     </span>            
