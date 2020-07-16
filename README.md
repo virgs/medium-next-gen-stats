@@ -4,11 +4,11 @@ Don't you think medium.com provides way less information that they should?
 I got tired of waiting for them to make it better and decided to make it by myself.
 Take your medium text stats to the Next Generation and get rid of the old fashion dataless default medium.
 
-A browser extension that provides richer information about your texts.
-[Chrome](https://chrome.google.com/webstore/detail/medium-next-generation-st/fhopcbdfcaleefngfpglahlpfhagendo)
-[Firefox](https://addons.mozilla.org/firefox/addon/medium-next-generation-stats/?src=search)
+A browser extension that provides richer information about your texts.  
+[<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](https://addons.mozilla.org/firefox/addon/medium-next-generation-stats) [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Firefox" width="24px" height="24px" />](https://chrome.google.com/webstore/detail/medium-next-generation-st/fhopcbdfcaleefngfpglahlpfhagendo)  
 
-![snapshot2](images/tutorial.gif)  
+
+<img src="images/tutorial.gif" alt="tutorial" width="100%">  
 
 Get larger time range, daily/weekly/monthly read/views/claps, and, specially, describes which article was view in which period.
 
