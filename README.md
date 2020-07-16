@@ -4,9 +4,11 @@ Don't you think medium.com provides way less information that they should?
 I got tired of waiting for them to make it better and decided to make it by myself.
 Take your medium text stats to the Next Generation and get rid of the old fashion dataless default medium.
 
-A [browser extension](https://chrome.google.com/webstore/detail/medium-next-generation-st/fhopcbdfcaleefngfpglahlpfhagendo) that provides richer information about your texts.
+A browser extension that provides richer information about your texts.
+[Chrome](https://chrome.google.com/webstore/detail/medium-next-generation-st/fhopcbdfcaleefngfpglahlpfhagendo)
+[Firefox](https://addons.mozilla.org/firefox/addon/medium-next-generation-stats/?src=search)
 
-![snapshot1](images/snapshot1.png)  
+![snapshot2](images/tutorial.gif)  
 
 Get larger time range, daily/weekly/monthly read/views/claps, and, specially, describes which article was view in which period.
 
@@ -38,6 +40,8 @@ Pagehub: https://pagehub.me/virgs
 ### Source Code
 You can find the source code on the link below: 
 https://github.com/virgs/medium-next-gen-stats
+
+![snapshot1](images/snapshot1.png)
 
 ### Development
 
