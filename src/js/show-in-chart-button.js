@@ -3,7 +3,7 @@ const addHighlightButton = (item) => {
     divider.classList.add('middotDivider');
     item.appendChild(divider);
 
-    const link = document.createElement('a');
+    const link = document.createElement('span');
     link.classList.add('link');
     link.classList.add('u-baseColor--link');
     link.classList.add('sortableTable-link');

@@ -43,20 +43,28 @@ function createSummary() {
 }
 
 function createRangeNavbar() {
-    const rangeNavBar = document.createElement('nav');
+    const rangeNavBar = document.createElement('div');
     rangeNavBar.setAttribute('id', 'rangeNavBar');
     rangeNavBar.classList.add('u-flex', 'heading', 'heading--borderedBottom', 'heading--paddedTop', 'mngs-range-selector');
     rangeNavBar.innerHTML = `
         <ul class="heading-tabs">
             ${ranges.map((range, index) => {
         return ` <li class="heading-tabsItem u-inlineBlock js-tabsItem ${index === 0 ? 'is-active' : ''} u-fontSize16">
-                    <span class="heading-title u-inlineBlock u-fontSize16">
-                        <a class="button button--chromeless u-baseColor--buttonNormal" href="#">${range.label}</a>
-                    </span>
-                 </li>`
+                            <span class="heading-title u-inlineBlock u-fontSize16">
+                                <a class="button button--chromeless u-baseColor--buttonNormal" href="#">${range.label}</a>
+                            </span>
+                         </li>`
     }).join('')}
         </ul>
+         <div class="current-month-button">
+            <div class="heading-tabsItem u-inlineBlock js-tabsItem u-fontSize16">
+                <span class="heading-title u-inlineBlock u-fontSize16">
+                    <div id="current-month-button" class="button button--chromeless u-baseColor--buttonNormal">Current month</div>
+                </span>
+            </div>         
+         </div> 
     `;
+    navBar.querySelector('#current-month-button').addEventListener('click', () => currentMonthButtonClick())
     const listItems = Array.from(rangeNavBar.querySelectorAll('ul li'));
     listItems
         .forEach((item, index) => {

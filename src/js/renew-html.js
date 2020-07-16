@@ -289,6 +289,21 @@ async function timeRangeButtonClicked(listItems, clickedItemIndex) {
 }
 
 
+async function currentMonthButtonClick() {
+    if (chartRenderingAnimationCompleted) {
+        statsOptions.lastDayOfRange = tomorrow;
+        const firstDayOfMonth = new Date(tomorrow);
+        firstDayOfMonth.setDate(1)
+        firstDayOfMonth.setHours(0, 0, 0, 0);
+        statsOptions.firstDayOfRange = firstDayOfMonth;
+        const chartPaginator = document.querySelectorAll(".chartPage button");
+        const chartPageNextRangeButton = chartPaginator[1];
+        chartPageNextRangeButton.disabled = true;
+
+        await generateChart();
+    }
+}
+
 function createTimeNavBar() {
     const navBar = document.createElement('div');
     navBar.setAttribute('id', 'timeNavBar');
@@ -305,15 +320,16 @@ function createTimeNavBar() {
                                          </li>`
                 }).join('')}
              </ul>
+             <div class="current-month-button">
+                <div class="heading-tabsItem u-inlineBlock js-tabsItem u-fontSize16">
+                    <span class="heading-title u-inlineBlock u-fontSize16">
+                        <div id="current-month-button" class="button button--chromeless u-baseColor--buttonNormal">Current month</div>
+                    </span>
+                </div>         
+             </div> 
          </span>   
-<!--         <div class="current-month-button">-->
-<!--            <li class="heading-tabsItem u-inlineBlock js-tabsItem u-fontSize16">-->
-<!--                <span class="heading-title u-inlineBlock u-fontSize16">-->
-<!--                    <a class="button button&#45;&#45;chromeless u-baseColor&#45;&#45;buttonNormal" href="#">Current month</a>-->
-<!--                </span>-->
-<!--            </li>         -->
-<!--         </div> -->
     `;
+    navBar.querySelector('#current-month-button').addEventListener('click', currentMonthButtonClick)
     const listItems = Array.from(navBar.querySelectorAll('ul li'));
     listItems
         .forEach((item, index) => {
