@@ -369,7 +369,9 @@ function createChartInnerHtml() {
 };
 
 async function renewOldFashionPage() {
-    document.querySelector('h1.stats-title').classList.add('mngs-stats-page-title');
+    const title = document.querySelector('h1.stats-title');
+    title.classList.add('mngs-stats-page-title');
+    title.textContent = 'Next Generation Stats';
     document.querySelector('.bargraph').remove();
 
     const statsTitleDetails = document.querySelectorAll('div .stats-title')[1];
