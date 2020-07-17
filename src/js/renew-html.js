@@ -282,6 +282,9 @@ async function timeRangeButtonClicked(listItems, clickedItemIndex) {
             .forEach((item, index) => index === clickedItemIndex ? item.classList.add('is-active') : item.classList.remove('is-active'));
         statsOptions.firstDayOfRange = new Date(statsOptions.lastDayOfRange.getTime() -
             (days * oneDayInMilliseconds));
+        const currentMonthButton = document.querySelector('#current-month-button');
+        console.log(currentMonthButton.classList)
+        currentMonthButton.classList.remove('is-active');
 
         updateChartPageLabels();
         await generateChart();
@@ -293,6 +296,8 @@ async function currentMonthButtonClick() {
     if (chartRenderingAnimationCompleted) {
         Array.from(document.querySelectorAll('.heading-tabs li'))
             .forEach(item => item.classList.remove('is-active'));
+        document.querySelector('#current-month-button').classList.add('is-active');
+
         statsOptions.lastDayOfRange = tomorrow;
         const firstDayOfMonth = new Date(tomorrow);
         firstDayOfMonth.setDate(1)

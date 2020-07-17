@@ -64,7 +64,7 @@ function createRangeNavbar() {
             </div>         
          </div> 
     `;
-    navBar.querySelector('#current-month-button').addEventListener('click', () => currentMonthButtonClick())
+    navBar.querySelector('#current-month-button').addEventListener('click', currentMonthButtonClick)
     const listItems = Array.from(rangeNavBar.querySelectorAll('ul li'));
     listItems
         .forEach((item, index) => {

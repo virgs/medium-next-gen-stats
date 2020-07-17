@@ -18,6 +18,12 @@
     right: 0;
 }
 
+#current-month-button.is-active {
+    color: rgba(0,0,0,.84);
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0,0,0,.54);
+}
+
 .mngs-summary-info {
     margin-top: 20px !important;
     border-bottom: 0 ! important;
