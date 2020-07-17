@@ -291,12 +291,14 @@ async function timeRangeButtonClicked(listItems, clickedItemIndex) {
 
 async function currentMonthButtonClick() {
     if (chartRenderingAnimationCompleted) {
+        Array.from(document.querySelectorAll('.heading-tabs li'))
+            .forEach(item => item.classList.remove('is-active'));
         statsOptions.lastDayOfRange = tomorrow;
         const firstDayOfMonth = new Date(tomorrow);
         firstDayOfMonth.setDate(1)
         firstDayOfMonth.setHours(0, 0, 0, 0);
         statsOptions.firstDayOfRange = firstDayOfMonth;
-        const chartPaginator = document.querySelectorAll(".chartPage button");
+        const chartPaginator = document.querySelectorAll('.chartPage button');
         const chartPageNextRangeButton = chartPaginator[1];
         chartPageNextRangeButton.disabled = true;
 
