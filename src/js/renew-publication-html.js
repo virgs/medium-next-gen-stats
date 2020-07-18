@@ -49,7 +49,7 @@ function createRangeNavbar() {
     rangeNavBar.innerHTML = `
         <ul class="heading-tabs">
             ${ranges.map((range, index) => {
-        return ` <li class="heading-tabsItem u-inlineBlock js-tabsItem ${index === 0 ? 'is-active' : ''} u-fontSize16">
+        return ` <li class="heading-tabsItem u-inlineBlock js-tabsItem range-item ${index === 0 ? 'is-active' : ''} u-fontSize16">
                             <span class="heading-title u-inlineBlock u-fontSize16">
                                 <a class="button button--chromeless u-baseColor--buttonNormal" href="#">${range.label}</a>
                             </span>

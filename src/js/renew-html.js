@@ -294,7 +294,7 @@ async function timeRangeButtonClicked(listItems, clickedItemIndex) {
 
 async function currentMonthButtonClick() {
     if (chartRenderingAnimationCompleted) {
-        Array.from(document.querySelectorAll('.heading-tabs li'))
+        Array.from(document.querySelectorAll('.heading-tabs .range-item'))
             .forEach(item => item.classList.remove('is-active'));
         document.querySelector('#current-month-button').classList.add('is-active');
 
@@ -319,7 +319,7 @@ function createTimeNavBar() {
          <span class="u-minWidth0">
              <ul class="heading-tabs">
                 ${timeRanges.map((range, index) => {
-                    return ` <li class="heading-tabsItem u-inlineBlock js-tabsItem ${index === 0 ? 'is-active' : ''} u-fontSize16">
+                    return ` <li class="heading-tabsItem u-inlineBlock js-tabsItem range-item ${index === 0 ? 'is-active' : ''} u-fontSize16">
                                              <span class="heading-title u-inlineBlock u-fontSize16">
                                                  <a class="button button--chromeless u-baseColor--buttonNormal"
                                                     href="#">${range} days</a>
