@@ -3,7 +3,7 @@ const addHighlightButton = (item) => {
     divider.classList.add('middotDivider');
     item.appendChild(divider);
 
-    const link = document.createElement('span');
+    const link = document.createElement('a');
     link.classList.add('link');
     link.classList.add('u-baseColor--link');
     link.classList.add('sortableTable-link');
@@ -11,10 +11,13 @@ const addHighlightButton = (item) => {
         link.classList.add('mngs-highlight-button-disabled');
     }
     link.text = 'Highlight';
+    console.log(link.text)
     item.appendChild(link);
+    console.log(link.text)
 
     const postId = item.parentElement.parentElement.getAttribute('data-action-value');
     link.setAttribute('data-post-id', postId);
+    link.setAttribute('href', '#');
     link.onclick = async () => {
         setTimeout(() => {
             document.documentElement
