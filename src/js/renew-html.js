@@ -283,7 +283,6 @@ async function timeRangeButtonClicked(listItems, clickedItemIndex) {
         statsOptions.firstDayOfRange = new Date(statsOptions.lastDayOfRange.getTime() -
             (days * oneDayInMilliseconds));
         const currentMonthButton = document.querySelector('#current-month-button');
-        console.log(currentMonthButton.classList)
         currentMonthButton.classList.remove('is-active');
 
         updateChartPageLabels();
