@@ -18,14 +18,17 @@ function getEarningsOfPost(postId) {
                 'query': 'query StatsPostChart($postId: ID!, $startAt: Long!, $endAt: Long!) {\n  post(id: $postId) {\n    id\n    ...StatsPostChart_dailyStats\n    ...StatsPostChart_dailyEarnings\n    __typename\n  }\n}\n\nfragment StatsPostChart_dailyStats on Post {\n  dailyStats(startAt: $startAt, endAt: $endAt) {\n    periodStartedAt\n    views\n    internalReferrerViews\n    memberTtr\n    __typename\n  }\n  __typename\n}\n\nfragment StatsPostChart_dailyEarnings on Post {\n  earnings {\n    dailyEarnings(startAt: $startAt, endAt: $endAt) {\n      periodEndedAt\n      periodStartedAt\n      amount\n      __typename\n    }\n    lastCommittedPeriodStartedAt\n    __typename\n  }\n  __typename\n}\n'
             })
         })
-        .then(res => {
+        .then(async res => {
             if (res.status !== 200) {
                 const message = `Fail to fetch data: (${res.status}) - ${res.statusText}`;
-                console.log(message);
-                throw message;
+                console.error(message);
+                return [];
             }
-            return res.text();
-        });
+            const text = await res.text();
+            const payload = JSON.parse(text);
+            return payload.data.post.earnings.dailyEarnings;
+        })
+        .catch(() => []);
 }
 
 const convertGraphQlToPostData = (dailyEarningsOfPost, postId) => {

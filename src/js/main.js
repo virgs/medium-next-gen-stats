@@ -130,9 +130,8 @@ async function getFullPostStats(postId, createdAt) {
         result = result.concat(stats.value ? stats.value : [])
     }
 
-    const payload = JSON.parse(await getEarningsOfPost(postId));
-    const dailyEarningsOfPost = payload.data.post.earnings.dailyEarnings;
-    const earningToPostData = convertGraphQlToPostData(dailyEarningsOfPost, postId);
+    const dailyEarnings = await getEarningsOfPost(postId);
+    const earningToPostData = convertGraphQlToPostData(dailyEarnings, postId);
     result = result.concat(earningToPostData)
 
     return result
