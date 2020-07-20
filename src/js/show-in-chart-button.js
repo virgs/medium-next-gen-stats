@@ -11,9 +11,7 @@ const addHighlightButton = (item) => {
         link.classList.add('mngs-highlight-button-disabled');
     }
     link.text = 'Highlight';
-    console.log(link.text)
     item.appendChild(link);
-    console.log(link.text)
 
     const postId = item.parentElement.parentElement.getAttribute('data-action-value');
     link.setAttribute('data-post-id', postId);
