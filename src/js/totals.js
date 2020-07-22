@@ -60,7 +60,7 @@ const totalsHtml = {
                     </span>
                 </td>
                 <td>
-                    <span class="sortableTable-number">${getRatio(values.fans, values.claps)}
+                    <span class="sortableTable-number">${values.fans ? (values.claps/values.fans).toFixed(1) : 0}
                         <span class="u-sm-show"><br>claps ratio</span>
                     </span>
                 </td>
@@ -98,6 +98,7 @@ function createTotalsTable() {
                 fans: 0
             });
     const innerHTML = totals.createHtml(values);
+    nextGenerationLog('Create totals row')
     element.innerHTML = innerHTML
 
     const chartPage = document.getElementsByClassName('chartPage')[0];
