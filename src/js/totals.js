@@ -17,6 +17,9 @@ const totalsHtml = {
                     <button class="button button--chromeless u-baseColor--buttonNormal">Read ratio</button>
                 </th>
                 <th class="sortableTable-header">
+                    <button class="button button--chromeless u-baseColor--buttonNormal">Claps</button>
+                </th>
+                <th class="sortableTable-header">
                     <button class="button button--chromeless u-baseColor--buttonNormal">Fans</button>
                 </th>
             </tr>
@@ -41,6 +44,11 @@ const totalsHtml = {
                 <td>
                     <span class="sortableTable-number">${readRatio(values.views, values.reads)}%
                         <span class="u-sm-show"><br>ratio</span>
+                    </span>
+                </td>
+                <td>
+                    <span class="sortableTable-number">${values.claps}
+                        <span class="u-sm-show"><br>claps</span>
                     </span>
                 </td>
                 <td>
@@ -71,12 +79,14 @@ function createTotalsTable() {
                 acc.views += item.views
                 acc.reads += item.reads
                 acc.fans += item.upvotes
+                acc.claps += item.claps
                 return acc;
             }
             , {
                 totals: 0,
                 views: 0,
                 reads: 0,
+                claps: 0,
                 fans: 0
             });
     const innerHTML = totals.createHtml(values);
