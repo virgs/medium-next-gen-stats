@@ -75,11 +75,11 @@ function createTotalsTable() {
     const totals = totalsHtml;
     const values = mngsData.postsSummary
         .reduce((acc, item) => {
-                ++acc.totals
-                acc.views += item.views
-                acc.reads += item.reads
-                acc.fans += item.upvotes
-                acc.claps += item.claps
+                ++acc.totals;
+                acc.views += item.views;
+                acc.reads += item.reads;
+                acc.claps += item.claps;
+                acc.fans += item.upvotes;
                 return acc;
             }
             , {
