@@ -22,6 +22,9 @@ const totalsHtml = {
                 <th class="sortableTable-header">
                     <button class="button button--chromeless u-baseColor--buttonNormal">Fans</button>
                 </th>
+                <th class="sortableTable-header">
+                    <button class="button button--chromeless u-baseColor--buttonNormal">Claps ratio</button>
+                </th>
             </tr>
         </thead>
         <tbody class="js-statsTableBody">
@@ -42,7 +45,7 @@ const totalsHtml = {
                     </span>
                 </td>
                 <td>
-                    <span class="sortableTable-number">${readRatio(values.views, values.reads)}%
+                    <span class="sortableTable-number">${getRatio(values.views, values.reads)}%
                         <span class="u-sm-show"><br>ratio</span>
                     </span>
                 </td>
@@ -56,6 +59,11 @@ const totalsHtml = {
                         <span class="u-sm-show"><br>fans</span>
                     </span>
                 </td>
+                <td>
+                    <span class="sortableTable-number">${getRatio(values.fans, values.claps)}
+                        <span class="u-sm-show"><br>claps ratio</span>
+                    </span>
+                </td>
             </tr>
         </tbody>
     </table>
@@ -63,11 +71,11 @@ const totalsHtml = {
     }
 }
 
-function readRatio(views, reads) {
-    if (!views) {
+function getRatio(denumerator, numerator) {
+    if (!denumerator) {
         return 0
     }
-    return (100 * reads / views).toFixed(1)
+    return (100 * numerator / denumerator).toFixed(1)
 }
 
 function createTotalsTable() {

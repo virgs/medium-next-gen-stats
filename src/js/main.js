@@ -245,9 +245,9 @@ function getPublicationName() {
 
 remodelHtmlAndGetPosts()
     .then(data => mngsData.postsSummary = data)
+    .then(() => createTotalsTable())
     .then(() => getFullPostsData())
     .then(data => mngsData.postsData = data)
     .then(() => aggregateDownloadData())
-    .then(() => createTotalsTable())
     .then(() => generateChart())
     .then(() => nextGenerationLog('Done'));
