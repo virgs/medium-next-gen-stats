@@ -9,7 +9,7 @@
 .mngs-range-selector {
     position: relative;
     margin-top: 10px !important;
-    border-bottom: 0 ! important;
+    border-bottom: 0 !important;
 }
 
 .current-month-button {
@@ -26,7 +26,7 @@
 
 .mngs-summary-info {
     margin-top: 20px !important;
-    border-bottom: 0 ! important;
+    border-bottom: 0 !important;
 }
 
 .mngs-stats-title-details {
@@ -35,15 +35,15 @@
 
 .mngs-stats-page-title {
     position: relative;
-    margin-top: 20px !important;
-    padding-bottom: 0;
-    margin-bottom: 22px;
+    margin: 26px 0 !important;
+    padding-bottom: 0 !important;
 }
 
 .mngs-stats-page-title-version {
     position: absolute;
     font-size: 1rem;
     color: rgba(0, 0, 0, .5);
+    font-weight: lighter;
     bottom: 0;
     right: 0;
 }
