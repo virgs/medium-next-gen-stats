@@ -30,12 +30,14 @@
 }
 
 .mngs-stats-title-details {
-    border-bottom: 0 ! important;
+    border-bottom: 0 !important;
 }
 
 .mngs-stats-page-title {
     position: relative;
     margin-top: 20px !important;
+    padding-bottom: 0;
+    margin-bottom: 22px;
 }
 
 .mngs-stats-page-title-version {
