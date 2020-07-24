@@ -58,7 +58,7 @@ const verticalStackedBarChartGenerator = {
             xPadding: 20,
             backgroundColor: 'rgba(0, 0, 0, 0.9)',
             displayColors: false,
-            currentExcludedItems: 0,
+            currentExcludedItems: [],
             topPostsOfTooltip: undefined,
             itemSort: (first, second) => second.value - first.value,
             filter: (item, chartData) => {
@@ -73,7 +73,13 @@ const verticalStackedBarChartGenerator = {
                         .filter(item => item > 0)
                         .sort((a, b) => a - b)
                         .reverse()
-                        .filter((_, index) => index < MAX_TOOLTIP_ITEMS);
+                        .filter((item, index) => {
+                            if (index < MAX_TOOLTIP_ITEMS) {
+                                return true;
+                            }
+                            verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems.push(item);
+                            return false;
+                        });
                 }
                 const foundItemIndex = verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip
                     .findIndex(item => item === parsedValue);
@@ -84,7 +90,6 @@ const verticalStackedBarChartGenerator = {
                             .filter((_, index) => index !== foundItemIndex);
                     return true;
                 }
-                ++verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems;
                 return false;
             },
             callbacks: {
@@ -105,19 +110,21 @@ const verticalStackedBarChartGenerator = {
                     return ` "${dataset.label}":    ${prettifyNumbersWithCommas(tooltipItem.value)}   (${(100 * tooltipItem.value / total).toFixed(1)}%)`
                 },
                 afterBody: () => {
-                    if (verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems > 0) {
-                        if (verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems === 1) {
+                    if (verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems.length > 0) {
+                        if (verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems.length === 1) {
                             return `   and another one...`;
                         }
-                        return `   and ${verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems} others...`;
+                        return `   and ${verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems.length} others...`;
                     }
                 },
                 footer: (tooltipItems) => {
-                    const value = tooltipItems.reduce((acc, tooltipItem) => parseInt(tooltipItem.value) + acc, 0);
                     const excludedItems = verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems;
-                    verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems = 0;
+                    const value = tooltipItems
+                            .reduce((acc, tooltipItem) => parseInt(tooltipItem.value) + acc, 0)
+                        + excludedItems.reduce((acc, item) => acc + item, 0);
+                    verticalStackedBarChartGenerator.options.tooltips.currentExcludedItems = [];
                     delete verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip;
-                    const total = tooltipItems.length + excludedItems;
+                    const total = tooltipItems.length + excludedItems.length;
 
                     const numOfHighlightedPosts = postsIdsToHighlight.length;
                     const prefix = `Total: ${prettifyNumbersWithCommas(value)} ${statsOptions.relevantDatumLabel} `;
@@ -167,7 +174,6 @@ const verticalStackedBarChartGenerator = {
 };
 
 async function generateVerticalStackedBarChart(postsDataOfChart, postsSummaryOfChart) {
-
     const range = statsOptions.rangeMethod(statsOptions.firstDayOfRange, statsOptions.lastDayOfRange);
     const labels = range.map(interval => interval.label);
     barChartData = generateBarChartData(range, postsDataOfChart, statsOptions.relevantDatum);
@@ -188,11 +194,31 @@ async function generateVerticalStackedBarChart(postsDataOfChart, postsSummaryOfC
 
 function generateBarChartData(range, postsDataOfChart, relevantDatum) {
     const alpha = postsIdsToHighlight.length > 0 ? HIGHLIGHTED_ALPHA : NOT_HIGHLIGHTED_ALPHA;
+    const data = range.map(_ => 0);
     return Object.values(postsDataOfChart
         .reduce((acc, info) => {
-            if (acc[info.id] === undefined) {
-                acc[info.id] = initialValueOfEveryBar(info, range);
-            }
+            acc[info.id] = acc[info.id] || {
+                claps: 0,
+                reads: 0,
+                followers: 0,
+                upvotes: 0,
+                views: 0,
+
+                readingTime: info.readingTime,
+                label: info.title,
+                id: info.id,
+                type: BAR_TYPE,
+                stack: 'unique',
+                barPercentage: 0.95,
+                categoryPercentage: 1,
+                data: data
+            };
+
+            acc[info.id].claps += getNumber(info.claps);
+            acc[info.id].reads += getNumber(info.reads);
+            acc[info.id].followers += getNumber(info.followers);
+            acc[info.id].upvotes += getNumber(info.upvotes);
+            acc[info.id].views += getNumber(info.views);
             return acc;
         }, {}))
         .map((post, index, vec) => {
@@ -247,33 +273,13 @@ function generateBubbleChartData(range, filteredByRangePostsSummary) {
     return filteredByRangePostsSummary
         .reduce((acc, summary) => {
             const indexOfDate = range
-                .findIndex(item => summary.firstPublishedAt >= item.begin.getTime() && summary.firstPublishedAt < item.end.getTime());
+                .findIndex(item => +summary.firstPublishedAt >= item.begin.getTime() && +summary.firstPublishedAt < item.end.getTime());
             const dataset = checkPublicationDataset(indexOfDate, summary, range, acc);
             if (dataset) {
                 acc.push(dataset);
             }
             return acc;
         }, []);
-}
-
-
-function initialValueOfEveryBar(info, range) {
-    return {
-        id: info.id,
-        claps: info.claps,
-        reads: info.reads,
-        followers: info.followers,
-        upvotes: info.upvotes,
-        label: info.title,
-        views: info.views,
-        readingTime: info.readingTime,
-
-        type: BAR_TYPE,
-        stack: 'unique',
-        barPercentage: 0.95,
-        categoryPercentage: 1,
-        data: range.map((_, index) => 0)
-    };
 }
 
 function checkPublicationDataset(indexOfDate, post, range, previousDatasets) {
@@ -313,13 +319,21 @@ function getDataOfPostInRange(range, data, post) {
     return data
         .filter(data => data.id === post.id)
         .reduce((acc, data) => {
-            const index = range.findIndex(item => item.begin.getTime() <= data.collectedAt && data.collectedAt < item.end.getTime());
-            acc[index].views += getNumber(data.views);
-            acc[index].claps += getNumber(data.claps);
-            acc[index].reads += getNumber(data.reads);
-            acc[index].upvotes += getNumber(data.upvotes);
-            acc[index].earnings += getNumber(data.earnings);
-            acc[index].followers += getNumber(data.followers);
+            const index = range.findIndex(item => {
+                const collectedAt = new Date(+data.collectedAt);
+                return item.begin <= collectedAt &&
+                    collectedAt <= item.end;
+            });
+            if (index >= 0) {
+                acc[index].views += getNumber(data.views);
+                acc[index].claps += getNumber(data.claps);
+                acc[index].reads += getNumber(data.reads);
+                acc[index].upvotes += getNumber(data.upvotes);
+                acc[index].earnings += getNumber(data.earnings);
+                acc[index].followers += getNumber(data.followers);
+            } else {
+                console.log(index)
+            }
             return acc;
         }, range.map(() => ({
             views: 0,

@@ -1,5 +1,5 @@
 function getRangeInDays(beginDate, endDate) {
-    const differenceInDays = (endDate.getTime() - beginDate.getTime()) / oneDayInMilliseconds;
+    const differenceInDays = Math.ceil((endDate.getTime() - beginDate.getTime()) / oneDayInMilliseconds);
     let dayIterator = beginDate;
     return Array.from(Array(differenceInDays))
         .reduce(acc => {
@@ -16,11 +16,11 @@ function getRangeInDays(beginDate, endDate) {
 }
 
 function getRangeInMonths(beginDate, endDate) {
-    const differenceInMonths = endDate.getMonth() - beginDate.getMonth() + (12 * (endDate.getFullYear() - beginDate.getFullYear())) + 1;
+    const differenceInMonths = endDate.getUTCMonth() - beginDate.getUTCMonth() + (12 * (endDate.getUTCFullYear() - beginDate.getUTCFullYear())) + 1;
     let monthIterator = beginDate;
     return Array.from(Array(differenceInMonths))
         .reduce(acc => {
-            const nextInterval = new Date(monthIterator.getFullYear(), monthIterator.getMonth() + 1);
+            const nextInterval = new Date(monthIterator.getUTCFullYear(), monthIterator.getUTCMonth() + 1);
             const interval = {
                 begin: monthIterator,
                 end: nextInterval,
@@ -51,18 +51,18 @@ function getRangeInWeeks(beginDate, endDate) {
 }
 
 function getStringifiedDate(date) {
-    const day = (date.getDate() + '').padStart(2, '0');
+    const day = (date.getUTCDate() + '').padStart(2, '0');
     const monthShort = date.toLocaleString('default', {month: 'long'}).substr(0, 3);
     const month = monthShort.substr(0, 1).toUpperCase() + monthShort.substr(1);
-    const year = date.getFullYear();
+    const year = date.getUTCFullYear();
     return `${day}/${month}/${year}`;
 }
 
 function getStringifiedWeekDifference(initial, end) {
     const differentYears = initial.getFullYear() !== end.getFullYear();
-    const differentMonth = initial.getMonth() !== end.getMonth();
+    const differentMonth = initial.getUTCMonth() !== end.getUTCMonth();
 
-    let initialString = (initial.getDate() + '').padStart(2, '0');
+    let initialString = (initial.getUTCDate() + '').padStart(2, '0');
     const initialMonth = initial.toLocaleString('default', {month: 'long'}).substr(0, 3);
 
     if (differentYears) {

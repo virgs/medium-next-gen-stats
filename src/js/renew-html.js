@@ -1,5 +1,5 @@
 function renewRangeNavbar() {
-    const rangeNavBar = document.querySelector("nav");
+    const rangeNavBar = document.querySelector('nav');
     rangeNavBar.setAttribute('id', 'rangeNavBar');
     rangeNavBar.classList.add('mngs-range-selector');
     const listItems = Array.from(rangeNavBar.querySelectorAll('ul li'));
@@ -182,8 +182,8 @@ function updateSummaryTabs(data) {
     const summary = data
         .reduce((acc, post) => {
             acc.views += getNumber(post.views);
-            acc.claps +=  getNumber(post.claps);
-            acc.reads +=  getNumber(post.reads);
+            acc.claps += getNumber(post.claps);
+            acc.reads += getNumber(post.reads);
             acc.earnings += getNumber(post.earnings);
             acc.followers += getNumber(post.followers);
             acc.upvotes += getNumber(post.upvotes);
@@ -296,7 +296,6 @@ async function currentMonthButtonClick() {
         Array.from(document.querySelectorAll('.heading-tabs .range-item'))
             .forEach(item => item.classList.remove('is-active'));
         document.querySelector('#current-month-button').classList.add('is-active');
-
         statsOptions.lastDayOfRange = tomorrow;
         const firstDayOfMonth = new Date(tomorrow);
         firstDayOfMonth.setDate(1)
@@ -318,13 +317,13 @@ function createTimeNavBar() {
          <span class="u-minWidth0">
              <ul class="heading-tabs">
                 ${timeRanges.map((range, index) => {
-                    return ` <li class="heading-tabsItem u-inlineBlock js-tabsItem range-item ${index === 0 ? 'is-active' : ''} u-fontSize16">
+        return ` <li class="heading-tabsItem u-inlineBlock js-tabsItem range-item ${index === 0 ? 'is-active' : ''} u-fontSize16">
                                              <span class="heading-title u-inlineBlock u-fontSize16">
                                                  <a class="button button--chromeless u-baseColor--buttonNormal"
                                                     href="#">${range} days</a>
                                              </span>
                                          </li>`
-                }).join('')}
+    }).join('')}
              </ul>
              <div class="current-month-button">
                 <div class="heading-tabsItem u-inlineBlock js-tabsItem u-fontSize16">
@@ -375,7 +374,8 @@ function createChartInnerHtml() {
 async function renewOldFashionPage() {
     const title = document.querySelector('h1.stats-title');
     title.classList.add('mngs-stats-page-title');
-    title.textContent = 'Next Generation Stats';
+    // title.innerHTML = `Next Generation Stats <small>1.1.13</small>`
+    title.textContent = 'Next Generation Stats'; // TODO browser.runtime.getManifest()
     document.querySelector('.bargraph').remove();
 
     const statsTitleDetails = document.querySelectorAll('div .stats-title')[1];

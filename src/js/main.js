@@ -64,79 +64,55 @@ async function getPosts(url) {
 }
 
 async function getPostsFromUser() {
-    return getPosts(`https://medium.com/me/stats?format=json&limit=1000000`);
+    const message = await getTotals('me/stats');
+    mngsData.user = message.references.User;
+    return message.value.map(item => ({...item, id: item.postId}));
 }
 
 async function getPostsFromPublication(publication) {
     return getPosts(`https://medium.com/${publication}/stats?format=json&limit=1000000`);
 }
 
-function getInitialPostsData() {
-    nextGenerationLog(`Loading initial data of ${mngsData.postsSummary.length} posts`);
-    return Promise
-        .all(mngsData.postsSummary.map((post) => loadInitialPostStats(post)))
-        .then(postsInformation => postsInformation
-            .reduce((acc, item) => acc.concat(item), [])
-        );
-}
-
-function getFullPostsData() {
+async function getFullPostsData() {
     nextGenerationLog(`Loading full data of ${mngsData.postsSummary.length} posts`);
-    return Promise
-        .all(mngsData.postsSummary.map((post) => loadFullPostsStats(post)))
+    mngsData.postsData = await Promise
+        .all(mngsData.postsSummary
+            .map(async (post) => {
+                return await getFullPostStats(post);
+            }))
         .then(postsInformation => postsInformation
             .reduce((acc, item) => acc.concat(item), [])
         );
 }
 
-function loadInitialPostStats(post) {
-    return getInitialPostStats(post.id)
-        .then(postStats => postStats
-            .map(postStat => {
-                const fullStats = {...postStat, id: post.id, title: post.title};
-                delete fullStats.postId;
-                return fullStats
-            }));
-}
-
-function loadFullPostsStats(post) {
-    return getFullPostStats(post.id, post.createdAt)
-        .then(postStats => postStats
-            .map(postStat => {
-                const fullStats = {...postStat, id: post.id, title: post.title};
-                delete fullStats.postId;
-                return fullStats
-            }));
-}
-
-function getInitialPostStats(postId) {
-    return request(`https://medium.com/stats/${postId}/${statsOptions.firstDayOfRange.getTime()}/${Date.now()}`)
-        .then(data => data && data.value || []);
-}
-
-async function getFullPostStats(postId, createdAt) {
-    // const fullPeriod = Date.now() - createdAt
-    const interval = oneDayInMilliseconds * 360;
-    // let result = await Promise.all(Array.from(Array(Math.ceil(fullPeriod / interval)))
-    //     .map(async _ => {
-    //         const stats = await request(`https://medium.com/stats/${postId}/${initial}/${initial + interval}?format=json&limit=1000000`);
-    //         return stats.value ? stats.value : []
-    //     }))
-    // result = result.reduce(async (acc, item) => acc.concat(await item))
-
-    let result = []
-    for (let initial = createdAt; initial < Date.now(); initial += interval) {
-        const stats = await request(`https://medium.com/stats/${postId}/${initial}/${initial + interval}?format=json&limit=1000000`);
-        result = result.concat(stats.value ? stats.value : [])
+async function getTotals(url, payload) {
+    let finalUrl = `https://medium.com/${url}?limit=500`;
+    if (!payload) {
+        const response = await request(finalUrl);
+        return getTotals(url, response);
     }
-
-    const dailyEarnings = await getEarningsOfPost(postId);
-    const earningToPostData = convertGraphQlToPostData(dailyEarnings, postId);
-    result = result.concat(earningToPostData)
-
-    return result
+    const {value, paging} = payload;
+    if (payload && paging && paging.next && paging.next.to && value && value.length) {
+        finalUrl += `&to=${paging.next.to}`;
+        const response = await request(finalUrl);
+        payload.value = [...payload.value, ...response.value];
+        payload.paging = response.paging;
+        return getTotals(url, payload);
+    } else {
+        return payload;
+    }
 }
 
+
+async function getFullPostStats(post) {
+    const interval = oneDayInMilliseconds * 180;
+    let data = []
+    for (let initial = post.firstPublishedAt - oneDayInMilliseconds; initial < tomorrow; initial += interval) {
+        const stats = await request(`https://medium.com/stats/${post.id}/${initial + 1}/${initial + interval}?format=json`);
+        data = data.concat(stats.value ? stats.value : [])
+    }
+    return data.map(item => ({...item, id: post.id, title: post.title}));
+}
 
 function request(url) {
     return fetch(url,
@@ -154,7 +130,7 @@ function request(url) {
             }
             return res.text();
         })
-        .then(text => JSON.parse(text.slice(16)).payload)
+        .then(text => JSON.parse(text.split('</x>')[1]).payload)
 }
 
 const getNumber = (value) => {
@@ -174,7 +150,8 @@ const getUpvotesOfData = data => getNumber(data.upvotes);
 const getEarningsOfData = data => getNumber(data.earnings);
 
 const now = new Date();
-const tomorrow = new Date(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() + oneDayInMilliseconds);
+const timezoneOffsetInMs = now.getTimezoneOffset() * 60 * 1000;
+const tomorrow = new Date(new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()).getTime() + timezoneOffsetInMs + oneDayInMilliseconds);
 const initiallySelectedRange = ranges[currentRangeIndex];
 const statsOptions = {
     firstDayOfRange: new Date(tomorrow.getTime() - (timeRanges[currentTimeRangeIndex] * oneDayInMilliseconds)),
@@ -190,12 +167,12 @@ nextGenerationLog('Started');
 const mngsData = {};
 
 async function getActivities() {
-    const response = await request(`https://medium.com/_/api/activity?limit=10000000`);
+    const response = await request(`https://medium.com/_/api/activity?limit=1000000`);
     const data = response && response.value || [];
     const rollUp = data
         .filter(item => item.activityType === 'users_following_you_rollup')
         .map(item => item.rollupItems);
-    return data
+    const activities = await data
         .concat(...rollUp)
         .filter(item => item.activityType === 'users_following_you')
         .map(item => ({
@@ -203,38 +180,36 @@ async function getActivities() {
             followers: 1,
             collectedAt: item.occurredAt
         }));
+    mngsData.postsData = mngsData.postsData.concat(activities);
+    nextGenerationLog('Activities data aggregated');
 }
 
-async function aggregateDownloadData() {
-    const activities = await getActivities();
-    mngsData.postsData = mngsData.postsData.concat(activities);
+async function getEarningsData() {
+    const earnings = await Promise
+        .all(mngsData.postsSummary
+            .map(async post => {
+                const dailyEarnings = await getEarningsOfPost(post);
+                return convertGraphQlToPostData(dailyEarnings, post);
+            }))
+        .then(postsInformation => postsInformation
+            .reduce((acc, item) => acc.concat(item), [])
+        );
+
+    mngsData.postsData = mngsData.postsData.concat(earnings);
     mngsData.downloadData = mngsData.postsData
-    nextGenerationLog('Downloadable data aggregated');
+    nextGenerationLog('Earnings data aggregated');
     enableDownloadButton();
 }
 
 const publicationRegex = /https:\/\/medium.com\/(.+)\/stats\/stories/;
 
-function printGoogleDetails() {
-    google.payments.inapp.getSkuDetails({
-        'parameters': {'env': 'prod'},
-        'success': (v) => console.log('getSkuDetails.suc: ', v),
-        'failure': (f) => console.log('getSkuDetails.fail', f)
-    });
-    google.payments.inapp.getPurchases({
-        'parameters': {'env': 'prod'},
-        'success': (v) => console.log('getPurchases.suc: ', v),
-        'failure': (f) => console.log('getPurchases.fail', f)
-    });
-}
-
 async function remodelHtmlAndGetPosts() {
     if (publicationRegex.test(document.location.href)) {
         await renewOldFashionPublicationPage()
-        return getPostsFromPublication(getPublicationName())
+        mngsData.postsSummary = await getPostsFromPublication(getPublicationName());
     } else {
-        await renewOldFashionPage()
-        return getPostsFromUser();
+        await renewOldFashionPage();
+        mngsData.postsSummary = await getPostsFromUser();
     }
 }
 
@@ -244,10 +219,10 @@ function getPublicationName() {
 }
 
 remodelHtmlAndGetPosts()
-    .then(data => mngsData.postsSummary = data)
     .then(() => createTotalsTable())
     .then(() => getFullPostsData())
-    .then(data => mngsData.postsData = data)
-    .then(() => aggregateDownloadData())
+    .then(() => getActivities())
+    .then(() => generateChart())
+    .then(() => getEarningsData())
     .then(() => generateChart())
     .then(() => nextGenerationLog('Done'));

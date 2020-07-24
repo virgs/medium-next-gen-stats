@@ -9,9 +9,17 @@ async function generateChart() {
 
     chartRenderingAnimationCompleted = false;
     const postsDataOfChart = mngsData.postsData
-        .filter(post => post.collectedAt >= statsOptions.firstDayOfRange.getTime() && post.collectedAt < statsOptions.lastDayOfRange.getTime());
+        .filter(post => {
+            const collectedAt = new Date(+post.collectedAt);
+            return collectedAt >= statsOptions.firstDayOfRange &&
+                collectedAt < statsOptions.lastDayOfRange;
+        });
     const postsSummaryOfChart = mngsData.postsSummary
-        .filter(post => post.firstPublishedAt >= statsOptions.firstDayOfRange.getTime() && post.firstPublishedAt < statsOptions.lastDayOfRange.getTime());
+        .filter(post => {
+            const date = new Date(+post.firstPublishedAt);
+            return date >= statsOptions.firstDayOfRange &&
+                date < statsOptions.lastDayOfRange;
+        });
 
     const chartOptions = await statsOptions.chartGenerator(postsDataOfChart, postsSummaryOfChart);
 
@@ -19,5 +27,5 @@ async function generateChart() {
     chart = new Chart(ctx, chartOptions);
 
     updateSummaryTabs(postsDataOfChart, statsOptions);
-    nextGenerationLog("Chart rendered");
+    nextGenerationLog('Chart rendered');
 }
