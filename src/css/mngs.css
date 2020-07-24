@@ -19,9 +19,9 @@
 }
 
 #current-month-button.is-active {
-    color: rgba(0,0,0,.84);
+    color: rgba(0, 0, 0, .84);
     padding-bottom: 8px;
-    border-bottom: 1px solid rgba(0,0,0,.54);
+    border-bottom: 1px solid rgba(0, 0, 0, .54);
 }
 
 .mngs-summary-info {
@@ -34,7 +34,16 @@
 }
 
 .mngs-stats-page-title {
+    position: relative;
     margin-top: 20px !important;
+}
+
+.mngs-stats-page-title-version {
+    position: absolute;
+    font-size: 1rem;
+    color: rgba(0, 0, 0, .5);
+    bottom: 0;
+    right: 0;
 }
 
 .mngs-chart-type-icon, .mngs-chart-action-icon, .mngs-donate-type-icon {

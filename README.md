@@ -53,7 +53,7 @@ https://github.com/virgs/medium-next-gen-stats
 
 - ##### firefox
     1. Clone this repo
-    2. Go to `about:debugging`
+    2. Go to `about:debugging` -> `This firefox`
     3. Click on `load Temporary Add-on`
     4. Select the `manifest.json` file
 

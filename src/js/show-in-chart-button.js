@@ -4,6 +4,7 @@ const addHighlightButton = (item) => {
     item.appendChild(divider);
 
     const link = document.createElement('a');
+    link.classList.add('highlight-in-chart');
     link.classList.add('link');
     link.classList.add('u-baseColor--link');
     link.classList.add('sortableTable-link');
@@ -50,8 +51,8 @@ const hidePost = async (post) => {
 const checkNecessityOfAddingHighlightButton = () => {
     Array.from(document.querySelectorAll('.sortableTable-rowTitle .sortableTable-text'))
         .forEach((item,) => {
-            const spansCount = item.querySelectorAll('span').length;
-            if (spansCount <= 4) {
+            const spansCount = item.querySelectorAll('span .highlight-in-chart').length;
+            if (spansCount <= 0) {
                 addHighlightButton(item);
             }
         });

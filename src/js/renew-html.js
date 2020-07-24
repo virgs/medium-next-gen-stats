@@ -374,8 +374,8 @@ function createChartInnerHtml() {
 async function renewOldFashionPage() {
     const title = document.querySelector('h1.stats-title');
     title.classList.add('mngs-stats-page-title');
-    // title.innerHTML = `Next Generation Stats <small>1.1.13</small>`
-    title.textContent = 'Next Generation Stats'; // TODO browser.runtime.getManifest()
+    const chromeOrFirefox = chrome || browse;
+    title.innerHTML = `Next Generation Stats <small class="mngs-stats-page-title-version">v${chromeOrFirefox.runtime.getManifest().version}</small>`;
     document.querySelector('.bargraph').remove();
 
     const statsTitleDetails = document.querySelectorAll('div .stats-title')[1];

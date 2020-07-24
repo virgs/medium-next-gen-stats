@@ -31,16 +31,16 @@ const totalsHtml = {
                             <tr class="sortableTable-row js-statsTableRow">
                                 <td>
                                     <div class="sortableTable-number" style="text-align: left">
-                                        ${values.totals} articles
+                                        ${prettifyNumbersWithCommas(values.totals)} articles
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="sortableTable-number">${values.views}
+                                    <span class="sortableTable-number">${prettifyNumbersWithCommas(values.views)}
                                         <span class="u-sm-show"><br>views</span>
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="sortableTable-number">${values.reads}
+                                    <span class="sortableTable-number">${prettifyNumbersWithCommas(values.reads)}
                                         <span class="u-sm-show"><br>reads</span>
                                     </span>
                                 </td>
@@ -50,17 +50,17 @@ const totalsHtml = {
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="sortableTable-number">${values.claps}
+                                    <span class="sortableTable-number">${prettifyNumbersWithCommas(values.claps)}
                                         <span class="u-sm-show"><br>claps</span>
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="sortableTable-number">${values.fans}
+                                    <span class="sortableTable-number">${prettifyNumbersWithCommas(values.fans)}
                                         <span class="u-sm-show"><br>fans</span>
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="sortableTable-number">${values.fans ? (values.claps / values.fans).toFixed(1) : 0}
+                                    <span class="sortableTable-number">${values.fans ? (values.claps / values.fans).toFixed(1) : 0}%
                                         <span class="u-sm-show"><br>claps ratio</span>
                                     </span>
                                 </td>
