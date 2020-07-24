@@ -51,6 +51,14 @@ function prettifyNumbersWithCommas(number) {
         .join('');
 }
 
+function convertToCsv(items) {
+    const replacer = (key, value) => value === null ? '' : value;
+    const header = Object.keys(items.reduce((acc, item) => ({...acc, ...item}), {}));
+    let csv = items.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','));
+    csv.unshift(header.join(','));
+    return csv.join('\r\n');
+}
+
 async function getPosts(url) {
     const posts = await request(url);
     return posts.value
@@ -196,7 +204,6 @@ async function getEarningsData() {
         );
 
     mngsData.postsData = mngsData.postsData.concat(earnings);
-    mngsData.downloadData = mngsData.postsData
     nextGenerationLog('Earnings data aggregated');
     enableDownloadButton();
 }

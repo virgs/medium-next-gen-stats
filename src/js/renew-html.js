@@ -215,6 +215,16 @@ function updateSummaryTabs(data) {
     earningsTab.querySelector('.js-totalFans').innerText = `${prettifyNumbersWithCommas(earningIntPart) + earningFractionPart} $`;
 }
 
+function downloadButtonClicked(stringifiedContent, filename) {
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(stringifiedContent));
+    element.setAttribute('download', filename);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+}
+
 function addActionToChartTypeIcons() {
     const downloadIcon = document.querySelector('.fa-file-download');
     const chartBarIcon = document.querySelector('.fa-chart-bar');
@@ -222,14 +232,10 @@ function addActionToChartTypeIcons() {
 
     downloadIcon.parentNode.onclick = async () => {
         if (document.querySelector('.fa-file-download').style.pointerEvents !== 'none') {
-            const element = document.createElement('a');
-            const stringifiedContent = JSON.stringify(mngsData.downloadData, null, 2);
-            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(stringifiedContent));
-            element.setAttribute('download', 'medium-next-generation-stats.json');
-            element.style.display = 'none';
-            document.body.appendChild(element);
-            element.click();
-            document.body.removeChild(element);
+            downloadButtonClicked(JSON.stringify(mngsData.postsData, null, 2), 'mngs-posts-data.json');
+            downloadButtonClicked(JSON.stringify(mngsData.postsSummary, null, 2), 'mngs-posts-summary.json');
+            downloadButtonClicked(convertToCsv(mngsData.postsData), 'mngs-posts-data.csv');
+            downloadButtonClicked(convertToCsv(mngsData.postsSummary), 'mngs-posts-summary.csv');
         }
     };
 
