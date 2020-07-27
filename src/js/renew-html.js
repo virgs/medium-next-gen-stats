@@ -310,7 +310,8 @@ async function currentMonthButtonClick() {
         const chartPaginator = document.querySelectorAll('.chartPage button');
         const chartPageNextRangeButton = chartPaginator[1];
         chartPageNextRangeButton.disabled = true;
-
+        currentTimeRangeIndex = 0;
+        updateChartPageLabels();
         await generateChart();
     }
 }
