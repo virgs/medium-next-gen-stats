@@ -127,12 +127,16 @@ const verticalStackedBarChartGenerator = {
                     const total = tooltipItems.length + excludedItems.length;
 
                     const numOfHighlightedPosts = postsIdsToHighlight.length;
-                    const prefix = `Total: ${prettifyNumbersWithCommas(value)} ${statsOptions.relevantDatumLabel} `;
-                    let suffix = `of ${total} article${total > 1 ? 's' : ''}`;
-                    if (numOfHighlightedPosts > 0) {
-                        suffix = `of ${numOfHighlightedPosts} highlighted article${numOfHighlightedPosts > 1 ? 's' : ''}`;
+                    const label = statsOptions.relevantDatumLabel;
+                    let footer = `Total: ${prettifyNumbersWithCommas(value)} ${label}`;
+                    if (label !== 'followers') {
+                        if (numOfHighlightedPosts > 0) {
+                            footer += `of ${numOfHighlightedPosts} highlighted article${numOfHighlightedPosts > 1 ? 's' : ''}`;
+                        } else {
+                            footer += ` of ${total} article${total > 1 ? 's' : ''}`;
+                        }
                     }
-                    return prefix + suffix;
+                    return footer;
                 },
             },
             footerFontStyle: 'bold',
