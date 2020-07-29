@@ -50,7 +50,8 @@ function getRangeInWeeks(beginDate, endDate) {
         }, []);
 }
 
-function getStringifiedDate(date) {
+function getStringifiedDate(value) {
+    const date = new Date(value.getTime() + timezoneOffsetInMs)
     const day = (date.getUTCDate() + '').padStart(2, '0');
     const monthShort = date.toLocaleString('default', {month: 'long'}).substr(0, 3);
     const month = monthShort.substr(0, 1).toUpperCase() + monthShort.substr(1);

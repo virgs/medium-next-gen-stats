@@ -83,14 +83,11 @@ async function getPostsFromPublication(publication) {
 
 async function getFullPostsData() {
     nextGenerationLog(`Loading full data of ${mngsData.postsSummary.length} posts`);
-    mngsData.postsData = await Promise
+    const postsData = await Promise
         .all(mngsData.postsSummary
-            .map(async (post) => {
-                return await getFullPostStats(post);
-            }))
-        .then(postsInformation => postsInformation
+            .map(async (post) => await getFullPostStats(post)));
+    mngsData.postsData = postsData
             .reduce((acc, item) => acc.concat(item), [])
-        );
 }
 
 async function getTotals(url, payload) {
@@ -102,10 +99,15 @@ async function getTotals(url, payload) {
     const {value, paging} = payload;
     if (payload && paging && paging.next && paging.next.to && value && value.length) {
         finalUrl += `&to=${paging.next.to}`;
-        const response = await request(finalUrl);
-        payload.value = [...payload.value, ...response.value];
-        payload.paging = response.paging;
-        return getTotals(url, payload);
+        try {
+            const response = await request(finalUrl);
+            payload.value = [...payload.value, ...response.value];
+            payload.paging = response.paging;
+            return getTotals(url, payload);
+        } catch (err) {
+            console.log(err);
+            return payload;
+        }
     } else {
         return payload;
     }
@@ -114,31 +116,38 @@ async function getTotals(url, payload) {
 
 async function getFullPostStats(post) {
     const interval = oneDayInMilliseconds * 180;
-    let data = []
+    let promises = [];
     for (let initial = post.firstPublishedAt - oneDayInMilliseconds; initial < tomorrow; initial += interval) {
-        const stats = await request(`https://medium.com/stats/${post.id}/${initial + 1}/${initial + interval}?format=json`);
-        data = data.concat(stats.value ? stats.value : [])
+        promises.push(request(`https://medium.com/stats/${post.id}/${initial + 1}/${initial + interval}?format=json`));
+        // promises.push(getTotals(`stats/${post.id}/${initial + 1}/${initial + interval}`));
     }
-    return data.map(item => ({...item, id: post.id, title: post.title}));
+    const data = await Promise.all(promises);
+    return data
+        .reduce((acc, item) => {
+            const stats = item.value ? item.value : [];
+            return acc.concat(stats);
+        }, [])
+        .map(item => {
+            return ({...item, id: post.id, title: post.title});
+        });
 }
 
-function request(url) {
-    return fetch(url,
+async function request(url) {
+    const response = await fetch(url,
         {
             credentials: 'same-origin',
             headers: {
                 accept: 'application/json'
             }
-        })
-        .then(res => {
-            if (res.status !== 200) {
-                const message = `Fail to fetch data: (${res.status}) - ${res.statusText}`;
-                console.log(message);
-                throw message;
-            }
-            return res.text();
-        })
-        .then(text => JSON.parse(text.split('</x>')[1]).payload)
+        });
+    if (response.status === 200) {
+        const text = await response.text();
+        return JSON.parse(text.split('</x>')[1]).payload;
+    } else {
+        const message = `Fail to fetch data: (${response.status}) - ${response.statusText}`;
+        console.log(message);
+        return {};
+    }
 }
 
 const getNumber = (value) => {
@@ -159,7 +168,7 @@ const getEarningsOfData = data => getNumber(data.earnings);
 
 const now = new Date();
 const timezoneOffsetInMs = now.getTimezoneOffset() * 60 * 1000;
-const tomorrow = new Date(new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()).getTime() + timezoneOffsetInMs + oneDayInMilliseconds);
+const tomorrow = new Date(new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()).getTime() + oneDayInMilliseconds);
 const initiallySelectedRange = ranges[currentRangeIndex];
 const statsOptions = {
     firstDayOfRange: new Date(tomorrow.getTime() - (timeRanges[currentTimeRangeIndex] * oneDayInMilliseconds)),

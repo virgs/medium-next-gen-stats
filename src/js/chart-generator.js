@@ -8,6 +8,8 @@ async function generateChart() {
     }
 
     chartRenderingAnimationCompleted = false;
+    console.log(statsOptions.firstDayOfRange)
+    console.log(statsOptions.lastDayOfRange)
     const postsDataOfChart = mngsData.postsData
         .filter(post => {
             const collectedAt = new Date(+post.collectedAt);

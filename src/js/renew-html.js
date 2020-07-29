@@ -303,10 +303,11 @@ async function currentMonthButtonClick() {
             .forEach(item => item.classList.remove('is-active'));
         document.querySelector('#current-month-button').classList.add('is-active');
         statsOptions.lastDayOfRange = tomorrow;
-        const firstDayOfMonth = new Date(tomorrow);
-        firstDayOfMonth.setDate(1)
-        firstDayOfMonth.setHours(0, 0, 0, 0);
+        let firstDayOfMonth = new Date(tomorrow);
+        firstDayOfMonth = new Date(firstDayOfMonth.setUTCDate(1));
+        firstDayOfMonth = new Date(firstDayOfMonth.setHours(0, 0, 0, 0));
         statsOptions.firstDayOfRange = firstDayOfMonth;
+
         const chartPaginator = document.querySelectorAll('.chartPage button');
         const chartPageNextRangeButton = chartPaginator[1];
         chartPageNextRangeButton.disabled = true;
