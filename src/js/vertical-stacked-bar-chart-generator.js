@@ -326,7 +326,7 @@ function getDataOfPostInRange(range, data, post) {
             const index = range.findIndex(item => {
                 const collectedAt = new Date(+data.collectedAt);
                 return item.begin <= collectedAt &&
-                    collectedAt <= item.end;
+                    collectedAt < item.end;
             });
             if (index >= 0) {
                 acc[index].views += getNumber(data.views);
