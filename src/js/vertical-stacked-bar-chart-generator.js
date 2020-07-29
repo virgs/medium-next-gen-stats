@@ -127,9 +127,12 @@ const verticalStackedBarChartGenerator = {
                     const total = tooltipItems.length + excludedItems.length;
 
                     const numOfHighlightedPosts = postsIdsToHighlight.length;
-                    const label = statsOptions.relevantDatumLabel;
+                    let label = statsOptions.relevantDatumLabel;
+                    if (value <= 1) {
+                        label = label.substring(0, label.length - 1);
+                    }
                     let footer = `Total: ${prettifyNumbersWithCommas(value)} ${label}`;
-                    if (label !== 'followers') {
+                    if (!label.startsWith('follower')) {
                         if (numOfHighlightedPosts > 0) {
                             footer += `of ${numOfHighlightedPosts} highlighted article${numOfHighlightedPosts > 1 ? 's' : ''}`;
                         } else {
