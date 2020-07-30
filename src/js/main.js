@@ -81,13 +81,17 @@ async function getPostsFromPublication(publication) {
     return getPosts(`https://medium.com/${publication}/stats?format=json&limit=1000000`);
 }
 
-async function getFullPostsData() {
-    nextGenerationLog(`Loading full data of ${mngsData.postsSummary.length} posts`);
+async function getPostsData(begin, end) {
+    nextGenerationLog(`Loading data of ${mngsData.postsSummary.length} posts`);
     const postsData = await Promise
         .all(mngsData.postsSummary
-            .map(async (post) => await getFullPostStats(post)));
-    mngsData.postsData = postsData
-            .reduce((acc, item) => acc.concat(item), [])
+            .map(async post => {
+                const postBegin = begin ? begin : +post.firstPublishedAt;
+                console.log(postBegin, end)
+                return await getPostStats(post, postBegin, end);
+            }));
+    mngsData.postsData = mngsData.postsData.concat(postsData
+        .reduce((acc, item) => acc.concat(item), []))
 }
 
 async function getTotals(url, payload) {
@@ -113,13 +117,14 @@ async function getTotals(url, payload) {
     }
 }
 
-
-async function getFullPostStats(post) {
+async function getPostStats(post, begin, end) {
     const interval = oneDayInMilliseconds * 180;
     let promises = [];
-    for (let initial = post.firstPublishedAt - oneDayInMilliseconds; initial < tomorrow; initial += interval) {
-        promises.push(request(`https://medium.com/stats/${post.id}/${initial + 1}/${initial + interval}?format=json`));
-        // promises.push(getTotals(`stats/${post.id}/${initial + 1}/${initial + interval}`));
+    for (let iterator = begin - 1; iterator < end; iterator += interval) {
+        if (iterator + interval > end) {
+            iterator = end - interval;
+        }
+        promises.push(request(`https://medium.com/stats/${post.id}/${iterator + 1}/${iterator + interval}?format=json`));
     }
     const data = await Promise.all(promises);
     return data
@@ -181,7 +186,11 @@ const statsOptions = {
 };
 
 nextGenerationLog('Started');
-const mngsData = {};
+const mngsData = {
+    postsData: [],
+    postsSummary: [],
+    user: null
+};
 
 async function getActivities() {
     const response = await request(`https://medium.com/_/api/activity?limit=1000000`);
@@ -214,7 +223,6 @@ async function getEarningsData() {
 
     mngsData.postsData = mngsData.postsData.concat(earnings);
     nextGenerationLog('Earnings data aggregated');
-    enableDownloadButton();
 }
 
 const publicationRegex = /https:\/\/medium.com\/(.+)\/stats\/stories/;
@@ -234,11 +242,14 @@ function getPublicationName() {
     return match ? match[1] : '';
 }
 
+const initialLoadingDate = new Date(tomorrow - 60 * oneDayInMilliseconds);
 remodelHtmlAndGetPosts()
     .then(() => createTotalsTable())
-    .then(() => getFullPostsData())
+    .then(() => getPostsData(initialLoadingDate.getTime(), tomorrow.getTime()))
     .then(() => getActivities())
     .then(() => generateChart())
     .then(() => getEarningsData())
+    .then(() => getPostsData(null, new Date(initialLoadingDate - 1).getTime()))
+    .then(() => enableDownloadButton())
     .then(() => generateChart())
     .then(() => nextGenerationLog('Done'));
