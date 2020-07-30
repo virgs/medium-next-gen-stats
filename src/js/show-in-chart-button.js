@@ -49,7 +49,7 @@ const hidePost = async (post) => {
 };
 
 const checkNecessityOfAddingHighlightButton = () => {
-    Array.from(document.querySelectorAll('.sortableTable-rowTitle .sortableTable-text'))
+    Array.from(document.querySelectorAll('.sortableTable-rowTitle span.sortableTable-text'))
         .forEach((item,) => {
             const spansCount = item.querySelectorAll('span .highlight-in-chart').length;
             if (spansCount <= 0) {
