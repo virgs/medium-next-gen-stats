@@ -194,7 +194,7 @@ async function generateVerticalStackedBarChart(postsDataOfChart, postsSummaryOfC
     };
 
     verticalStackedBarChartGenerator.options.title.text = `${statsOptions.label} ${statsOptions.relevantDatumLabel} from '${getStringifiedDate(statsOptions.firstDayOfRange)}' to '${
-        getStringifiedDate(new Date(statsOptions.lastDayOfRange.getTime() - oneDayInMilliseconds))}'`;
+        getStringifiedDate(statsOptions.lastDayOfRange)}'`;
     verticalStackedBarChartGenerator.options.tooltips.callbacks.title = tooltipItems => tooltipItems.length > 0 ? range[tooltipItems[0].index].label : '';
     return verticalStackedBarChartGenerator;
 }

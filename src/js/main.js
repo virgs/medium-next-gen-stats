@@ -81,14 +81,19 @@ async function getPostsFromPublication(publication) {
     return getPosts(`https://medium.com/${publication}/stats?format=json&limit=1000000`);
 }
 
-async function getPostsData(begin, end) {
+async function getPostsData(initialLoading) {
+    const initialLoadingDate = new Date(tomorrow - (60 * oneDayInMilliseconds)).getTime();
     nextGenerationLog(`Loading data of ${mngsData.postsSummary.length} posts`);
     const postsData = await Promise
         .all(mngsData.postsSummary
             .map(async post => {
-                const postBegin = begin ? begin : +post.firstPublishedAt;
-                console.log(postBegin, end)
-                return await getPostStats(post, postBegin, end);
+                const publishedAt = +post.firstPublishedAt - oneDayInMilliseconds;
+                if (initialLoading) {
+                    return await getPostStats(post, initialLoadingDate, tomorrow.getTime());
+                } else if (publishedAt < initialLoadingDate) {
+                    return await getPostStats(post, publishedAt, new Date(initialLoadingDate - 1).getTime());
+                }
+                return [];
             }));
     mngsData.postsData = mngsData.postsData.concat(postsData
         .reduce((acc, item) => acc.concat(item), []))
@@ -119,12 +124,13 @@ async function getTotals(url, payload) {
 
 async function getPostStats(post, begin, end) {
     const interval = oneDayInMilliseconds * 180;
-    let promises = [];
-    for (let iterator = begin - 1; iterator < end; iterator += interval) {
-        if (iterator + interval > end) {
-            iterator = end - interval;
+    const promises = [];
+    for (let iterator = end + 1; iterator >= begin; iterator -= interval) {
+        let fetchBegin = iterator - interval;
+        if (fetchBegin < begin) {
+            fetchBegin = begin;
         }
-        promises.push(request(`https://medium.com/stats/${post.id}/${iterator + 1}/${iterator + interval}?format=json`));
+        promises.push(request(`https://medium.com/stats/${post.id}/${fetchBegin}/${iterator - 1}?format=json`));
     }
     const data = await Promise.all(promises);
     return data
@@ -242,14 +248,13 @@ function getPublicationName() {
     return match ? match[1] : '';
 }
 
-const initialLoadingDate = new Date(tomorrow - 60 * oneDayInMilliseconds);
 remodelHtmlAndGetPosts()
     .then(() => createTotalsTable())
-    .then(() => getPostsData(initialLoadingDate.getTime(), tomorrow.getTime()))
+    .then(() => getPostsData(true))
     .then(() => getActivities())
     .then(() => generateChart())
     .then(() => getEarningsData())
-    .then(() => getPostsData(null, new Date(initialLoadingDate - 1).getTime()))
+    .then(() => getPostsData(false))
     .then(() => enableDownloadButton())
     .then(() => generateChart())
     .then(() => nextGenerationLog('Done'));
