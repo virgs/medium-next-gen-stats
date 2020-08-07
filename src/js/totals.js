@@ -23,7 +23,7 @@ const totalsHtml = {
                                     <button class="button button--chromeless u-baseColor--buttonNormal">Fans</button>
                                 </th>
                                 <th class="sortableTable-header">
-                                    <button class="button button--chromeless u-baseColor--buttonNormal">Claps ratio</button>
+                                    <button class="button button--chromeless u-baseColor--buttonNormal">Claps per fan</button>
                                 </th>
                             </tr>
                         </thead>
@@ -60,8 +60,8 @@ const totalsHtml = {
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="sortableTable-number">${values.fans ? (values.claps / values.fans).toFixed(1) : 0}%
-                                        <span class="u-sm-show"><br>claps ratio</span>
+                                    <span class="sortableTable-number">${values.fans ? (values.claps / values.fans).toFixed(1) : 0}
+                                        <span class="u-sm-show"><br>claps per fan</span>
                                     </span>
                                 </td>
                             </tr>
