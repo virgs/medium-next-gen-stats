@@ -1,8 +1,32 @@
 let chartRenderingAnimationCompleted = false;
 
 let chart = undefined;
+let prevStatsOptions = undefined;
+
+function statsOptionsHasChanged() {
+    console.log(prevStatsOptions, statsOptions)
+    if (prevStatsOptions) {
+        if (prevStatsOptions.firstDayOfRange.getTime() !== statsOptions.firstDayOfRange.getTime()) {
+            return true;
+        }
+        if (prevStatsOptions.lastDayOfRange.getTime() !== statsOptions.lastDayOfRange.getTime()) {
+            return true;
+        }
+        if (prevStatsOptions.label !== statsOptions.label) {
+            return true;
+        }
+        if (prevStatsOptions.relevantDatumLabel !== statsOptions.relevantDatumLabel) {
+            return true;
+        }
+        return false
+    }
+    return true;
+}
 
 async function generateChart() {
+    if (!statsOptionsHasChanged()) {
+        return
+    }
     if (chart) {
         chart.destroy();
     }
@@ -28,4 +52,5 @@ async function generateChart() {
 
     updateSummaryTabs(postsDataOfChart, statsOptions);
     nextGenerationLog('Chart rendered');
+    prevStatsOptions = statsOptions
 }
