@@ -18,6 +18,12 @@ function statsOptionsHasChanged() {
         if (prevStatsOptions.relevantDatumLabel !== statsOptions.relevantDatumLabel) {
             return true;
         }
+        if (prevStatsOptions.rangeMethod !== statsOptions.rangeMethod) {
+            return true;
+        }
+        if (prevStatsOptions.chartGenerator !== statsOptions.chartGenerator) {
+            return true;
+        }
         return false
     }
     return true;
@@ -52,5 +58,5 @@ async function generateChart() {
 
     updateSummaryTabs(postsDataOfChart, statsOptions);
     nextGenerationLog('Chart rendered');
-    prevStatsOptions = statsOptions
+    prevStatsOptions = {...statsOptions}
 }
