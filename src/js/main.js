@@ -5,7 +5,6 @@ const oneDayInMilliseconds = 24 * 3600 * 1000;
 const originalColor = {r: 82, g: 186, b: 151};
 const highlightColor = {r: 173, g: 49, b: 104};
 
-let postsIdsToHighlight = [];
 const HIGHLIGHTED_ALPHA = 0.35;
 const NOT_HIGHLIGHTED_ALPHA = 0.75;
 
@@ -188,7 +187,8 @@ const statsOptions = {
     relevantDatum: getViewOfData,
     relevantDatumLabel: 'views',
     rangeMethod: initiallySelectedRange.rangeMethod,
-    label: initiallySelectedRange.label
+    label: initiallySelectedRange.label,
+    postsIdsToHighlight: []
 };
 
 nextGenerationLog('Started');
@@ -256,5 +256,4 @@ remodelHtmlAndGetPosts()
     .then(() => getEarningsData())
     .then(() => getPostsData(false))
     .then(() => enableDownloadButton())
-    .then(() => generateChart())
     .then(() => nextGenerationLog('Done'));

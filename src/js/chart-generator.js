@@ -24,20 +24,16 @@ function statsOptionsHasChanged() {
         if (prevStatsOptions.chartGenerator !== statsOptions.chartGenerator) {
             return true;
         }
+        if (prevStatsOptions.postsIdsToHighlight !== statsOptions.postsIdsToHighlight) {
+            return true;
+        }
         return false
     }
     return true;
 }
 
 async function generateChart() {
-    if (!statsOptionsHasChanged()) {
-        return
-    }
-    if (chart) {
-        chart.destroy();
-    }
 
-    chartRenderingAnimationCompleted = false;
     const postsDataOfChart = mngsData.postsData
         .filter(post => {
             const collectedAt = new Date(+post.collectedAt);
@@ -50,13 +46,21 @@ async function generateChart() {
             return date >= statsOptions.firstDayOfRange &&
                 date < statsOptions.lastDayOfRange;
         });
+    updateSummaryTabs(postsDataOfChart, statsOptions);
 
+    if (!statsOptionsHasChanged()) {
+        return
+    }
+    if (chart) {
+        chart.destroy();
+    }
+    chartRenderingAnimationCompleted = false;
     const chartOptions = await statsOptions.chartGenerator(postsDataOfChart, postsSummaryOfChart);
 
     const ctx = document.getElementById('chart').getContext('2d');
     chart = new Chart(ctx, chartOptions);
 
-    updateSummaryTabs(postsDataOfChart, statsOptions);
+
     nextGenerationLog('Chart rendered');
-    prevStatsOptions = {...statsOptions}
+    prevStatsOptions = {...statsOptions, postsIdsToHighlight: [...statsOptions.postsIdsToHighlight]}
 }

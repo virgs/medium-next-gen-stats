@@ -28,19 +28,19 @@ const addHighlightButton = (item) => {
                 });
         }, 100);
 
-        if (postsIdsToHighlight.includes(postId)) {
-            postsIdsToHighlight = postsIdsToHighlight.filter(id => id !== postId)
+        if (statsOptions.postsIdsToHighlight.includes(postId)) {
+            statsOptions.postsIdsToHighlight = statsOptions.postsIdsToHighlight.filter(id => id !== postId)
             link.text = 'Highlight';
         } else {
             link.text = 'Hide';
-            postsIdsToHighlight.push(postId)
+            statsOptions.postsIdsToHighlight.push(postId)
         }
         await generateChart();
     };
 }
 
 const hidePost = async (post) => {
-    postsIdsToHighlight = postsIdsToHighlight.filter(id => id !== post.id);
+    statsOptions.postsIdsToHighlight = statsOptions.postsIdsToHighlight.filter(id => id !== post.id);
     const link = document.querySelector(`a[data-post-id="${post.id}"]`);
     if (link) {
         link.text = 'Highlight';

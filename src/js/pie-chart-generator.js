@@ -115,12 +115,12 @@ function getPieChartData(postsDataOfChart) {
 }
 
 function setBackgroundColor(pieChartData) {
-    const alpha = postsIdsToHighlight.length > 0 ? HIGHLIGHTED_ALPHA : NOT_HIGHLIGHTED_ALPHA;
+    const alpha = statsOptions.postsIdsToHighlight.length > 0 ? HIGHLIGHTED_ALPHA : NOT_HIGHLIGHTED_ALPHA;
     pieChartData
         .forEach((item, index, vec) => {
-            const findIndex = postsIdsToHighlight.findIndex(highlightedItem => highlightedItem === item.id);
+            const findIndex = statsOptions.postsIdsToHighlight.findIndex(highlightedItem => highlightedItem === item.id);
             if (findIndex !== -1) {
-                const backgroundColor = getShadeOfColor(postsIdsToHighlight.length, findIndex, highlightColor);
+                const backgroundColor = getShadeOfColor(statsOptions.postsIdsToHighlight.length, findIndex, highlightColor);
                 item.backgroundColor = `rgb(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, 0.95)`;
             } else {
                 const backgroundColor = getShadeOfColor(vec.length, index);

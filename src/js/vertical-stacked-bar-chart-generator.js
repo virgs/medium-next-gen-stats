@@ -68,7 +68,7 @@ const verticalStackedBarChartGenerator = {
                 }
                 if (!verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip) {
                     verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip = chartData.datasets
-                        .filter(dataset => postsIdsToHighlight.length <= 0 ? dataset.type === BAR_TYPE : dataset.type === LINE_TYPE)
+                        .filter(dataset => statsOptions.postsIdsToHighlight.length <= 0 ? dataset.type === BAR_TYPE : dataset.type === LINE_TYPE)
                         .map(dataset => dataset.data[item.index])
                         .filter(item => item > 0)
                         .sort((a, b) => a - b)
@@ -126,7 +126,7 @@ const verticalStackedBarChartGenerator = {
                     delete verticalStackedBarChartGenerator.options.tooltips.topPostsOfTooltip;
                     const total = tooltipItems.length + excludedItems.length;
 
-                    const numOfHighlightedPosts = postsIdsToHighlight.length;
+                    const numOfHighlightedPosts = statsOptions.postsIdsToHighlight.length;
                     let label = statsOptions.relevantDatumLabel;
                     if (value <= 1) {
                         label = label.substring(0, label.length - 1);
@@ -200,7 +200,7 @@ async function generateVerticalStackedBarChart(postsDataOfChart, postsSummaryOfC
 }
 
 function generateBarChartData(range, postsDataOfChart, relevantDatum) {
-    const alpha = postsIdsToHighlight.length > 0 ? HIGHLIGHTED_ALPHA : NOT_HIGHLIGHTED_ALPHA;
+    const alpha = statsOptions.postsIdsToHighlight.length > 0 ? HIGHLIGHTED_ALPHA : NOT_HIGHLIGHTED_ALPHA;
     const data = range.map(_ => 0);
     return Object.values(postsDataOfChart
         .reduce((acc, info) => {
@@ -241,7 +241,7 @@ function generateBarChartData(range, postsDataOfChart, relevantDatum) {
 function generateLineChartData(range, postsDataOfChart, relevantDatum) {
     return Object.values(postsDataOfChart
         .reduce((acc, info) => {
-            if (acc[info.id] === undefined && postsIdsToHighlight.includes(info.id)) {
+            if (acc[info.id] === undefined && statsOptions.postsIdsToHighlight.includes(info.id)) {
                 acc[info.id] = {
                     id: info.id,
                     claps: info.claps,
