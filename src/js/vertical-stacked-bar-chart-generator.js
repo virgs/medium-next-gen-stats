@@ -134,7 +134,7 @@ const verticalStackedBarChartGenerator = {
                     let footer = `Total: ${prettifyNumbersWithCommas(value)} ${label}`;
                     if (!label.startsWith('follower')) {
                         if (numOfHighlightedPosts > 0) {
-                            footer += `of ${numOfHighlightedPosts} highlighted article${numOfHighlightedPosts > 1 ? 's' : ''}`;
+                            footer += ` of ${numOfHighlightedPosts} highlighted article${numOfHighlightedPosts > 1 ? 's' : ''}`;
                         } else {
                             footer += ` of ${total} article${total > 1 ? 's' : ''}`;
                         }
