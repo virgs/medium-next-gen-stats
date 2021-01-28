@@ -382,7 +382,9 @@ function createChartInnerHtml() {
 function addClapsHeaderRow() {
     const fansHeader = document.querySelectorAll('.sortableTable.js-statsTable')[1].querySelectorAll('.sortableTable-header')[4];
     const clapsHeader = fansHeader.cloneNode(true);
-    clapsHeader.querySelector('button').innerText = 'Claps';
+    const clapsRowButton = clapsHeader.querySelector('button');
+    clapsRowButton.innerText = 'Claps';
+    clapsRowButton.setAttribute('data-action-value', 'claps');
     fansHeader.parentElement.insertBefore(clapsHeader, fansHeader);
 }
 

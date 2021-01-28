@@ -125,19 +125,21 @@ async function getPostStats(post, begin, end) {
     const user = Object.values(mngsData.user || {null: null})[0]
     const cacheKey = user.username || mngsData.publicationName;
     const {
-        beginAfterCache,
+        // beginAfterCache,
         endAfterCache,
-        cacheStats,
+        // cacheStats,
         hasToFetchInformation
     } = await getFromCache(cacheKey, post.id, begin, end)
     const interval = oneDayInMilliseconds * 180;
     const promises = [];
     let stats = [];
-    if (hasToFetchInformation) {
-        for (let iterator = endAfterCache + 1; iterator >= beginAfterCache; iterator -= interval) {
+    // if (hasToFetchInformation) {
+    //     for (let iterator = endAfterCache + 1; iterator >= beginAfterCache; iterator -= interval) {
+        for (let iterator = end + 1; iterator >= begin; iterator -= interval) {
             let fetchBegin = iterator - interval;
-            if (fetchBegin < beginAfterCache) {
-                fetchBegin = beginAfterCache;
+            // if (fetchBegin < beginAfterCache) {
+            if (fetchBegin < begin) {
+                fetchBegin = begin;
             }
             promises.push(request(`https://medium.com/stats/${post.id}/${fetchBegin}/${iterator - 1}?format=json`));
         }
@@ -148,9 +150,10 @@ async function getPostStats(post, begin, end) {
                 return acc.concat(stats);
             }, [])
             .map(item => ({...item, id: post.id, title: post.title}));
-        await addToCache(cacheKey, stats)
-    }
-    return stats.concat(cacheStats);
+        // await addToCache(cacheKey, stats)
+    // }
+    // return stats.concat(cacheStats);
+    return stats.concat([]);
 }
 
 

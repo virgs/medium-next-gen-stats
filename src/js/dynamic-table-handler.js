@@ -1,4 +1,4 @@
-const addHighlightButton = (item) => {
+const addHighlightButton = (item, postId) => {
     const divider = document.createElement('span');
     divider.classList.add('middotDivider');
     item.appendChild(divider);
@@ -14,7 +14,6 @@ const addHighlightButton = (item) => {
     link.text = 'Highlight';
     item.appendChild(link);
 
-    const postId = item.parentElement.parentElement.getAttribute('data-action-value');
     link.setAttribute('data-post-id', postId);
     link.setAttribute('href', '#');
     link.onclick = async () => {
@@ -53,14 +52,16 @@ const checkNecessityOfAddingNewElements = () => {
         .forEach((item,) => {
             const spansCount = item.querySelectorAll('span .highlight-in-chart').length;
             if (spansCount <= 0) {
-                addHighlightButton(item);
-                addClapsRow(item.parentElement.parentElement);
+                const row = item.parentElement.parentElement;
+                const postId = row.getAttribute('data-action-value');
+                addHighlightButton(item, postId);
+                addClapsRow(row, postId);
+                addPreviewImageAsBackgroundRow(row, postId);
             }
         });
 };
 
-function addClapsRow(row) {
-    const postId = row.getAttribute('data-action-value');
+function addClapsRow(row, postId) {
     const fansRow = row.querySelectorAll('td')[4];
     const claps = mngsData.postsSummary
         .filter(post => post.id === postId)
@@ -74,15 +75,23 @@ function addClapsRow(row) {
     fansRow.parentElement.insertBefore(clapsRow, fansRow);
 }
 
+function addPreviewImageAsBackgroundRow(row, postId) {
+    const titleRow = row.querySelectorAll('td')[0];
+    const imageUrl = mngsData.postsSummary
+        .filter(post => post.id === postId && post.previewImage && post.previewImage.id)
+        .reduce((acc, item) => `https://miro.medium.com/max/150/${item.previewImage.id}`, '');
+
+    titleRow.classList.add('mngs-title-img');
+    titleRow.style.padding = '5px 5px 5px 0';
+    titleRow.style['background'] = `url("${imageUrl}") center center / cover no-repeat content-box rgba(255, 255, 255, 0.85)`;
+    titleRow.style['background-blend-mode'] = 'lighten';
+
+    Array.from(titleRow.children)
+        .forEach(item => item.style['padding-left'] = '5px');
+
+}
+
 function enableTableDynamicChecking() {
     checkNecessityOfAddingNewElements();
     setInterval(checkNecessityOfAddingNewElements, 500);
 }
-
-
-//previewImage:
-// id: "0*vtVVuA1gz5ivHFOi"
-// isFeatured: true
-// originalHeight: 1803
-// originalWidth: 3000
-// unsplashPhotoId: "IUY_3DvM__w"
