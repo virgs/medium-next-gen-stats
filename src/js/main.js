@@ -122,25 +122,38 @@ async function getTotals(url, payload) {
 }
 
 async function getPostStats(post, begin, end) {
+    const user = Object.values(mngsData.user || {null: null})[0]
+    const cacheKey = user.username || mngsData.publicationName;
+    const {
+        beginAfterCache,
+        endAfterCache,
+        cacheStats,
+        hasToFetchInformation
+    } = await getFromCache(cacheKey, post.id, begin, end)
     const interval = oneDayInMilliseconds * 180;
     const promises = [];
-    for (let iterator = end + 1; iterator >= begin; iterator -= interval) {
-        let fetchBegin = iterator - interval;
-        if (fetchBegin < begin) {
-            fetchBegin = begin;
+    let stats = [];
+    if (hasToFetchInformation) {
+        for (let iterator = endAfterCache + 1; iterator >= beginAfterCache; iterator -= interval) {
+            let fetchBegin = iterator - interval;
+            if (fetchBegin < beginAfterCache) {
+                fetchBegin = beginAfterCache;
+            }
+            promises.push(request(`https://medium.com/stats/${post.id}/${fetchBegin}/${iterator - 1}?format=json`));
         }
-        promises.push(request(`https://medium.com/stats/${post.id}/${fetchBegin}/${iterator - 1}?format=json`));
+        const data = await Promise.all(promises);
+        stats = data
+            .reduce((acc, item) => {
+                const stats = item.value ? item.value : [];
+                return acc.concat(stats);
+            }, [])
+            .map(item => ({...item, id: post.id, title: post.title}));
+        await addToCache(cacheKey, stats)
     }
-    const data = await Promise.all(promises);
-    return data
-        .reduce((acc, item) => {
-            const stats = item.value ? item.value : [];
-            return acc.concat(stats);
-        }, [])
-        .map(item => {
-            return ({...item, id: post.id, title: post.title});
-        });
+    return stats.concat(cacheStats);
 }
+
+
 
 async function request(url) {
     const response = await fetch(url,
@@ -195,7 +208,8 @@ nextGenerationLog('Started');
 const mngsData = {
     postsData: [],
     postsSummary: [],
-    user: null
+    user: null,
+    publicationName: null
 };
 
 async function getActivities() {
@@ -236,11 +250,17 @@ const publicationRegex = /https:\/\/medium.com\/(.+)\/stats\/stories/;
 async function remodelHtmlAndGetPosts() {
     if (publicationRegex.test(document.location.href)) {
         await renewOldFashionPublicationPage()
-        mngsData.postsSummary = await getPostsFromPublication(getPublicationName());
+        const publicationName = getPublicationName();
+        mngsData.postsSummary = await getPostsFromPublication(publicationName);
+        mngsData.publicationName = publicationName;
     } else {
         await renewOldFashionPage();
         mngsData.postsSummary = await getPostsFromUser();
     }
+
+    const user = Object.values(mngsData.user || {null: null})[0]
+    const cacheKey = user.username || mngsData.publicationName;
+    await loadCache(cacheKey);
 }
 
 function getPublicationName() {
@@ -250,6 +270,8 @@ function getPublicationName() {
 
 remodelHtmlAndGetPosts()
     .then(() => createTotalsTable())
+    .then(() => addClapsHeaderRow())
+    .then(() => enableTableDynamicChecking())
     .then(() => getPostsData(true))
     .then(() => getActivities())
     .then(() => generateChart())

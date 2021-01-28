@@ -4,7 +4,7 @@ let chart = undefined;
 let prevStatsOptions = undefined;
 
 function statsOptionsHasChanged() {
-    console.log(prevStatsOptions, statsOptions)
+    // console.log(prevStatsOptions, statsOptions)
     if (prevStatsOptions) {
         if (prevStatsOptions.firstDayOfRange.getTime() !== statsOptions.firstDayOfRange.getTime()) {
             return true;

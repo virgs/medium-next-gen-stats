@@ -1,10 +1,11 @@
 {
   "name": "Medium Next Generation Stats",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "Take your medium text stats to the Next Generation",
   "manifest_version": 2,
   "author": "Guilherme Virgs Moraes <https://pagehub.me/virgs>",
   "permissions": [
+    "storage"
   ],
   "content_scripts": [
     {
@@ -26,13 +27,14 @@
         "src/js/online-store.js",
         "src/js/totals.js",
         "src/js/process-earnings.js",
-        "src/js/show-in-chart-button.js",
+        "src/js/dynamic-table-handler.js",
         "src/js/vertical-stacked-bar-chart-generator.js",
         "src/js/pie-chart-generator.js",
         "src/js/chart-generator.js",
         "src/js/ranges.js",
         "src/js/renew-html.js",
         "src/js/renew-publication-html.js",
+        "src/js/cache.js",
         "src/js/main.js"
       ]
     }

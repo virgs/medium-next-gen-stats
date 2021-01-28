@@ -377,7 +377,14 @@ function createChartInnerHtml() {
                     </span>            
                 </div>
             </div>`;
-};
+}
+
+function addClapsHeaderRow() {
+    const fansHeader = document.querySelectorAll('.sortableTable.js-statsTable')[1].querySelectorAll('.sortableTable-header')[4];
+    const clapsHeader = fansHeader.cloneNode(true);
+    clapsHeader.querySelector('button').innerText = 'Claps';
+    fansHeader.parentElement.insertBefore(clapsHeader, fansHeader);
+}
 
 async function renewOldFashionPage() {
     const title = document.querySelector('h1.stats-title');

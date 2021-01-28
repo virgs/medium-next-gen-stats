@@ -48,16 +48,41 @@ const hidePost = async (post) => {
     }
 };
 
-const checkNecessityOfAddingHighlightButton = () => {
+const checkNecessityOfAddingNewElements = () => {
     Array.from(document.querySelectorAll('.sortableTable-rowTitle span.sortableTable-text'))
         .forEach((item,) => {
             const spansCount = item.querySelectorAll('span .highlight-in-chart').length;
             if (spansCount <= 0) {
                 addHighlightButton(item);
+                addClapsRow(item.parentElement.parentElement);
             }
         });
 };
 
-checkNecessityOfAddingHighlightButton();
-setInterval(checkNecessityOfAddingHighlightButton, 500);
+function addClapsRow(row) {
+    const postId = row.getAttribute('data-action-value');
+    const fansRow = row.querySelectorAll('td')[4];
+    const claps = mngsData.postsSummary
+        .filter(post => post.id === postId)
+        .map(item => item.claps);
 
+    const clapsRow = fansRow.cloneNode(true);
+    clapsRow.querySelectorAll('span')[0].innerText = claps;
+    clapsRow.querySelectorAll('span')[1].innerHTML = `${claps}<span class="u-sm-show"><br>claps</span>`;
+    clapsRow.querySelectorAll('span')[1].setAttribute('title', claps);
+
+    fansRow.parentElement.insertBefore(clapsRow, fansRow);
+}
+
+function enableTableDynamicChecking() {
+    checkNecessityOfAddingNewElements();
+    setInterval(checkNecessityOfAddingNewElements, 500);
+}
+
+
+//previewImage:
+// id: "0*vtVVuA1gz5ivHFOi"
+// isFeatured: true
+// originalHeight: 1803
+// originalWidth: 3000
+// unsplashPhotoId: "IUY_3DvM__w"
