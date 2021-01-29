@@ -122,43 +122,37 @@ async function getTotals(url, payload) {
 }
 
 async function getPostStats(post, begin, end) {
-    const user = Object.values(mngsData.user || {null: null})[0]
-    const cacheKey = user.username || mngsData.publicationName;
-    const {
-        // beginAfterCache,
-        endAfterCache,
-        // cacheStats,
-        hasToFetchInformation
-    } = await getFromCache(cacheKey, post.id, begin, end)
-    const interval = oneDayInMilliseconds * 180;
-    const promises = [];
-    let stats = [];
-    // if (hasToFetchInformation) {
-    //     for (let iterator = endAfterCache + 1; iterator >= beginAfterCache; iterator -= interval) {
-        for (let iterator = end + 1; iterator >= begin; iterator -= interval) {
-            let fetchBegin = iterator - interval;
-            // if (fetchBegin < beginAfterCache) {
-            if (fetchBegin < begin) {
-                fetchBegin = begin;
-            }
-            promises.push(request(`https://medium.com/stats/${post.id}/${fetchBegin}/${iterator - 1}?format=json`));
+    const beginningOfTheMonth = new Date();
+    beginningOfTheMonth.setUTCDate(0);
+    beginningOfTheMonth.setUTCHours(0, 0, 0, 0);
+    const promises = [request(`https://medium.com/stats/${post.id}/${beginningOfTheMonth.getTime()}/${end + 1}?format=json`, {cache: true})];
+    let iterator = beginningOfTheMonth.getTime() - 1;
+    while (iterator > begin) {
+        let fetchBegin = new Date(iterator);
+        fetchBegin.setUTCMonth(fetchBegin.getUTCMonth() - 1)
+        if (fetchBegin.getTime() < begin) {
+            fetchBegin = new Date(begin);
         }
-        const data = await Promise.all(promises);
-        stats = data
-            .reduce((acc, item) => {
-                const stats = item.value ? item.value : [];
-                return acc.concat(stats);
-            }, [])
-            .map(item => ({...item, id: post.id, title: post.title}));
-        // await addToCache(cacheKey, stats)
-    // }
-    // return stats.concat(cacheStats);
-    return stats.concat([]);
+        promises.push(request(`https://medium.com/stats/${post.id}/${fetchBegin.getTime()}/${iterator - 1}?format=json`, {cache: true}));
+        iterator = fetchBegin.getTime()
+    }
+    const data = await Promise.all(promises);
+    return data
+        .reduce((acc, item) => {
+            const stats = item.value ? item.value : [];
+            return acc.concat(stats);
+        }, [])
+        .map(item => ({...item, id: post.id, title: post.title}));
 }
 
 
-
-async function request(url) {
+async function request(url, options) {
+    if (options && options.cache) {
+        const cache = await loadCache(url);
+        if (cache) {
+            return cache;
+        }
+    }
     const response = await fetch(url,
         {
             credentials: 'same-origin',
@@ -168,7 +162,11 @@ async function request(url) {
         });
     if (response.status === 200) {
         const text = await response.text();
-        return JSON.parse(text.split('</x>')[1]).payload;
+        const payload = JSON.parse(text.split('</x>')[1]).payload;
+        if (options && options.cache) {
+            await addToCache(url, payload)
+        }
+        return payload;
     } else {
         const message = `Fail to fetch data: (${response.status}) - ${response.statusText}`;
         console.log(message);
@@ -260,10 +258,6 @@ async function remodelHtmlAndGetPosts() {
         await renewOldFashionPage();
         mngsData.postsSummary = await getPostsFromUser();
     }
-
-    const user = Object.values(mngsData.user || {null: null})[0]
-    const cacheKey = user.username || mngsData.publicationName;
-    await loadCache(cacheKey);
 }
 
 function getPublicationName() {
