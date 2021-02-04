@@ -104,3 +104,7 @@
     pointer-events: none;
     color: var(--mngs-disabled-color) !important;
 }
+
+.sortableTable-rowTitle {
+    max-width: 100px;
+}
