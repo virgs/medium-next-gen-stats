@@ -22,9 +22,9 @@ const totalsHtml = {
                                 <th class="sortableTable-header">
                                     <button class="button button--chromeless u-baseColor--buttonNormal">Fans</button>
                                 </th>
-                                <th class="sortableTable-header">
-                                    <button class="button button--chromeless u-baseColor--buttonNormal">Claps per fan</button>
-                                </th>
+<!--                                <th class="sortableTable-header">-->
+<!--                                    <button class="button button&#45;&#45;chromeless u-baseColor&#45;&#45;buttonNormal">Claps per fan</button>-->
+<!--                                </th>-->
                             </tr>
                         </thead>
                         <tbody class="totals-table-body">
@@ -58,13 +58,13 @@ const totalsHtml = {
                                     <span class="sortableTable-number">${prettifyNumbersWithCommas(values.fans)}
                                         <span class="u-sm-show"><br>fans</span>
                                     </span>
-                                </td>
-                                <td>
-                                    <span class="sortableTable-number">${values.fans ? (values.claps / values.fans).toFixed(1) : 0}
-                                        <span class="u-sm-show"><br>claps per fan</span>
-                                    </span>
-                                </td>
-                            </tr>
+                                </td>` +
+                                // <td>
+                                //     <span class="sortableTable-number">${values.fans ? (values.claps / values.fans).toFixed(1) : 0}
+                                //         <span class="u-sm-show"><br>claps per fan</span>
+                                //     </span>
+                                // </td>
+                            `</tr>
                         </tbody>
                     </table>
                 </div>`
