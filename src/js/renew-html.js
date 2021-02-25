@@ -148,7 +148,7 @@ function updateChartPageLabels() {
 
 function renewChartPaginator() {
     updateChartPageLabels();
-    const chartPaginator = document.querySelector(".chartPage");
+    const chartPaginator = document.querySelector('.chartPage');
     const chartPageButtons = chartPaginator.querySelectorAll('button');
     const chartPagePrevButton = chartPageButtons[0];
     const chartPageNextRangeButton = chartPageButtons[1];
@@ -344,9 +344,12 @@ function createTimeNavBar() {
     `;
     navBar.querySelector('#current-month-button').addEventListener('click', currentMonthButtonClick)
     const listItems = Array.from(navBar.querySelectorAll('ul li'));
+    const timeRangeButtonClick = async (index) => {
+        await timeRangeButtonClicked(listItems, index);
+    };
     listItems
         .forEach((item, index) => {
-            item.querySelector('a').addEventListener('click', () => timeRangeButtonClicked(listItems, index));
+            item.querySelector('a').addEventListener('click', () => timeRangeButtonClick(index));
         });
     return navBar;
 }

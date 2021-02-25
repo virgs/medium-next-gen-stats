@@ -145,14 +145,20 @@ async function getPostStats(post, begin, end) {
         .map(item => ({...item, id: post.id, title: post.title}));
 }
 
-
+const cacheCounter  = {
+    total: 0,
+    used: 0
+}
 async function request(url, options) {
+    ++cacheCounter.total
     if (options && options.cache) {
         const cache = await loadCache(url);
         if (cache) {
+            ++cacheCounter.used
             return cache;
         }
     }
+
     const response = await fetch(url,
         {
             credentials: 'same-origin',
@@ -275,4 +281,4 @@ remodelHtmlAndGetPosts()
     .then(() => getPostsData(false))
     .then(() => generateChart())
     .then(() => enableDownloadButton())
-    .then(() => nextGenerationLog('Done'));
+    .then(() => nextGenerationLog(`Done. Cache hit: ${(100 * cacheCounter.used / cacheCounter.total).toFixed(1)}%`));
