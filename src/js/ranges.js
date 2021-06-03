@@ -94,4 +94,4 @@ const ranges = [
     },
 ];
 
-const timeRanges = [30, 60, 120, 360];
+const timeRanges = [30, 60, 120, 360, 1800];
