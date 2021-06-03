@@ -1,3 +1,18 @@
+const addDateLabel = (item, postId) => {
+    const postData = mngsData.postsSummary
+        .find(post => post.id === postId);
+    const readingTime = item.parentElement.querySelector('.readingTime').parentElement;
+    console.log(readingTime)
+
+    const divider = document.createElement('span');
+    divider.classList.add('middotDivider');
+    item.insertBefore(divider, readingTime);
+    const publishedDate = document.createElement('span');
+    publishedDate.classList.add('readingTime');
+    publishedDate.title = getStringifiedDate(new Date(+postData.firstPublishedAt));
+    item.insertBefore(publishedDate, divider);
+}
+
 const addHighlightButton = (item, postId) => {
     const divider = document.createElement('span');
     divider.classList.add('middotDivider');
@@ -50,11 +65,13 @@ const hidePost = async (post) => {
 const checkNecessityOfAddingNewElements = () => {
     Array.from(document.querySelectorAll('.sortableTable-rowTitle span.sortableTable-text'))
         .forEach((item,) => {
-            const spansCount = item.querySelectorAll('span .highlight-in-chart').length;
-            if (spansCount <= 0) {
+            const highlightButton = item.querySelectorAll('span .highlight-in-chart').length;
+            const thereIsNoHighlightButton = highlightButton <= 0;
+            if (thereIsNoHighlightButton) {
                 const row = item.parentElement.parentElement;
                 const postId = row.getAttribute('data-action-value');
                 addHighlightButton(item, postId);
+                addDateLabel(item, postId);
                 addClapsRow(row, postId);
                 addPreviewImageAsBackgroundRow(row, postId);
             }
@@ -82,6 +99,7 @@ function addPreviewImageAsBackgroundRow(row, postId) {
         .reduce((acc, item) => `https://miro.medium.com/max/150/${item.previewImage.id}`, '');
 
     titleRow.classList.add('mngs-title-img');
+    titleRow.style.cursor = 'unset';
     titleRow.style.padding = '5px 5px 5px 0';
     titleRow.style['background'] = `url("${imageUrl}") center center / cover no-repeat content-box rgba(255, 255, 255, 0.85)`;
     titleRow.style['background-blend-mode'] = 'lighten';

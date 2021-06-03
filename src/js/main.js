@@ -255,6 +255,8 @@ async function getEarningsData() {
 const publicationRegex = /https:\/\/medium.com\/(.+)\/stats\/stories/;
 
 async function remodelHtmlAndGetPosts() {
+    const container = document.querySelector('.container.stats');
+    container.style['max-width'] = '1140px !important';
     if (publicationRegex.test(document.location.href)) {
         await renewOldFashionPublicationPage()
         const publicationName = getPublicationName();
