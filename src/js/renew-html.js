@@ -362,11 +362,12 @@ function createChartInnerHtml() {
                 <span class="tooltip">
                     <div class="tooltiptext">Donate to help it keep running and improving</div>
                     <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=J9XP66XJE98LQ&source=url">
+                    <a href="https://www.paypal.com/donate?business=A3XKGLRLHF87Y&no_recurring=0&item_name=Appreciation+feedback%21&currency_code=CAD">
                         <i class="fas fa-donate mngs-donate-type-icon"></i>
                     </a>
                 </span>
                 <span class="tooltip">
-                    <div class="tooltiptext">Export to JSON file</div>
+                    <div class="tooltiptext">Export data</div>
                     <i style="pointer-events: none; visibility: hidden" class="fas fa-file-download mngs-chart-action-icon"></i>
                 </span>
                 <div style="top: 0; right: 0; position: absolute;">
