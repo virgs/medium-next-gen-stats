@@ -18,7 +18,7 @@ Have fun!
 
 ### Features
 -  Highlight post/publication
--  Larger time ranges: 30/60/120/360/1800 days.
+-  Larger time ranges: 30/90/180/360/1800 days.
 -  Super cool and animated charts
 -  Total stories views/reads/claps/earnings
 -  Top articles/publications read/viewed/clapped/earned in the time range
