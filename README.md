@@ -1,5 +1,8 @@
 # Medium Next Generation Stats
 
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/virgs/medium-next-gen-stats/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/virgs/medium-next-gen-stats/tree/master)
+[![codecov](https://codecov.io/gh/virgs/medium-next-gen-stats/branch/master/graph/badge.svg)](https://codecov.io/gh/virgs/medium-next-gen-stats)
+
 Don't you think medium.com provides way less information that they should?
 I got tired of waiting for them to make it better and decided to make it by myself.
 Take your medium text stats to the Next Generation and get rid of the old fashion dataless default medium.

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { MngsData, PostData } from '../types';
 import {
   getPostsFromUser,
@@ -50,7 +50,7 @@ export const useStatsData = (): UseStatsDataResult => {
   });
   const [loadingPhase, setLoadingPhase] = useState<LoadingPhase>('idle');
 
-  const loadData = useCallback(async (): Promise<void> => {
+  const loadData = async (): Promise<void> => {
     const tomorrow = createTomorrow();
     const initialLoadingDate = new Date(
       tomorrow.getTime() - INITIAL_DAYS * ONE_DAY_IN_MS
@@ -136,11 +136,11 @@ export const useStatsData = (): UseStatsDataResult => {
       console.error('Failed to load stats data:', error);
       setLoadingPhase('done');
     }
-  }, []);
+  };
 
   useEffect(() => {
     loadData();
-  }, [loadData]);
+  }, []);
 
   return { mngsData, loadingPhase };
 };

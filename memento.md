@@ -35,3 +35,28 @@ Migrated the Chrome extension from a vanilla JavaScript project with vendored li
 ### Package Manager
 - **pnpm** is the package manager (see `packageManager` field in `package.json`).
 
+---
+
+## CI/CD Pipeline: CircleCI + Codecov
+
+**Date:** 2026-03-04
+
+### Decision
+Added a CircleCI pipeline with separate jobs for linting, testing, coverage, and building. Integrated Codecov for coverage reporting.
+
+### What Changed
+- **ESLint:** Added `eslint.config.js` (flat config, ESM) with `typescript-eslint`, `eslint-plugin-react-hooks`, and `eslint-plugin-react-refresh`. Added `pnpm lint` script.
+- **CircleCI:** Created `.circleci/config.yml` with 4 jobs:
+  - `lint` – runs ESLint
+  - `test` – runs Vitest
+  - `coverage` – runs Vitest with v8 coverage, uploads lcov to Codecov
+  - `build` – runs Vite build (requires lint + test to pass first)
+- **Coverage:** Configured `@vitest/coverage-v8` with `lcov`, `text`, and `json-summary` reporters in `vitest.config.ts`.
+- **Badges:** Added CircleCI build status and Codecov coverage badges to `README.md`.
+
+### Trade-offs
+- **`react-hooks/set-state-in-effect` rule is disabled** because the data-fetching-on-mount pattern in `useStatsData.ts` legitimately calls `setState` inside a `useEffect`. This is a very new, strict rule from React 19's compiler plugin and does not apply to async data fetching patterns.
+- **Codecov orb v5** is used. Requires a `CODECOV_TOKEN` environment variable to be set in CircleCI project settings.
+- **Build job gates on lint + test** to fail fast. Coverage runs in parallel since it's informational.
+
+

@@ -1,0 +1,82 @@
+version: 2.1
+
+orbs:
+  codecov: codecov/codecov@5
+
+executors:
+  node:
+    docker:
+      - image: cimg/node:22.12
+    working_directory: ~/project
+
+commands:
+  install_dependencies:
+    steps:
+      - checkout
+      - run:
+          name: Install pnpm
+          command: corepack enable && corepack prepare pnpm@10.30.3 --activate
+      - restore_cache:
+          keys:
+            - pnpm-deps-v1-{{ checksum "pnpm-lock.yaml" }}
+            - pnpm-deps-v1-
+      - run:
+          name: Install dependencies
+          command: pnpm install --frozen-lockfile
+      - save_cache:
+          key: pnpm-deps-v1-{{ checksum "pnpm-lock.yaml" }}
+          paths:
+            - node_modules
+
+jobs:
+  lint:
+    executor: node
+    steps:
+      - install_dependencies
+      - run:
+          name: Run linting
+          command: pnpm lint
+
+  test:
+    executor: node
+    steps:
+      - install_dependencies
+      - run:
+          name: Run tests
+          command: pnpm test
+
+  coverage:
+    executor: node
+    steps:
+      - install_dependencies
+      - run:
+          name: Run tests with coverage
+          command: pnpm test:coverage
+      - store_artifacts:
+          path: coverage
+          destination: coverage
+      - codecov/upload:
+          file: coverage/lcov.info
+
+  build:
+    executor: node
+    steps:
+      - install_dependencies
+      - run:
+          name: Build extension
+          command: pnpm build
+      - store_artifacts:
+          path: dist
+          destination: dist
+
+workflows:
+  ci:
+    jobs:
+      - lint
+      - test
+      - coverage
+      - build:
+          requires:
+            - lint
+            - test
+

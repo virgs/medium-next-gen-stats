@@ -123,9 +123,9 @@ export const App: React.FC = () => {
   const nextDisabled = useMemo(() => {
     return (
       new Date(lastDayOfRange.getTime() + ONE_DAY_IN_MS).getTime() >=
-      Date.now()
+      tomorrow.getTime()
     );
-  }, [lastDayOfRange]);
+  }, [lastDayOfRange, tomorrow]);
 
   const handleRangeChange = useCallback(
     (index: number): void => {

@@ -180,6 +180,6 @@ Build incrementally and safely.
 
 # TODO list
 
-1. [x] Turn this project into a typescript/react/bootstrap one, then update the dependencies. Add tests. Replace the library imports with package.json managed ones. Use pnpm to install them. Clean the code and create unit tests.
-2. [] Add a circleci pipeline with multiple jobs to run linting, tests, coverage and build on every commit. Add a badge to the README.md file to show the build status. Add a codecov badge to show the test coverage status. Add a job to publish the extension to the Chrome web store on every release.
+1. [x] Add a circleci pipeline with multiple jobs to run linting, tests, coverage and build on every commit. Add a badge to the README.md file to show the build status. Add a codecov badge to show the test coverage status.
+2. [ ] Add a job to publish the extension to the Chrome web store on every release.
 

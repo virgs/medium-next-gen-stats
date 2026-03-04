@@ -11,7 +11,7 @@
   "content_scripts": [
     {
       "js": [
-        "assets/content.tsx-tLc68Eq7.js"
+        "assets/content.tsx-B6OcTBve.js"
       ],
       "matches": [
         "https://medium.com/*/stats",
@@ -43,7 +43,7 @@
         "https://medium.com/*"
       ],
       "resources": [
-        "assets/content.tsx-tLc68Eq7.js"
+        "assets/content.tsx-B6OcTBve.js"
       ],
       "use_dynamic_url": false
     }
