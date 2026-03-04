@@ -43,19 +43,49 @@ https://github.com/virgs/medium-next-gen-stats
 
 ![snapshot1](images/snapshot1.png)
 
+### Tech Stack
+- **TypeScript** + **React** + **Bootstrap** (react-bootstrap)
+- **Chart.js** (via react-chartjs-2) for interactive charts
+- **FontAwesome** (via @fortawesome/react-fontawesome) for icons
+- **Vite** + **@crxjs/vite-plugin** for building the Chrome extension
+- **Vitest** + **React Testing Library** for unit testing
+- **pnpm** as the package manager
+
 ### Development
 
-- ##### chrome
-    1. Clone this repo
-    2. Go to `chrome://extensions` 
-    3. Enable developer mode
-    4. Click on `load unpacked extension` and select the `medium-next-gen-stats` folder
+#### Prerequisites
+- Node.js (v18+)
+- pnpm (`npm install -g pnpm`)
 
-- ##### firefox
-    1. Clone this repo
-    2. Go to `about:debugging` -> `This firefox`
-    3. Click on `load Temporary Add-on`
-    4. Select the `manifest.json` file
+#### Setup
+```bash
+git clone https://github.com/virgs/medium-next-gen-stats.git
+cd medium-next-gen-stats
+pnpm install
+```
+
+#### Scripts
+| Command              | Description                        |
+|----------------------|------------------------------------|
+| `pnpm dev`           | Start Vite dev server              |
+| `pnpm build`         | Build the extension for production |
+| `pnpm test`          | Run tests once                     |
+| `pnpm test:watch`    | Run tests in watch mode            |
+| `pnpm test:coverage` | Run tests with coverage report     |
+
+#### Load in Browser
+
+- ##### Chrome
+    1. Run `pnpm build`
+    2. Go to `chrome://extensions`
+    3. Enable developer mode
+    4. Click on `Load unpacked` and select the `dist` folder
+
+- ##### Firefox
+    1. Run `pnpm build`
+    2. Go to `about:debugging` → `This Firefox`
+    3. Click on `Load Temporary Add-on`
+    4. Select the `dist/manifest.json` file
 
 PRs are most welcome :)
 

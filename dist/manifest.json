@@ -10,14 +10,17 @@
   ],
   "content_scripts": [
     {
+      "js": [
+        "assets/content.tsx-tLc68Eq7.js"
+      ],
       "matches": [
         "https://medium.com/*/stats",
         "https://medium.com/*/stats/",
         "https://medium.com/*/stats/stories"
       ],
       "run_at": "document_idle",
-      "js": [
-        "src/content.tsx"
+      "css": [
+        "assets/content-CSQ_uoCV.css"
       ]
     }
   ],
@@ -31,6 +34,18 @@
   },
   "action": {
     "default_title": "Medium Next Generation Stats"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "matches": [
+        "https://medium.com/*",
+        "https://medium.com/*",
+        "https://medium.com/*"
+      ],
+      "resources": [
+        "assets/content.tsx-tLc68Eq7.js"
+      ],
+      "use_dynamic_url": false
+    }
+  ]
 }
-

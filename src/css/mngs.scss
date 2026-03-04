@@ -1,0 +1,147 @@
+:root {
+  --mngs-disabled-color: rgb(173, 78, 49);
+  --mngs-icon-color: #b1b1b1;
+  --mngs-icon-hover-color: #767676;
+  --mngs-icon-active-color: #141414;
+  --mngs-donate-color: #ba9752;
+}
+
+.mngs-container {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.mngs-summary-tabs {
+  margin-top: 20px;
+  border-bottom: 0;
+
+  .mngs-summary-tab-item {
+    flex: 1;
+    text-align: center;
+
+    .mngs-tab-value {
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+
+    .mngs-tab-label {
+      font-size: 0.85rem;
+      color: #666;
+    }
+  }
+
+  .mngs-disabled-tab {
+    color: var(--mngs-disabled-color) !important;
+    pointer-events: none;
+  }
+}
+
+.mngs-range-navbar {
+  margin-top: 10px;
+}
+
+.mngs-time-range-navbar {
+  margin-top: 10px;
+
+  .mngs-current-month-btn {
+    white-space: nowrap;
+
+    &.active {
+      font-weight: bold;
+      border-bottom: 2px solid rgba(0, 0, 0, 0.54);
+    }
+  }
+}
+
+.mngs-chart-paginator {
+  .mngs-paginator-divider {
+    color: #ccc;
+    padding: 0 4px;
+  }
+}
+
+.mngs-action-icons {
+  padding: 10px 0;
+
+  .mngs-tooltip-wrapper {
+    cursor: pointer;
+    padding: 0 8px;
+  }
+
+  .mngs-donate-icon {
+    font-size: 24px;
+    color: var(--mngs-donate-color);
+    transition: filter 100ms;
+
+    &:hover {
+      filter: brightness(1.2);
+    }
+  }
+
+  .mngs-action-icon {
+    font-size: 24px;
+    color: var(--mngs-icon-color);
+    transition: color 100ms;
+
+    &:hover {
+      color: var(--mngs-icon-hover-color) !important;
+    }
+  }
+
+  .mngs-chart-type-icon {
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0 8px;
+    color: var(--mngs-icon-color);
+    transition: color 100ms;
+
+    &:hover {
+      color: var(--mngs-icon-hover-color) !important;
+    }
+
+    &.mngs-chart-type-icon-active {
+      color: var(--mngs-icon-active-color) !important;
+
+      &:hover {
+        color: var(--mngs-icon-active-color) !important;
+      }
+    }
+  }
+}
+
+.mngs-totals-table-wrapper {
+  .mngs-totals-table {
+    width: 100%;
+  }
+}
+
+.mngs-stats-chart-wrapper {
+  position: relative;
+  min-height: 300px;
+
+  canvas {
+    width: 100% !important;
+  }
+}
+
+.mngs-stats-page-title {
+  position: relative;
+  margin: 26px 0;
+  padding-bottom: 0;
+
+  .mngs-stats-page-title-version {
+    position: absolute;
+    font-size: 1rem;
+    color: rgba(0, 0, 0, 0.5);
+    font-weight: lighter;
+    bottom: 0;
+    right: 0;
+  }
+}
+
+.mngs-highlight-button-disabled {
+  pointer-events: none;
+  color: var(--mngs-disabled-color) !important;
+}
+
