@@ -29,7 +29,7 @@ export const ActionIcons: React.FC<ActionIconsProps> = ({
     <div className="mngs-action-icons d-flex align-items-center position-relative">
       <span className="mngs-tooltip-wrapper" title="Donate to help it keep running and improving">
         <a
-          href="https://www.paypal.com/donate?business=A3XKGLRLHF87Y&no_recurring=0&item_name=Appreciation+feedback%21&currency_code=CAD"
+          href="https://www.paypal.com/donate/?hosted_button_id=9C66XCH4VAX6U"
           target="_blank"
           rel="noopener noreferrer"
         >

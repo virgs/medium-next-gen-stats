@@ -67,8 +67,12 @@ export const useStatsData = (): UseStatsDataResult => {
       const match = document.location.href.match(PUBLICATION_REGEX);
       if (match) {
         publicationName = match[1];
+        nextGenerationLog(
+          `Detected publication page: ${publicationName}`
+        );
         postsSummary = await getPostsFromPublication(publicationName);
       } else {
+        nextGenerationLog('Detected personal stats page');
         const result = await getPostsFromUser();
         postsSummary = result.posts;
         user = result.user;
@@ -86,11 +90,17 @@ export const useStatsData = (): UseStatsDataResult => {
       );
 
       setLoadingPhase('initial-stats');
+      nextGenerationLog(
+        `Phase: initial-stats (last ${INITIAL_DAYS} days)`
+      );
       const initialPostsData = await loadPostsData(
         postsSummary,
         initialLoadingDate,
         tomorrow.getTime(),
         true
+      );
+      nextGenerationLog(
+        `Initial stats loaded: ${initialPostsData.length} data points`
       );
 
       setMngsData((prev) => ({
@@ -99,7 +109,11 @@ export const useStatsData = (): UseStatsDataResult => {
       }));
 
       setLoadingPhase('activities');
+      nextGenerationLog('Phase: activities');
       const activities = await getActivities();
+      nextGenerationLog(
+        `Activities loaded: ${activities.length} follower events`
+      );
 
       setMngsData((prev) => ({
         ...prev,
@@ -107,7 +121,11 @@ export const useStatsData = (): UseStatsDataResult => {
       }));
 
       setLoadingPhase('earnings');
+      nextGenerationLog('Phase: earnings');
       const earnings = await loadEarningsData(postsSummary);
+      nextGenerationLog(
+        `Earnings loaded: ${earnings.length} data points`
+      );
 
       setMngsData((prev) => ({
         ...prev,
@@ -115,11 +133,15 @@ export const useStatsData = (): UseStatsDataResult => {
       }));
 
       setLoadingPhase('remaining-stats');
+      nextGenerationLog('Phase: remaining-stats (historical data)');
       const remainingData = await loadPostsData(
         postsSummary,
         initialLoadingDate,
         tomorrow.getTime(),
         false
+      );
+      nextGenerationLog(
+        `Remaining stats loaded: ${remainingData.length} data points`
       );
 
       setMngsData((prev) => ({

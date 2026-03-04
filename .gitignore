@@ -2,3 +2,5 @@
 .idea
 node_modules
 coverage
+.env
+/stats-page_files/

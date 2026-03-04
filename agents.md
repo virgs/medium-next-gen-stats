@@ -180,6 +180,6 @@ Build incrementally and safely.
 
 # TODO list
 
-1. [x] Add a circleci pipeline with multiple jobs to run linting, tests, coverage and build on every commit. Add a badge to the README.md file to show the build status. Add a codecov badge to show the test coverage status.
-2. [ ] Add a job to publish the extension to the Chrome web store on every release.
+
+1. [x] Medium changed its stats page structure, so we need to update our selectors and data extraction logic. Take a look at the stats-page.html file to see the new structure and identify the necessary changes. Update the content script to reflect these changes and ensure that we can still extract the required data correctly.
 

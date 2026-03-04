@@ -2,17 +2,43 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { request, getPosts, convertGraphQlToPostData, getCacheStats } from './api';
 import { DailyEarning, PostSummary } from '../types';
 
+vi.mock('../utils/logger', () => ({
+  nextGenerationLog: vi.fn(),
+}));
+
 describe('request', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.restoreAllMocks();
   });
 
-  it('fetches and parses medium API response', async () => {
+  it('fetches and parses medium API response with XSSI prefix', async () => {
     const mockPayload = { value: [{ id: '1' }] };
     vi.spyOn(globalThis, 'fetch').mockResolvedValue({
       status: 200,
       text: async () => `])}while(1);</x>${JSON.stringify({ payload: mockPayload })}`,
+    } as Response);
+
+    const result = await request('https://medium.com/test');
+    expect(result).toEqual(mockPayload);
+  });
+
+  it('fetches and parses plain JSON with payload wrapper', async () => {
+    const mockPayload = { value: [{ id: '2' }] };
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+      status: 200,
+      text: async () => JSON.stringify({ payload: mockPayload }),
+    } as Response);
+
+    const result = await request('https://medium.com/test');
+    expect(result).toEqual(mockPayload);
+  });
+
+  it('fetches and parses plain JSON without payload wrapper', async () => {
+    const mockPayload = { value: [{ id: '3' }] };
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+      status: 200,
+      text: async () => JSON.stringify(mockPayload),
     } as Response);
 
     const result = await request('https://medium.com/test');

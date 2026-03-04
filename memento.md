@@ -59,4 +59,22 @@ Added a CircleCI pipeline with separate jobs for linting, testing, coverage, and
 - **Codecov orb v5** is used. Requires a `CODECOV_TOKEN` environment variable to be set in CircleCI project settings.
 - **Build job gates on lint + test** to fail fast. Coverage runs in parallel since it's informational.
 
+---
 
+## Content Script: Updated Selectors for New Medium Stats Page
+
+**Date:** 2026-03-04
+
+### Decision
+Updated `src/content.tsx` to replace the `.container.stats` CSS selector with a text-based selector strategy. Medium redesigned their stats page, replacing the old `.container.stats` element with a React SPA that uses obfuscated CSS class names (e.g., `fa`, `cg`, `fb`) that change on every deploy.
+
+### What Changed
+- **Selector strategy:** Instead of `document.querySelector('.container.stats')`, the extension now searches for an `<h2>` element with the text content "Stats", then walks up the DOM tree to find the top-level content wrapper (a direct child of `#root`). Falls back to `#root` itself, then `document.body`.
+- **MutationObserver:** Since Medium is an SPA, the stats content may not be in the DOM when the content script runs. Added a `MutationObserver` that watches for the `<h2>Stats</h2>` element to appear, with a 15-second timeout fallback.
+- **Exported helpers:** `findStatsHeading`, `findInsertionPoint`, and `init` are now exported for testability.
+- **Tests:** Created `src/content.test.tsx` with 13 tests covering heading detection, insertion point resolution, idempotency, and fallback behavior.
+
+### Trade-offs
+- **Text-based selectors are more stable** than CSS class selectors for Medium's obfuscated classes, but could break if Medium renames the "Stats" heading. This is unlikely since it's user-facing text.
+- **The `MutationObserver` timeout (15s)** is generous to handle slow page loads. If the page never renders the Stats heading, the extension falls back to inserting at the end of `document.body`.
+- **`findContentAncestor` walks to `#root`'s direct child**, which means the extension container is inserted as a sibling of Medium's top-level content wrapper. This keeps it visually below the stats page content.

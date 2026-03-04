@@ -3,7 +3,7 @@
   "version": "1.0.22",
   "description": "Take your medium text stats to the Next Generation",
   "manifest_version": 3,
-  "author": "Guilherme Virgs Moraes <https://pagehub.me/virgs>",
+  "author": "Guilherme Virgs Moraes",
   "permissions": [
     "storage",
     "unlimitedStorage"
@@ -11,7 +11,7 @@
   "content_scripts": [
     {
       "js": [
-        "assets/content.tsx-B6OcTBve.js"
+        "assets/content.tsx-loader-V1NP16aG.js"
       ],
       "matches": [
         "https://medium.com/*/stats",
@@ -43,7 +43,7 @@
         "https://medium.com/*"
       ],
       "resources": [
-        "assets/content.tsx-B6OcTBve.js"
+        "assets/content.tsx-DQVWXtCa.js"
       ],
       "use_dynamic_url": false
     }

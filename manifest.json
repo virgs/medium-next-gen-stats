@@ -3,7 +3,7 @@
   "version": "1.0.22",
   "description": "Take your medium text stats to the Next Generation",
   "manifest_version": 3,
-  "author": "Guilherme Virgs Moraes <https://pagehub.me/virgs>",
+  "author": "Guilherme Virgs Moraes",
   "permissions": [
     "storage",
     "unlimitedStorage"

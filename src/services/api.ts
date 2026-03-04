@@ -24,6 +24,19 @@ interface MediumPayload {
   };
 }
 
+const parseResponseText = (text: string): MediumPayload => {
+  const xssiParts = text.split('</x>');
+  if (xssiParts.length > 1 && xssiParts[1]) {
+    return JSON.parse(xssiParts[1]).payload;
+  }
+
+  const parsed = JSON.parse(text);
+  if (parsed.payload) {
+    return parsed.payload;
+  }
+  return parsed;
+};
+
 export const request = async (
   url: string,
   options?: RequestOptions
@@ -33,10 +46,12 @@ export const request = async (
     const cache = await loadCache(url);
     if (cache) {
       ++cacheCounter.used;
+      nextGenerationLog(`Cache hit: ${url}`);
       return cache as MediumPayload;
     }
   }
 
+  nextGenerationLog(`Fetching: ${url}`);
   const response = await fetch(url, {
     credentials: 'same-origin',
     headers: { accept: 'application/json' },
@@ -44,15 +59,26 @@ export const request = async (
 
   if (response.status === 200) {
     const text = await response.text();
-    const payload = JSON.parse(text.split('</x>')[1]).payload;
-    if (options?.cache) {
-      await addToCache(url, payload);
+    try {
+      const payload = parseResponseText(text);
+      if (options?.cache) {
+        await addToCache(url, payload);
+      }
+      return payload;
+    } catch (parseError) {
+      const preview = text.substring(0, 200);
+      nextGenerationLog(
+        `Failed to parse response from ${url}. Preview: ${preview}`
+      );
+      throw new Error(
+        `Failed to parse JSON response from ${url}`,
+        { cause: parseError }
+      );
     }
-    return payload;
   }
 
-  console.error(
-    `Fail to fetch data: (${response.status}) - ${response.statusText}`
+  nextGenerationLog(
+    `HTTP error: (${response.status}) ${response.statusText} for ${url}`
   );
   return {};
 };
@@ -69,18 +95,21 @@ export const getPostsFromUser = async (): Promise<{
   posts: PostSummary[];
   user: Record<string, unknown> | null;
 }> => {
+  nextGenerationLog('Fetching user posts and stats');
   const message = await getTotals('me/stats');
   const user = message.references?.User ?? null;
   const posts = (message.value ?? []).map((item) => ({
     ...item,
     id: item.postId,
   }));
+  nextGenerationLog(`Found ${posts.length} posts`);
   return { posts, user };
 };
 
 export const getPostsFromPublication = async (
   publication: string
 ): Promise<PostSummary[]> => {
+  nextGenerationLog(`Fetching posts for publication: ${publication}`);
   return getPosts(
     `https://medium.com/${publication}/stats?format=json&limit=1000000`
   );
@@ -90,8 +119,9 @@ export const getTotals = async (
   url: string,
   payload?: MediumPayload
 ): Promise<MediumPayload> => {
-  const finalUrl = `https://medium.com/${url}?limit=500`;
+  const finalUrl = `https://medium.com/${url}?format=json&limit=500`;
   if (!payload) {
+    nextGenerationLog(`Fetching totals from: ${finalUrl}`);
     const response = await request(finalUrl);
     return getTotals(url, response);
   }
@@ -99,6 +129,9 @@ export const getTotals = async (
   const { value, paging } = payload;
   if (paging?.next?.to && value?.length) {
     const paginatedUrl = `${finalUrl}&to=${paging.next.to}`;
+    nextGenerationLog(
+      `Paginating totals: ${value.length} posts so far`
+    );
     try {
       const response = await request(paginatedUrl);
       payload.value = [...(payload.value ?? []), ...(response.value ?? [])];
@@ -153,6 +186,7 @@ export const getPostStats = async (
 };
 
 export const getActivities = async (): Promise<PostData[]> => {
+  nextGenerationLog('Fetching user activities (followers)');
   const response = await request(
     'https://medium.com/_/api/activity?limit=1000000'
   );
@@ -179,6 +213,7 @@ export const getEarningsOfPost = async (
   post: PostSummary
 ): Promise<DailyEarning[]> => {
   try {
+    nextGenerationLog(`Fetching earnings for: "${post.title}" (${post.id})`);
     const res = await fetch('https://medium.com/_/graphql', {
       credentials: 'same-origin',
       method: 'POST',
