@@ -1,0 +1,13 @@
+[
+  {
+    "operationName": "UserMonthlyStoryStatsTimeseriesQuery",
+    "variables": {
+      "username": "virgs",
+      "input": {
+        "startTime": 1772323200000,
+        "endTime": 1772582400000
+      }
+    },
+    "query": "query UserMonthlyStoryStatsTimeseriesQuery($username: ID!, $input: UserPostsAggregateStatsInput!) {\n  user(username: $username) {\n    id\n    postsAggregateTimeseriesStats(input: $input) {\n      __typename\n      ... on AggregatePostTimeseriesStats {\n        ...MonthlyStoryStats_aggregatePostTimeseriesStats\n        __typename\n      }\n    }\n    __typename\n  }\n}\n\nfragment MonthlyStoryStatsTotals_postStats on PostStats {\n  presentations\n  viewers\n  readers\n  netFollowersGained\n  netSubscribersGained\n  __typename\n}\n\nfragment MonthlyStoryStatsChart_postStatsPoint on PostStatsPoint {\n  timestamp\n  stats {\n    total {\n      viewers\n      readers\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment MonthlyStoryStats_aggregatePostTimeseriesStats on AggregatePostTimeseriesStats {\n  totalStats {\n    ...MonthlyStoryStatsTotals_postStats\n    __typename\n  }\n  points {\n    ...MonthlyStoryStatsChart_postStatsPoint\n    __typename\n  }\n  __typename\n}\n"
+  }
+]

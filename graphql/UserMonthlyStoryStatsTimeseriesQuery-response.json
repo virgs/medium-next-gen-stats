@@ -1,0 +1,71 @@
+[
+  {
+    "data": {
+      "user": {
+        "id": "5e1d07b76ff4",
+        "postsAggregateTimeseriesStats": {
+          "__typename": "AggregatePostTimeseriesStats",
+          "totalStats": {
+            "presentations": 4,
+            "viewers": 9,
+            "readers": 3,
+            "netFollowersGained": 0,
+            "netSubscribersGained": 0,
+            "__typename": "PostStats"
+          },
+          "points": [
+            {
+              "timestamp": 1772323200000,
+              "stats": {
+                "total": {
+                  "viewers": 1,
+                  "readers": 1,
+                  "__typename": "PostStats"
+                },
+                "__typename": "PostStatsBreakdown"
+              },
+              "__typename": "PostStatsPoint"
+            },
+            {
+              "timestamp": 1772409600000,
+              "stats": {
+                "total": {
+                  "viewers": 1,
+                  "readers": 1,
+                  "__typename": "PostStats"
+                },
+                "__typename": "PostStatsBreakdown"
+              },
+              "__typename": "PostStatsPoint"
+            },
+            {
+              "timestamp": 1772496000000,
+              "stats": {
+                "total": {
+                  "viewers": 7,
+                  "readers": 1,
+                  "__typename": "PostStats"
+                },
+                "__typename": "PostStatsBreakdown"
+              },
+              "__typename": "PostStatsPoint"
+            },
+            {
+              "timestamp": 1772582400000,
+              "stats": {
+                "total": {
+                  "viewers": 0,
+                  "readers": 0,
+                  "__typename": "PostStats"
+                },
+                "__typename": "PostStatsBreakdown"
+              },
+              "__typename": "PostStatsPoint"
+            }
+          ]
+        },
+        "__typename": "User"
+      }
+    }
+  }
+]

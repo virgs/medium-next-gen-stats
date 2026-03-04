@@ -1,0 +1,560 @@
+[
+  {
+    "data": {
+      "user": {
+        "id": "5e1d07b76ff4",
+        "postsConnection": {
+          "__typename": "RelayPostConnection",
+          "edges": [
+            {
+              "node": {
+                "id": "bc1ffa9b9b8d",
+                "firstPublishedAt": 1768397076309,
+                "isLocked": true,
+                "totalStats": {
+                  "presentations": 72,
+                  "views": 4,
+                  "reads": 1,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "Irmãos Brothers SA",
+                "readingTime": 3.6830188679245284,
+                "visibility": "LOCKED",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/irm%C3%A3os-brothers-sa-bc1ffa9b9b8d",
+                "sequence": null,
+                "uniqueSlug": "irmãos-brothers-sa-bc1ffa9b9b8d",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "b144c1a53e7",
+                "firstPublishedAt": 1660944456385,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 56,
+                  "reads": 3,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "Confissões de um Assassino em Série",
+                "readingTime": 0.6679245283018869,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/confiss%C3%B5es-de-um-assassino-em-s%C3%A9rie-b144c1a53e7",
+                "sequence": null,
+                "uniqueSlug": "confissões-de-um-assassino-em-série-b144c1a53e7",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "b58491e53b66",
+                "firstPublishedAt": 1660944378295,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 15,
+                  "reads": 6,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "É sobre isso",
+                "readingTime": 0.7849056603773585,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/%C3%A9-sobre-isso-b58491e53b66",
+                "sequence": null,
+                "uniqueSlug": "é-sobre-isso-b58491e53b66",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "c86f6b8e4577",
+                "firstPublishedAt": 1660944249669,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 25,
+                  "reads": 7,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "Segredos que o mar guarda",
+                "readingTime": 3.207547169811321,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/segredos-que-o-mar-guarda-c86f6b8e4577",
+                "sequence": null,
+                "uniqueSlug": "segredos-que-o-mar-guarda-c86f6b8e4577",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "b8eea7064975",
+                "firstPublishedAt": 1660944050151,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 10,
+                  "reads": 4,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "O Gol Que Meu Irmão Não Fez",
+                "readingTime": 2.667924528301887,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/o-gol-que-meu-irm%C3%A3o-n%C3%A3o-fez-b8eea7064975",
+                "sequence": null,
+                "uniqueSlug": "o-gol-que-meu-irmão-não-fez-b8eea7064975",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "80206691d63c",
+                "firstPublishedAt": 1652640493308,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 20,
+                  "reads": 13,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "O Astra e o Corsa",
+                "readingTime": 2.811320754716981,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/o-astra-e-o-corsa-80206691d63c",
+                "sequence": null,
+                "uniqueSlug": "o-astra-e-o-corsa-80206691d63c",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "8281c2168e7f",
+                "firstPublishedAt": 1646250118623,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 35,
+                  "reads": 23,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "Os Fracassos do Ricardo",
+                "readingTime": 1.581132075471698,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/os-fracassos-do-ricardo-8281c2168e7f",
+                "sequence": null,
+                "uniqueSlug": "os-fracassos-do-ricardo-8281c2168e7f",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "aa81747ffad",
+                "firstPublishedAt": 1635959275426,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 1076,
+                  "reads": 304,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "Tudo Sobre Variáveis",
+                "readingTime": 7.267924528301887,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/tudo-sobre-vari%C3%A1veis-aa81747ffad",
+                "sequence": null,
+                "uniqueSlug": "tudo-sobre-variáveis-aa81747ffad",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "5b03ccca672",
+                "firstPublishedAt": 1623511426371,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 67,
+                  "reads": 33,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "Observações a Respeito do Casamento",
+                "readingTime": 2.4415094339622643,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/observa%C3%A7%C3%B5es-a-respeito-do-casamento-5b03ccca672",
+                "sequence": null,
+                "uniqueSlug": "observações-a-respeito-do-casamento-5b03ccca672",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "509b9ebc73a4",
+                "firstPublishedAt": 1618598299413,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 53,
+                  "reads": 32,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "Olha, Escrevi Sobre Você",
+                "readingTime": 1.1358490566037736,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/olha-escrevi-sobre-voc%C3%AA-509b9ebc73a4",
+                "sequence": null,
+                "uniqueSlug": "olha-escrevi-sobre-você-509b9ebc73a4",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            }
+          ],
+          "pageInfo": {
+            "endCursor": "{\"column\":{\"S\":\"@\"},\"creator\":{\"S\":\"5e1d07b76ff4\"},\"firstPublishedAt\":{\"N\":\"1618598299413\"},\"postId\":{\"S\":\"509b9ebc73a4\"}}",
+            "hasNextPage": true,
+            "__typename": "PageInfoV2"
+          }
+        },
+        "__typename": "User"
+      }
+    }
+  }
+]

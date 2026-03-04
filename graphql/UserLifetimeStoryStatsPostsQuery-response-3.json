@@ -1,0 +1,573 @@
+[
+  {
+    "data": {
+      "user": {
+        "id": "5e1d07b76ff4",
+        "postsConnection": {
+          "__typename": "RelayPostConnection",
+          "edges": [
+            {
+              "node": {
+                "id": "759f798c27bd",
+                "firstPublishedAt": 1617469754421,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 27,
+                  "reads": 13,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "Barato Errado",
+                "readingTime": 1.550943396226415,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/barato-errado-759f798c27bd",
+                "sequence": null,
+                "uniqueSlug": "barato-errado-759f798c27bd",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "ec568e9ae579",
+                "firstPublishedAt": 1611761047227,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 52,
+                  "reads": 35,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "Escritor?",
+                "readingTime": 0.9433962264150944,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/escritor-ec568e9ae579",
+                "sequence": null,
+                "uniqueSlug": "escritor-ec568e9ae579",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "eab28df3300e",
+                "firstPublishedAt": 1605209618982,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 97,
+                  "reads": 51,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "O Algoritmo",
+                "readingTime": 1.3320754716981131,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/o-algoritmo-eab28df3300e",
+                "sequence": null,
+                "uniqueSlug": "o-algoritmo-eab28df3300e",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "cbf76bd593d7",
+                "firstPublishedAt": 1600453708834,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 81,
+                  "reads": 39,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "O Bom e o Ruim",
+                "readingTime": 5.957861635220126,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/o-bom-e-o-ruim-cbf76bd593d7",
+                "sequence": null,
+                "uniqueSlug": "o-bom-e-o-ruim-cbf76bd593d7",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "8f875bb4a2d3",
+                "firstPublishedAt": 1596855661687,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 50,
+                  "reads": 25,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "Object Oriented Reactive Programming",
+                "readingTime": 6.401886792452831,
+                "visibility": "UNLISTED",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/object-oriented-reactive-programming-8f875bb4a2d3",
+                "sequence": null,
+                "uniqueSlug": "object-oriented-reactive-programming-8f875bb4a2d3",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "8c8da67b6dc2",
+                "firstPublishedAt": 1596753225248,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 286,
+                  "reads": 87,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "Orientação ao Objeto Reativa",
+                "readingTime": 6.703773584905661,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/orienta%C3%A7%C3%A3o-ao-objeto-reativa-8c8da67b6dc2",
+                "sequence": null,
+                "uniqueSlug": "orientação-ao-objeto-reativa-8c8da67b6dc2",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "9c26d20b1777",
+                "firstPublishedAt": 1595090976651,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 52,
+                  "reads": 28,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "A Vida Mais Difícil",
+                "readingTime": 3.632389937106918,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/a-vida-mais-dif%C3%ADcil-9c26d20b1777",
+                "sequence": null,
+                "uniqueSlug": "a-vida-mais-difícil-9c26d20b1777",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "6555913fc764",
+                "firstPublishedAt": 1593034744025,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 108,
+                  "reads": 73,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "O Convite",
+                "readingTime": 3.388679245283019,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/o-convite-6555913fc764",
+                "sequence": null,
+                "uniqueSlug": "o-convite-6555913fc764",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "b8e61bddda5d",
+                "firstPublishedAt": 1580614584775,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 289,
+                  "reads": 146,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "Medium Next Generation Stats",
+                "readingTime": 4.39748427672956,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": {
+                  "id": "d5e885e906a7",
+                  "domain": null,
+                  "slug": "dataseries",
+                  "__typename": "Collection",
+                  "name": "DataSeries",
+                  "avatar": {
+                    "id": "1*7_DWdmSBSBXKQzUwrpzI6w.png",
+                    "__typename": "ImageMetadata"
+                  },
+                  "description": "Imagine the future of data",
+                  "subscriberCount": 8428,
+                  "customStyleSheet": null
+                },
+                "isSeries": false,
+                "mediumUrl": "https://medium.com/dataseries/medium-next-generation-stats-b8e61bddda5d",
+                "sequence": null,
+                "uniqueSlug": "medium-next-generation-stats-b8e61bddda5d",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            },
+            {
+              "node": {
+                "id": "296213035c97",
+                "firstPublishedAt": 1579557040087,
+                "isLocked": false,
+                "totalStats": {
+                  "presentations": null,
+                  "views": 111,
+                  "reads": 70,
+                  "__typename": "SummaryPostStat"
+                },
+                "earnings": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "nanos": 0,
+                    "units": 0,
+                    "__typename": "Money"
+                  },
+                  "__typename": "PostEarnings"
+                },
+                "title": "Paradoxo 21",
+                "readingTime": 0.8188679245283019,
+                "visibility": "PUBLIC",
+                "firstBoostedAt": null,
+                "creator": {
+                  "__typename": "User",
+                  "id": "5e1d07b76ff4",
+                  "customDomainState": {
+                    "live": {
+                      "domain": "virgs.medium.com",
+                      "__typename": "CustomDomain"
+                    },
+                    "__typename": "CustomDomainState"
+                  },
+                  "hasSubdomain": true,
+                  "username": "virgs",
+                  "imageId": "1*ZKz9xHl9bBlZ8bDqHMoVpw.jpeg",
+                  "membership": null,
+                  "name": "Guilherme \"Virgs\" Moraes",
+                  "verifications": {
+                    "isBookAuthor": false,
+                    "__typename": "VerifiedInfo"
+                  }
+                },
+                "collection": null,
+                "isSeries": false,
+                "mediumUrl": "https://virgs.medium.com/paradoxo-21-296213035c97",
+                "sequence": null,
+                "uniqueSlug": "paradoxo-21-296213035c97",
+                "__typename": "Post",
+                "isFeaturedInPublishedPublication": false
+              },
+              "__typename": "RelayPostEdge"
+            }
+          ],
+          "pageInfo": {
+            "endCursor": "{\"column\":{\"S\":\"@\"},\"creator\":{\"S\":\"5e1d07b76ff4\"},\"firstPublishedAt\":{\"N\":\"1579557040087\"},\"postId\":{\"S\":\"296213035c97\"}}",
+            "hasNextPage": true,
+            "__typename": "PageInfoV2"
+          }
+        },
+        "__typename": "User"
+      }
+    }
+  }
+]
