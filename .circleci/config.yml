@@ -12,7 +12,7 @@ commands:
       - checkout
       - run:
           name: Install pnpm
-          command: corepack enable && corepack prepare pnpm@10.30.3 --activate
+          command: sudo corepack enable && corepack prepare pnpm@10.30.3 --activate
       - restore_cache:
           keys:
             - pnpm-deps-v1-{{ checksum "pnpm-lock.yaml" }}
@@ -24,6 +24,7 @@ commands:
           key: pnpm-deps-v1-{{ checksum "pnpm-lock.yaml" }}
           paths:
             - node_modules
+            - ~/.cache/pnpm
 
 jobs:
   lint:
@@ -71,4 +72,3 @@ workflows:
           requires:
             - lint
             - test
-
