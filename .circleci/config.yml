@@ -52,11 +52,6 @@ jobs:
       - run:
           name: Run tests with coverage
           command: pnpm test:coverage
-      - store_artifacts:
-          path: coverage
-          destination: coverage
-      - codecov/upload:
-          file: coverage/lcov.info
 
   build:
     executor: node
