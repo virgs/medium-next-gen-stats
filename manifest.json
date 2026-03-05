@@ -11,8 +11,10 @@
   "content_scripts": [
     {
       "matches": [
-        "https://medium.com/*/stats",
-        "https://medium.com/*/stats/",
+        "https://medium.com/me/stats",
+        "https://medium.com/me/stats?*",
+        "https://medium.com/me/stats/",
+        "https://medium.com/me/stats/*",
         "https://medium.com/*/stats/stories"
       ],
       "run_at": "document_idle",

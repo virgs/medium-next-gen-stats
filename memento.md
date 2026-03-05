@@ -78,3 +78,34 @@ Updated `src/content.tsx` to replace the `.container.stats` CSS selector with a 
 - **Text-based selectors are more stable** than CSS class selectors for Medium's obfuscated classes, but could break if Medium renames the "Stats" heading. This is unlikely since it's user-facing text.
 - **The `MutationObserver` timeout (15s)** is generous to handle slow page loads. If the page never renders the Stats heading, the extension falls back to inserting at the end of `document.body`.
 - **`findContentAncestor` walks to `#root`'s direct child**, which means the extension container is inserted as a sibling of Medium's top-level content wrapper. This keeps it visually below the stats page content.
+
+---
+
+## API Migration: REST → GraphQL
+
+**Date:** 2026-03-04
+
+### Decision
+Migrated the data-fetching layer from Medium's deprecated REST API endpoints to their GraphQL API (`POST https://medium.com/_/graphql`). The old REST endpoints (`/me/stats?format=json`, `/stats/{postId}/{begin}/{end}?format=json`, `/_/api/activity`) now return HTML instead of JSON, breaking the extension.
+
+### What Changed
+- **`src/services/api.ts`:** Completely rewritten. Removed all REST-based functions (`request`, `getPosts`, `getTotals`). Now uses GraphQL queries via the new `graphqlClient.ts` module.
+- **`src/services/graphqlQueries.ts`:** New file containing GraphQL query strings and TypeScript interfaces for the GraphQL response shapes (`GraphQlPostNode`, `PostsConnectionPage`, `TimeseriesPoint`).
+- **`src/services/graphqlClient.ts`:** New file containing the generic `graphqlFetch<T>()` helper (with caching support), `extractUsername()` (reads the logged-in user's username from `window.__PRELOADED_STATE__` or profile links), and `getCacheStats()`.
+- **`getPostsFromUser()`:** Now uses `UserLifetimeStoryStatsPostsQuery` with cursor-based pagination (25 posts per page) instead of the old `/me/stats?format=json&limit=500` endpoint.
+- **`getPostStats()`:** Now uses `UserMonthlyStoryStatsTimeseriesQuery` for aggregate daily views/reads data, replacing per-post REST fetches to `/stats/{postId}/{begin}/{end}?format=json`.
+- **`getActivities()`:** Returns empty array since the old `/_/api/activity` REST endpoint is dead. Follower tracking is no longer available via the new API.
+- **`getEarningsOfPost()`:** Unchanged — it already used GraphQL (`StatsPostChart` operation).
+- **`manifest.json`:** Updated `content_scripts.matches` to include `https://medium.com/me/stats` and `https://medium.com/me/stats?*` patterns (Medium's new stats URL format).
+- **`src/hooks/useStatsData.ts`:** Updated to work with aggregate timeseries data (one GraphQL call per time range chunk) instead of per-post REST calls.
+
+### Username Extraction
+The GraphQL API requires the authenticated user's username. `extractUsername()` uses two strategies:
+1. **Primary:** Scans `<script>` tags for `window.__PRELOADED_STATE__` and extracts the `"username"` field via regex.
+2. **Fallback:** Looks for an `<a href="/@username">` link in the page DOM.
+
+### Trade-offs
+- **Aggregate stats only:** The timeseries query (`UserMonthlyStoryStatsTimeseriesQuery`) returns aggregate views/reads across all posts, not per-post breakdowns. Per-post daily stats would require additional GraphQL queries (e.g., `StatsPostChart` per post), which was deferred to avoid rate-limiting.
+- **No follower/activity data:** The old `/_/api/activity` endpoint is gone. The GraphQL API doesn't expose an equivalent activity feed, so follower tracking is disabled.
+- **Username dependency:** The extension now requires the username to be extractable from the page. If Medium changes how `__PRELOADED_STATE__` is embedded, the fallback profile-link strategy should still work.
+- **GraphQL request format:** Medium's GraphQL endpoint expects the request body wrapped in an array (`[{ operationName, variables, query }]`) and returns an array response. The `graphqlFetch` helper handles both array and object response shapes.

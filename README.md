@@ -49,6 +49,7 @@ https://github.com/virgs/medium-next-gen-stats
 ### Tech Stack
 - **TypeScript** + **React** + **Bootstrap** (react-bootstrap)
 - **Chart.js** (via react-chartjs-2) for interactive charts
+- **Medium GraphQL API** (`https://medium.com/_/graphql`) for fetching stats data
 - **FontAwesome** (via @fortawesome/react-fontawesome) for icons
 - **Vite** + **@crxjs/vite-plugin** for building the Chrome extension
 - **Vitest** + **React Testing Library** for unit testing

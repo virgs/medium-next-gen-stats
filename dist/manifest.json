@@ -11,11 +11,13 @@
   "content_scripts": [
     {
       "js": [
-        "assets/content.tsx-loader-V1NP16aG.js"
+        "assets/content.tsx-loader-ml12g5AK.js"
       ],
       "matches": [
-        "https://medium.com/*/stats",
-        "https://medium.com/*/stats/",
+        "https://medium.com/me/stats",
+        "https://medium.com/me/stats?*",
+        "https://medium.com/me/stats/",
+        "https://medium.com/me/stats/*",
         "https://medium.com/*/stats/stories"
       ],
       "run_at": "document_idle",
@@ -40,10 +42,12 @@
       "matches": [
         "https://medium.com/*",
         "https://medium.com/*",
+        "https://medium.com/*",
+        "https://medium.com/*",
         "https://medium.com/*"
       ],
       "resources": [
-        "assets/content.tsx-DQVWXtCa.js"
+        "assets/content.tsx-BdkRrFb9.js"
       ],
       "use_dynamic_url": false
     }

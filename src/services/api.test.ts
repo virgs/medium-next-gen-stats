@@ -1,85 +1,148 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { request, getPosts, convertGraphQlToPostData, getCacheStats } from './api';
+import {
+  extractUsername,
+  getPostsFromUser,
+  getActivities,
+  convertGraphQlToPostData,
+  getCacheStats,
+} from './api';
 import { DailyEarning, PostSummary } from '../types';
 
 vi.mock('../utils/logger', () => ({
   nextGenerationLog: vi.fn(),
 }));
 
-describe('request', () => {
+vi.mock('./cache', () => ({
+  addToCache: vi.fn().mockResolvedValue(undefined),
+  loadCache: vi.fn().mockResolvedValue(undefined),
+}));
+
+describe('extractUsername', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.restoreAllMocks();
+    document.body.innerHTML = '';
   });
 
-  it('fetches and parses medium API response with XSSI prefix', async () => {
-    const mockPayload = { value: [{ id: '1' }] };
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
-      status: 200,
-      text: async () => `])}while(1);</x>${JSON.stringify({ payload: mockPayload })}`,
-    } as Response);
+  it('extracts username from __PRELOADED_STATE__ script', () => {
+    const script = document.createElement('script');
+    // Use textContent assignment after appending to avoid jsdom executing the script
+    document.body.appendChild(script);
+    Object.defineProperty(script, 'textContent', {
+      get: () =>
+        'window.__PRELOADED_STATE__ = {"navigation":{"currentLocation":"https://medium.com/me/stats"},"config":{}}; "username":"testuser" ',
+    });
 
-    const result = await request('https://medium.com/test');
-    expect(result).toEqual(mockPayload);
+    expect(extractUsername()).toBe('testuser');
   });
 
-  it('fetches and parses plain JSON with payload wrapper', async () => {
-    const mockPayload = { value: [{ id: '2' }] };
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
-      status: 200,
-      text: async () => JSON.stringify({ payload: mockPayload }),
-    } as Response);
+  it('falls back to profile link when __PRELOADED_STATE__ is missing', () => {
+    const link = document.createElement('a');
+    link.href = 'https://medium.com/@myuser/some-story';
+    document.body.appendChild(link);
 
-    const result = await request('https://medium.com/test');
-    expect(result).toEqual(mockPayload);
+    expect(extractUsername()).toBe('myuser');
   });
 
-  it('fetches and parses plain JSON without payload wrapper', async () => {
-    const mockPayload = { value: [{ id: '3' }] };
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
-      status: 200,
-      text: async () => JSON.stringify(mockPayload),
-    } as Response);
-
-    const result = await request('https://medium.com/test');
-    expect(result).toEqual(mockPayload);
-  });
-
-  it('returns empty object on non-200 status', async () => {
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
-      status: 404,
-      statusText: 'Not Found',
-    } as Response);
-
-    const result = await request('https://medium.com/missing');
-    expect(result).toEqual({});
-    consoleSpy.mockRestore();
+  it('throws when no username can be found', () => {
+    expect(() => extractUsername()).toThrow(
+      'Could not determine Medium username from page'
+    );
   });
 });
 
-describe('getPosts', () => {
+describe('getPostsFromUser', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.restoreAllMocks();
+    document.body.innerHTML = '';
+    const script = document.createElement('script');
+    document.body.appendChild(script);
+    Object.defineProperty(script, 'textContent', {
+      get: () =>
+        'window.__PRELOADED_STATE__ = {"x":"y","username":"virgs"}',
+    });
   });
 
-  it('maps posts adding id from postId', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
-      status: 200,
-      text: async () =>
-        `])}while(1);</x>${JSON.stringify({
-          payload: {
-            value: [
-              { postId: 'abc', title: 'Test Post', views: 100, reads: 50, claps: 10, upvotes: 5, firstPublishedAt: Date.now(), readingTime: 3 },
-            ],
+  it('fetches posts via GraphQL and paginates', async () => {
+    const page1Response = [
+      {
+        data: {
+          user: {
+            id: 'user1',
+            postsConnection: {
+              edges: [
+                {
+                  node: {
+                    id: 'post1',
+                    firstPublishedAt: 1000,
+                    title: 'Post 1',
+                    readingTime: 3,
+                    isLocked: false,
+                    totalStats: { views: 100, reads: 50, presentations: 10 },
+                    earnings: { total: { units: 0, nanos: 0 } },
+                    creator: { id: 'user1', username: 'virgs', name: 'Test' },
+                  },
+                },
+              ],
+              pageInfo: { endCursor: 'cursor1', hasNextPage: true },
+            },
           },
-        })}`,
-    } as Response);
+        },
+      },
+    ];
 
-    const posts = await getPosts('https://medium.com/test/stats');
-    expect(posts[0].id).toBe('abc');
-    expect(posts[0].postId).toBe('abc');
+    const page2Response = [
+      {
+        data: {
+          user: {
+            id: 'user1',
+            postsConnection: {
+              edges: [
+                {
+                  node: {
+                    id: 'post2',
+                    firstPublishedAt: 2000,
+                    title: 'Post 2',
+                    readingTime: 5,
+                    isLocked: true,
+                    totalStats: { views: 200, reads: 100, presentations: null },
+                    earnings: { total: { units: 1, nanos: 500000000 } },
+                    creator: { id: 'user1', username: 'virgs', name: 'Test' },
+                  },
+                },
+              ],
+              pageInfo: { endCursor: 'cursor2', hasNextPage: false },
+            },
+          },
+        },
+      },
+    ];
+
+    let callCount = 0;
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async () => {
+      callCount++;
+      return {
+        status: 200,
+        json: async () =>
+          callCount === 1 ? page1Response : page2Response,
+      } as Response;
+    });
+
+    const result = await getPostsFromUser();
+    expect(result.posts).toHaveLength(2);
+    expect(result.posts[0].id).toBe('post1');
+    expect(result.posts[0].views).toBe(100);
+    expect(result.posts[1].id).toBe('post2');
+    expect(result.posts[1].views).toBe(200);
+    expect(result.user).not.toBeNull();
+  });
+});
+
+describe('getActivities', () => {
+  it('returns empty array (old REST API no longer available)', async () => {
+    const result = await getActivities();
+    expect(result).toEqual([]);
   });
 });
 

@@ -1,212 +1,142 @@
 import { DailyEarning, PostData, PostSummary } from '../types';
-import { addToCache, loadCache } from './cache';
 import { nextGenerationLog } from '../utils/logger';
 import { ONE_DAY_IN_MS, getNumber } from '../utils/formatters';
+import { extractUsername, graphqlFetch, getCacheStats } from './graphqlClient';
+import {
+  GRAPHQL_ENDPOINT,
+  GraphQlPostNode,
+  PostsConnectionPage,
+  TimeseriesPoint,
+  LIFETIME_QUERY,
+  TIMESERIES_QUERY,
+  EARNINGS_QUERY,
+} from './graphqlQueries';
 
-interface CacheCounter {
-  total: number;
-  used: number;
-}
+export { extractUsername, getCacheStats } from './graphqlClient';
 
-const cacheCounter: CacheCounter = { total: 0, used: 0 };
+const POSTS_PAGE_SIZE = 25;
 
-interface RequestOptions {
-  cache?: boolean;
-}
-
-interface MediumPayload {
-  value?: PostSummary[];
-  paging?: {
-    next?: { to?: string };
-  };
-  references?: {
-    User: Record<string, unknown>;
-  };
-}
-
-const parseResponseText = (text: string): MediumPayload => {
-  const xssiParts = text.split('</x>');
-  if (xssiParts.length > 1 && xssiParts[1]) {
-    return JSON.parse(xssiParts[1]).payload;
-  }
-
-  const parsed = JSON.parse(text);
-  if (parsed.payload) {
-    return parsed.payload;
-  }
-  return parsed;
-};
-
-export const request = async (
-  url: string,
-  options?: RequestOptions
-): Promise<MediumPayload> => {
-  ++cacheCounter.total;
-  if (options?.cache) {
-    const cache = await loadCache(url);
-    if (cache) {
-      ++cacheCounter.used;
-      nextGenerationLog(`Cache hit: ${url}`);
-      return cache as MediumPayload;
-    }
-  }
-
-  nextGenerationLog(`Fetching: ${url}`);
-  const response = await fetch(url, {
-    credentials: 'same-origin',
-    headers: { accept: 'application/json' },
-  });
-
-  if (response.status === 200) {
-    const text = await response.text();
-    try {
-      const payload = parseResponseText(text);
-      if (options?.cache) {
-        await addToCache(url, payload);
-      }
-      return payload;
-    } catch (parseError) {
-      const preview = text.substring(0, 200);
-      nextGenerationLog(
-        `Failed to parse response from ${url}. Preview: ${preview}`
-      );
-      throw new Error(
-        `Failed to parse JSON response from ${url}`,
-        { cause: parseError }
-      );
-    }
-  }
-
-  nextGenerationLog(
-    `HTTP error: (${response.status}) ${response.statusText} for ${url}`
-  );
-  return {};
-};
-
-export const getPosts = async (url: string): Promise<PostSummary[]> => {
-  const posts = await request(url);
-  return (posts.value ?? []).map((post) => ({
-    ...post,
-    id: post.postId,
-  }));
-};
+const convertNodeToPostSummary = (
+  node: GraphQlPostNode
+): PostSummary => ({
+  id: node.id,
+  postId: node.id,
+  title: node.title,
+  views: node.totalStats?.views ?? 0,
+  reads: node.totalStats?.reads ?? 0,
+  claps: 0,
+  upvotes: 0,
+  firstPublishedAt: node.firstPublishedAt,
+  readingTime: node.readingTime,
+});
 
 export const getPostsFromUser = async (): Promise<{
   posts: PostSummary[];
   user: Record<string, unknown> | null;
 }> => {
-  nextGenerationLog('Fetching user posts and stats');
-  const message = await getTotals('me/stats');
-  const user = message.references?.User ?? null;
-  const posts = (message.value ?? []).map((item) => ({
-    ...item,
-    id: item.postId,
-  }));
-  nextGenerationLog(`Found ${posts.length} posts`);
-  return { posts, user };
+  const username = extractUsername();
+  nextGenerationLog(`Fetching user posts via GraphQL for @${username}`);
+
+  const allPosts: PostSummary[] = [];
+  let after = '';
+  let hasNextPage = true;
+  let user: Record<string, unknown> | null = null;
+
+  while (hasNextPage) {
+    nextGenerationLog(
+      `Fetching posts page (${allPosts.length} so far, cursor: ${after ? '...' : 'start'})`
+    );
+    const data = await graphqlFetch<{
+      user: {
+        id: string;
+        postsConnection: PostsConnectionPage;
+      };
+    }>('UserLifetimeStoryStatsPostsQuery', LIFETIME_QUERY, {
+      username,
+      first: POSTS_PAGE_SIZE,
+      after,
+      orderBy: { publishedAt: 'DESC' },
+      filter: { published: true },
+    });
+
+    if (!user && data.user) {
+      user = { [data.user.id]: { username, userId: data.user.id } };
+    }
+
+    const page = data.user.postsConnection;
+    for (const edge of page.edges) {
+      allPosts.push(convertNodeToPostSummary(edge.node));
+    }
+
+    hasNextPage = page.pageInfo.hasNextPage;
+    after = page.pageInfo.endCursor;
+  }
+
+  nextGenerationLog(`Found ${allPosts.length} posts via GraphQL`);
+  return { posts: allPosts, user };
 };
 
 export const getPostsFromPublication = async (
-  publication: string
+  _publication: string
 ): Promise<PostSummary[]> => {
-  nextGenerationLog(`Fetching posts for publication: ${publication}`);
-  return getPosts(
-    `https://medium.com/${publication}/stats?format=json&limit=1000000`
+  nextGenerationLog(
+    `Publication stats not yet supported via GraphQL, falling back to user posts`
   );
-};
-
-export const getTotals = async (
-  url: string,
-  payload?: MediumPayload
-): Promise<MediumPayload> => {
-  const finalUrl = `https://medium.com/${url}?format=json&limit=500`;
-  if (!payload) {
-    nextGenerationLog(`Fetching totals from: ${finalUrl}`);
-    const response = await request(finalUrl);
-    return getTotals(url, response);
-  }
-
-  const { value, paging } = payload;
-  if (paging?.next?.to && value?.length) {
-    const paginatedUrl = `${finalUrl}&to=${paging.next.to}`;
-    nextGenerationLog(
-      `Paginating totals: ${value.length} posts so far`
-    );
-    try {
-      const response = await request(paginatedUrl);
-      payload.value = [...(payload.value ?? []), ...(response.value ?? [])];
-      payload.paging = response.paging;
-      return getTotals(url, payload);
-    } catch (err) {
-      console.error(err);
-      return payload;
-    }
-  }
-  return payload;
+  const { posts } = await getPostsFromUser();
+  return posts;
 };
 
 export const getPostStats = async (
-  post: PostSummary,
+  _post: PostSummary,
   begin: number,
   end: number
 ): Promise<PostData[]> => {
-  const beginningOfTheMonth = new Date();
-  beginningOfTheMonth.setUTCDate(0);
-  beginningOfTheMonth.setUTCHours(0, 0, 0, 0);
+  const username = extractUsername();
+  const cacheKey = `timeseries:${username}:${begin}:${end}`;
+  nextGenerationLog(
+    `Fetching timeseries stats via GraphQL (${new Date(begin).toISOString()} – ${new Date(end).toISOString()})`
+  );
 
-  const promises = [
-    request(
-      `https://medium.com/stats/${post.id}/${beginningOfTheMonth.getTime()}/${end + 1}?format=json`,
-      { cache: true }
-    ),
-  ];
-
-  let iterator = beginningOfTheMonth.getTime() - 1;
-  while (iterator > begin) {
-    const fetchBegin = new Date(iterator);
-    fetchBegin.setUTCMonth(fetchBegin.getUTCMonth() - 1);
-    const fetchStart =
-      fetchBegin.getTime() < begin ? begin : fetchBegin.getTime();
-    promises.push(
-      request(
-        `https://medium.com/stats/${post.id}/${fetchStart}/${iterator - 1}?format=json`,
-        { cache: true }
-      )
+  try {
+    const data = await graphqlFetch<{
+      user: {
+        postsAggregateTimeseriesStats: {
+          totalStats: {
+            viewers: number;
+            readers: number;
+            netFollowersGained: number;
+          };
+          points: TimeseriesPoint[];
+        };
+      };
+    }>(
+      'UserMonthlyStoryStatsTimeseriesQuery',
+      TIMESERIES_QUERY,
+      { username, input: { startTime: begin, endTime: end } },
+      cacheKey
     );
-    iterator = fetchStart;
-  }
 
-  const data = await Promise.all(promises);
-  return data
-    .reduce((acc: PostData[], item) => {
-      const stats = (item.value as unknown as PostData[]) ?? [];
-      return acc.concat(stats);
-    }, [])
-    .map((item) => ({ ...item, id: post.id, title: post.title }));
+    const points =
+      data.user?.postsAggregateTimeseriesStats?.points ?? [];
+
+    return points.map((point) => ({
+      id: 'aggregate',
+      title: 'All stories',
+      views: point.stats.total.viewers,
+      reads: point.stats.total.readers,
+      collectedAt: point.timestamp,
+    }));
+  } catch (err) {
+    nextGenerationLog(`Timeseries fetch failed: ${err}`);
+    return [];
+  }
 };
 
 export const getActivities = async (): Promise<PostData[]> => {
-  nextGenerationLog('Fetching user activities (followers)');
-  const response = await request(
-    'https://medium.com/_/api/activity?limit=1000000'
+  nextGenerationLog(
+    'Skipping activities fetch (old REST API no longer available)'
   );
-  const data = (response?.value as unknown as PostData[]) ?? [];
-  const rollUp = data
-    .filter(
-      (item) => item.activityType === 'users_following_you_rollup'
-    )
-    .flatMap(
-      (item) => (item as unknown as { rollupItems: PostData[] }).rollupItems
-    );
-  const activities = [...data, ...rollUp]
-    .filter((item) => item.activityType === 'users_following_you')
-    .map((item) => ({
-      ...item,
-      followers: 1,
-      collectedAt: (item as unknown as { occurredAt: number }).occurredAt,
-    }));
-  nextGenerationLog('Activities data aggregated');
-  return activities;
+  return [];
 };
 
 export const getEarningsOfPost = async (
@@ -214,7 +144,7 @@ export const getEarningsOfPost = async (
 ): Promise<DailyEarning[]> => {
   try {
     nextGenerationLog(`Fetching earnings for: "${post.title}" (${post.id})`);
-    const res = await fetch('https://medium.com/_/graphql', {
+    const res = await fetch(GRAPHQL_ENDPOINT, {
       credentials: 'same-origin',
       method: 'POST',
       headers: {
@@ -229,49 +159,20 @@ export const getEarningsOfPost = async (
           startAt: 0,
           endAt: Date.now() + ONE_DAY_IN_MS,
         },
-        query: `query StatsPostChart($postId: ID!, $startAt: Long!, $endAt: Long!) {
-  post(id: $postId) {
-    id
-    ...StatsPostChart_dailyStats
-    ...StatsPostChart_dailyEarnings
-    __typename
-  }
-}
-fragment StatsPostChart_dailyStats on Post {
-  dailyStats(startAt: $startAt, endAt: $endAt) {
-    periodStartedAt
-    views
-    internalReferrerViews
-    memberTtr
-    __typename
-  }
-  __typename
-}
-fragment StatsPostChart_dailyEarnings on Post {
-  earnings {
-    dailyEarnings(startAt: $startAt, endAt: $endAt) {
-      periodEndedAt
-      periodStartedAt
-      amount
-      __typename
-    }
-    lastCommittedPeriodStartedAt
-    __typename
-  }
-  __typename
-}`,
+        query: EARNINGS_QUERY,
       }),
     });
     if (res.status !== 200) {
-      console.error(
-        `Fail to fetch data: (${res.status}) - ${res.statusText}`
+      nextGenerationLog(
+        `Earnings fetch failed: (${res.status}) - ${res.statusText}`
       );
       return [];
     }
     const text = await res.text();
     const payload = JSON.parse(text);
     return payload.data.post.earnings.dailyEarnings;
-  } catch {
+  } catch (err) {
+    nextGenerationLog(`Earnings fetch error: ${err}`);
     return [];
   }
 };
@@ -296,5 +197,4 @@ export const convertGraphQlToPostData = (
   });
 };
 
-export const getCacheStats = (): CacheCounter => ({ ...cacheCounter });
 

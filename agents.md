@@ -181,5 +181,4 @@ Build incrementally and safely.
 # TODO list
 
 
-1. [x] Medium changed its stats page structure, so we need to update our selectors and data extraction logic. Take a look at the stats-page.html file to see the new structure and identify the necessary changes. Update the content script to reflect these changes and ensure that we can still extract the required data correctly.
-
+1. [x] This extension is no longer working because Medium has changed its API and Stats page. Check the stats-example.html file to how its Stats page looks like now and update the extension accordingly. Also, they might have changed their back end. Check the graphql folder to see currently working requests/responses pairs and update them if needed. This is their endpoint: (POST) https://medium.com/_/graphql. You can use the GraphiQL extension to test the queries and mutations. The extension should work as before, but with the new API and Stats page.

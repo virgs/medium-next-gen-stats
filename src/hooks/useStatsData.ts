@@ -93,11 +93,10 @@ export const useStatsData = (): UseStatsDataResult => {
       nextGenerationLog(
         `Phase: initial-stats (last ${INITIAL_DAYS} days)`
       );
-      const initialPostsData = await loadPostsData(
-        postsSummary,
+      const initialPostsData = await loadTimeseriesData(
+        postsSummary[0],
         initialLoadingDate,
-        tomorrow.getTime(),
-        true
+        tomorrow.getTime()
       );
       nextGenerationLog(
         `Initial stats loaded: ${initialPostsData.length} data points`
@@ -134,12 +133,14 @@ export const useStatsData = (): UseStatsDataResult => {
 
       setLoadingPhase('remaining-stats');
       nextGenerationLog('Phase: remaining-stats (historical data)');
-      const remainingData = await loadPostsData(
-        postsSummary,
-        initialLoadingDate,
-        tomorrow.getTime(),
-        false
-      );
+      const oldestPublished = getOldestPublishDate(postsSummary);
+      const remainingData = oldestPublished < initialLoadingDate
+        ? await loadTimeseriesData(
+            postsSummary[0],
+            oldestPublished,
+            initialLoadingDate - 1
+          )
+        : [];
       nextGenerationLog(
         `Remaining stats loaded: ${remainingData.length} data points`
       );
@@ -151,7 +152,7 @@ export const useStatsData = (): UseStatsDataResult => {
 
       const cacheStats = getCacheStats();
       nextGenerationLog(
-        `Done. Cache hit: ${((100 * cacheStats.used) / cacheStats.total).toFixed(1)}%`
+        `Done. Cache hit: ${cacheStats.total > 0 ? ((100 * cacheStats.used) / cacheStats.total).toFixed(1) : 0}%`
       );
       setLoadingPhase('done');
     } catch (error) {
@@ -167,29 +168,33 @@ export const useStatsData = (): UseStatsDataResult => {
   return { mngsData, loadingPhase };
 };
 
-const loadPostsData = async (
-  postsSummary: MngsData['postsSummary'],
-  initialLoadingDate: number,
-  tomorrowTime: number,
-  isInitialLoading: boolean
-): Promise<PostData[]> => {
-  const results = await Promise.all(
-    postsSummary.map(async (post) => {
-      const publishedAt =
-        +post.firstPublishedAt - ONE_DAY_IN_MS;
-      if (isInitialLoading) {
-        return getPostStats(post, initialLoadingDate, tomorrowTime);
-      } else if (publishedAt < initialLoadingDate) {
-        return getPostStats(
-          post,
-          publishedAt,
-          new Date(initialLoadingDate - 1).getTime()
-        );
-      }
-      return [];
-    })
+const getOldestPublishDate = (
+  postsSummary: MngsData['postsSummary']
+): number => {
+  if (postsSummary.length === 0) return Date.now();
+  return Math.min(
+    ...postsSummary.map((p) => +p.firstPublishedAt - ONE_DAY_IN_MS)
   );
-  return results.flat();
+};
+
+const loadTimeseriesData = async (
+  firstPost: MngsData['postsSummary'][0] | undefined,
+  begin: number,
+  end: number
+): Promise<PostData[]> => {
+  if (!firstPost) return [];
+
+  const MONTH_MS = 30 * ONE_DAY_IN_MS;
+  const chunks: PostData[] = [];
+  let chunkEnd = end;
+
+  while (chunkEnd > begin) {
+    const chunkStart = Math.max(begin, chunkEnd - MONTH_MS);
+    const data = await getPostStats(firstPost, chunkStart, chunkEnd);
+    chunks.push(...data);
+    chunkEnd = chunkStart;
+  }
+  return chunks;
 };
 
 const loadEarningsData = async (
