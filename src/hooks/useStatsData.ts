@@ -90,16 +90,13 @@ export const useStatsData = (): UseStatsDataResult => {
       );
 
       setLoadingPhase('initial-stats');
-      nextGenerationLog(
-        `Phase: initial-stats (last ${INITIAL_DAYS} days)`
-      );
       const initialPostsData = await loadTimeseriesData(
         postsSummary[0],
         initialLoadingDate,
         tomorrow.getTime()
       );
       nextGenerationLog(
-        `Initial stats loaded: ${initialPostsData.length} data points`
+        `Initial stats: ${initialPostsData.length} data points`
       );
 
       setMngsData((prev) => ({
@@ -108,11 +105,7 @@ export const useStatsData = (): UseStatsDataResult => {
       }));
 
       setLoadingPhase('activities');
-      nextGenerationLog('Phase: activities');
       const activities = await getActivities();
-      nextGenerationLog(
-        `Activities loaded: ${activities.length} follower events`
-      );
 
       setMngsData((prev) => ({
         ...prev,
@@ -120,10 +113,9 @@ export const useStatsData = (): UseStatsDataResult => {
       }));
 
       setLoadingPhase('earnings');
-      nextGenerationLog('Phase: earnings');
       const earnings = await loadEarningsData(postsSummary);
       nextGenerationLog(
-        `Earnings loaded: ${earnings.length} data points`
+        `Earnings: ${earnings.length} data points`
       );
 
       setMngsData((prev) => ({
@@ -132,7 +124,6 @@ export const useStatsData = (): UseStatsDataResult => {
       }));
 
       setLoadingPhase('remaining-stats');
-      nextGenerationLog('Phase: remaining-stats (historical data)');
       const oldestPublished = getOldestPublishDate(postsSummary);
       const remainingData = oldestPublished < initialLoadingDate
         ? await loadTimeseriesData(
@@ -142,7 +133,7 @@ export const useStatsData = (): UseStatsDataResult => {
           )
         : [];
       nextGenerationLog(
-        `Remaining stats loaded: ${remainingData.length} data points`
+        `Historical stats: ${remainingData.length} data points`
       );
 
       setMngsData((prev) => ({

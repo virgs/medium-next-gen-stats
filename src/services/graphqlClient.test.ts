@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { extractUsername, graphqlFetch, getCacheStats } from './graphqlClient';
+import { extractUsername, graphqlFetch, getCacheStats, resetUsernameCache } from './graphqlClient';
 
 vi.mock('../utils/logger', () => ({
   nextGenerationLog: vi.fn(),
@@ -15,6 +15,7 @@ describe('extractUsername', () => {
     vi.clearAllMocks();
     vi.restoreAllMocks();
     document.body.innerHTML = '';
+    resetUsernameCache();
   });
 
   it('extracts username from __PRELOADED_STATE__ script', () => {

@@ -6,6 +6,7 @@ import {
   convertGraphQlToPostData,
   getCacheStats,
 } from './api';
+import { resetUsernameCache } from './graphqlClient';
 import { DailyEarning, PostSummary } from '../types';
 
 vi.mock('../utils/logger', () => ({
@@ -22,6 +23,7 @@ describe('extractUsername', () => {
     vi.clearAllMocks();
     vi.restoreAllMocks();
     document.body.innerHTML = '';
+    resetUsernameCache();
   });
 
   it('extracts username from __PRELOADED_STATE__ script', () => {
@@ -56,6 +58,7 @@ describe('getPostsFromUser', () => {
     vi.clearAllMocks();
     vi.restoreAllMocks();
     document.body.innerHTML = '';
+    resetUsernameCache();
     const script = document.createElement('script');
     document.body.appendChild(script);
     Object.defineProperty(script, 'textContent', {

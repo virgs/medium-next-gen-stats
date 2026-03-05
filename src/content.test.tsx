@@ -52,17 +52,20 @@ describe('content', () => {
       expect(findInsertionPoint()).toBeNull();
     });
 
-    it('returns content ancestor when Stats h2 exists inside #root', () => {
+    it('returns content column when Stats h2 exists inside #root', () => {
       document.body.innerHTML = `
         <div id="root">
-          <div class="content-wrapper">
-            <h2>Stats</h2>
+          <div class="shell">
+            <div class="content-column">
+              <h2>Stats</h2>
+            </div>
           </div>
         </div>
       `;
       const result = findInsertionPoint();
       expect(result).not.toBeNull();
-      expect(result?.parentElement?.id).toBe('root');
+      // Should be the content-column, whose parent's parent is #root
+      expect(result?.className).toBe('content-column');
     });
 
     it('returns #root as fallback when no Stats h2', () => {
@@ -72,21 +75,23 @@ describe('content', () => {
       expect(result?.id).toBe('root');
     });
 
-    it('returns the direct child of #root containing the h2', () => {
+    it('returns content column inside #root shell', () => {
       document.body.innerHTML = `
         <div id="root">
-          <div class="sidebar">Sidebar</div>
-          <div class="main">
-            <div class="stats-area">
-              <h2>Stats</h2>
+          <div class="shell">
+            <div class="sidebar">Sidebar</div>
+            <div class="main">
+              <div class="stats-area">
+                <h2>Stats</h2>
+              </div>
             </div>
           </div>
         </div>
       `;
       const result = findInsertionPoint();
       expect(result).not.toBeNull();
-      const parent = result?.parentElement;
-      expect(parent?.id).toBe('root');
+      // Should be the main div (grandchild of #root)
+      expect(result?.className).toBe('main');
     });
   });
 
@@ -94,7 +99,9 @@ describe('content', () => {
     it('creates mngs-root container', () => {
       document.body.innerHTML = `
         <div id="root">
-          <div class="content"><h2>Stats</h2></div>
+          <div class="shell">
+            <div class="content"><h2>Stats</h2></div>
+          </div>
         </div>
       `;
       init();
@@ -104,7 +111,9 @@ describe('content', () => {
     it('does not create duplicate container', () => {
       document.body.innerHTML = `
         <div id="root">
-          <div class="content"><h2>Stats</h2></div>
+          <div class="shell">
+            <div class="content"><h2>Stats</h2></div>
+          </div>
         </div>
       `;
       init();
@@ -113,15 +122,19 @@ describe('content', () => {
       expect(roots.length).toBe(1);
     });
 
-    it('inserts after the stats content ancestor', () => {
+    it('appends inside the content column', () => {
       document.body.innerHTML = `
         <div id="root">
-          <div class="content"><h2>Stats</h2></div>
+          <div class="shell">
+            <div class="content"><h2>Stats</h2></div>
+          </div>
         </div>
       `;
       init();
       const mngsRoot = document.getElementById('mngs-root');
-      expect(mngsRoot?.previousElementSibling).not.toBeNull();
+      expect(mngsRoot).not.toBeNull();
+      // The container should be a child of the content column
+      expect(mngsRoot?.parentElement?.className).toBe('content');
     });
 
     it('appends to body when no insertion point found', () => {

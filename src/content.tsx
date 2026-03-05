@@ -22,12 +22,12 @@ export const findStatsHeading = (): HTMLElement | null => {
 export const findInsertionPoint = (): HTMLElement | null => {
   const statsHeading = findStatsHeading();
   if (statsHeading) {
-    const mainContentRoot = findContentAncestor(statsHeading);
-    if (mainContentRoot) {
+    const statsContainer = findStatsContainer(statsHeading);
+    if (statsContainer) {
       nextGenerationLog(
-        'Found insertion point via Stats heading ancestor'
+        'Found insertion point via Stats heading container'
       );
-      return mainContentRoot;
+      return statsContainer;
     }
   }
 
@@ -45,17 +45,39 @@ export const findInsertionPoint = (): HTMLElement | null => {
   return null;
 };
 
-const findContentAncestor = (el: HTMLElement): HTMLElement | null => {
+const findStatsContainer = (el: HTMLElement): HTMLElement | null => {
+  // Walk up from the Stats heading to find the main content column.
+  // Medium's layout: #root > shell > sidebar + contentColumn.
+  // The stats content sits several levels inside the content column.
+  // We look for the deepest ancestor that still contains all stats sections.
   let current: HTMLElement | null = el;
+  let candidate: HTMLElement | null = null;
+
   while (current && current !== document.body) {
     const parentEl: HTMLElement | null = current.parentElement;
     if (!parentEl) break;
+
+    // Stop before we reach #root — we don't want to escape the
+    // content column.
     if (parentEl.id === 'root' || parentEl === document.body) {
-      return current;
+      break;
     }
+
+    // The content column typically has a computed width style like
+    // "calc(100% - 240px)" or is a direct child of #root's child.
+    // We pick the last container before #root's direct child.
+    if (
+      parentEl.parentElement?.id === 'root' ||
+      parentEl.parentElement === document.body
+    ) {
+      candidate = current;
+      break;
+    }
+
     current = parentEl;
   }
-  return current;
+
+  return candidate;
 };
 
 export const init = (): void => {
@@ -69,11 +91,8 @@ export const init = (): void => {
   container.id = CONTAINER_ID;
 
   const insertionPoint = findInsertionPoint();
-  if (insertionPoint && insertionPoint.parentNode) {
-    insertionPoint.parentNode.insertBefore(
-      container,
-      insertionPoint.nextSibling
-    );
+  if (insertionPoint) {
+    insertionPoint.appendChild(container);
   } else {
     document.body.appendChild(container);
   }

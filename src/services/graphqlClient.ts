@@ -9,8 +9,12 @@ interface CacheCounter {
 
 const cacheCounter: CacheCounter = { total: 0, used: 0 };
 
+let cachedUsername: string | null = null;
+
 export const extractUsername = (): string => {
-  nextGenerationLog('Extracting username from page state');
+  if (cachedUsername) return cachedUsername;
+
+  nextGenerationLog('Extracting username from page');
   try {
     const scripts = document.querySelectorAll('script');
     for (const s of scripts) {
@@ -18,10 +22,9 @@ export const extractUsername = (): string => {
       if (text.includes('window.__PRELOADED_STATE__')) {
         const match = text.match(/"username"\s*:\s*"([^"]+)"/);
         if (match) {
-          nextGenerationLog(
-            `Username from __PRELOADED_STATE__: ${match[1]}`
-          );
-          return match[1];
+          cachedUsername = match[1];
+          nextGenerationLog(`Username: ${cachedUsername}`);
+          return cachedUsername;
         }
       }
     }
@@ -34,8 +37,9 @@ export const extractUsername = (): string => {
     const href = profileLink.getAttribute('href') ?? '';
     const match = href.match(/@([^/?]+)/);
     if (match) {
-      nextGenerationLog(`Username from profile link: ${match[1]}`);
-      return match[1];
+      cachedUsername = match[1];
+      nextGenerationLog(`Username: ${cachedUsername}`);
+      return cachedUsername;
     }
   }
 
@@ -53,12 +57,10 @@ export const graphqlFetch = async <T>(
     const cached = await loadCache(cacheKey);
     if (cached) {
       ++cacheCounter.used;
-      nextGenerationLog(`Cache hit: ${operationName} (${cacheKey})`);
       return cached as T;
     }
   }
 
-  nextGenerationLog(`GraphQL request: ${operationName}`);
   const res = await fetch(GRAPHQL_ENDPOINT, {
     credentials: 'same-origin',
     method: 'POST',
@@ -86,4 +88,9 @@ export const graphqlFetch = async <T>(
 };
 
 export const getCacheStats = (): CacheCounter => ({ ...cacheCounter });
+
+/** @internal Resets the cached username – for testing only. */
+export const resetUsernameCache = (): void => {
+  cachedUsername = null;
+};
 

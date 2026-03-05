@@ -43,9 +43,6 @@ export const getPostsFromUser = async (): Promise<{
   let user: Record<string, unknown> | null = null;
 
   while (hasNextPage) {
-    nextGenerationLog(
-      `Fetching posts page (${allPosts.length} so far, cursor: ${after ? '...' : 'start'})`
-    );
     const data = await graphqlFetch<{
       user: {
         id: string;
@@ -79,9 +76,6 @@ export const getPostsFromUser = async (): Promise<{
 export const getPostsFromPublication = async (
   _publication: string
 ): Promise<PostSummary[]> => {
-  nextGenerationLog(
-    `Publication stats not yet supported via GraphQL, falling back to user posts`
-  );
   const { posts } = await getPostsFromUser();
   return posts;
 };
@@ -93,9 +87,6 @@ export const getPostStats = async (
 ): Promise<PostData[]> => {
   const username = extractUsername();
   const cacheKey = `timeseries:${username}:${begin}:${end}`;
-  nextGenerationLog(
-    `Fetching timeseries stats via GraphQL (${new Date(begin).toISOString()} – ${new Date(end).toISOString()})`
-  );
 
   try {
     const data = await graphqlFetch<{
@@ -133,9 +124,6 @@ export const getPostStats = async (
 };
 
 export const getActivities = async (): Promise<PostData[]> => {
-  nextGenerationLog(
-    'Skipping activities fetch (old REST API no longer available)'
-  );
   return [];
 };
 
@@ -143,7 +131,6 @@ export const getEarningsOfPost = async (
   post: PostSummary
 ): Promise<DailyEarning[]> => {
   try {
-    nextGenerationLog(`Fetching earnings for: "${post.title}" (${post.id})`);
     const res = await fetch(GRAPHQL_ENDPOINT, {
       credentials: 'same-origin',
       method: 'POST',
